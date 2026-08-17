@@ -243,7 +243,7 @@ export const ProblemBrowser: React.FC<ProblemBrowserProps> = ({
     if (!Array.isArray(problems)) return [];
     return problems.filter(p => {
       const pTags = Array.isArray(p.tags) ? p.tags : [];
-      const slug = p.slug.toLowerCase();
+      const slug = (p.slug || '').toLowerCase();
 
       // 1. Curated Track Filter
       if (activeTrack === 'blind75') {
@@ -251,7 +251,7 @@ export const ProblemBrowser: React.FC<ProblemBrowserProps> = ({
         if (!isBlind75) return false;
       } else if (activeTrack === 'neetcode150') {
         // NeetCode 150 includes all algorithmic curriculum questions (non-SQL)
-        const isSql = pTags.some(t => t.toLowerCase().includes('sql') || t.toLowerCase().includes('database'));
+        const isSql = pTags.some(t => t.toLowerCase().includes('sql') || t.toLowerCase().includes('database')) || slug.includes('sql');
         if (isSql) return false;
       } else if (activeTrack === 'faang') {
         // FAANG questions
@@ -291,7 +291,8 @@ export const ProblemBrowser: React.FC<ProblemBrowserProps> = ({
         </span>
       );
     }
-    if (p.interval_days !== null && p.interval_days !== undefined && p.interval_days > 0) {
+    // Only display active interval if user has actually reviewed or practiced this question
+    if (p.repetition_count && p.repetition_count > 0 && p.interval_days) {
       return (
         <span className="font-mono text-gray-300 text-xs">
           {p.interval_days}d
@@ -332,7 +333,7 @@ export const ProblemBrowser: React.FC<ProblemBrowserProps> = ({
     <div className="flex-1 flex flex-col h-full overflow-y-auto bg-[#0a0d12] p-3 sm:p-6 lg:p-8 space-y-6">
       
       {/* 1. Curated Tracks Filter Bar */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin">
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 shrink-0">
         {CURATED_TRACKS.map(track => {
           const Icon = track.icon;
           const isActive = activeTrack === track.id;
@@ -343,23 +344,23 @@ export const ProblemBrowser: React.FC<ProblemBrowserProps> = ({
                 setActiveTrack(track.id);
                 setSelectedCompany(null);
               }}
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 border ${
+              className={`h-9 px-4 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 border select-none ${
                 isActive
-                  ? 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-600/20'
+                  ? 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-600/25'
                   : 'bg-[#12161f] border-[#262d3d] text-gray-400 hover:text-gray-200 hover:border-gray-600'
               }`}
             >
               <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-white' : 'text-gray-400'}`} />
-              <span>{track.label}</span>
+              <span className="whitespace-nowrap">{track.label}</span>
             </button>
           );
         })}
       </div>
 
       {/* 2. Top Company Pills */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-thin">
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 shrink-0">
         <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider shrink-0 flex items-center gap-1 mr-1">
-          <Building2 className="w-3 h-3 text-amber-400" />
+          <Building2 className="w-3.5 h-3.5 text-amber-400" />
           <span>Companies:</span>
         </span>
         {POPULAR_COMPANIES.map(comp => {
@@ -371,13 +372,13 @@ export const ProblemBrowser: React.FC<ProblemBrowserProps> = ({
                 setSelectedCompany(isSelected ? null : comp);
                 if (!isSelected) setActiveTrack('all');
               }}
-              className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition border shrink-0 ${
+              className={`h-7 px-3 rounded-lg text-xs font-semibold transition-all border shrink-0 flex items-center select-none ${
                 isSelected
                   ? 'bg-amber-500/20 border-amber-500 text-amber-300 shadow-sm'
                   : 'bg-[#0a0d12] border-[#262d3d] text-gray-400 hover:text-gray-200 hover:border-gray-600'
               }`}
             >
-              {comp}
+              <span className="whitespace-nowrap">{comp}</span>
             </button>
           );
         })}
@@ -401,7 +402,7 @@ export const ProblemBrowser: React.FC<ProblemBrowserProps> = ({
               }
             }}
             placeholder="Search problems by title, keyword, data structure, or concept..."
-            className="w-full pl-10 pr-8 py-2 bg-[#0a0d12] border border-[#262d3d] focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-xl text-xs text-gray-100 placeholder-gray-500 outline-none transition"
+            className="w-full pl-10 pr-8 py-2.5 bg-[#0a0d12] border border-[#262d3d] focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-xl text-xs text-gray-100 placeholder-gray-500 outline-none transition"
           />
           {searchQuery && (
             <button
@@ -468,7 +469,7 @@ export const ProblemBrowser: React.FC<ProblemBrowserProps> = ({
           <select
             value={selectedDifficulty}
             onChange={(e) => setSelectedDifficulty(e.target.value)}
-            className="px-3 py-2 bg-[#0a0d12] border border-[#262d3d] rounded-xl text-xs text-gray-300 outline-none focus:border-blue-500 shrink-0 font-medium"
+            className="px-3 py-2.5 bg-[#0a0d12] border border-[#262d3d] rounded-xl text-xs text-gray-300 outline-none focus:border-blue-500 shrink-0 font-medium"
           >
             <option value="All">All Difficulties</option>
             <option value="Easy">Easy</option>
@@ -480,7 +481,7 @@ export const ProblemBrowser: React.FC<ProblemBrowserProps> = ({
           <select
             value={selectedTag}
             onChange={(e) => setSelectedTag(e.target.value)}
-            className="px-3 py-2 bg-[#0a0d12] border border-[#262d3d] rounded-xl text-xs text-gray-300 outline-none focus:border-blue-500 shrink-0 max-w-[140px] font-medium"
+            className="px-3 py-2.5 bg-[#0a0d12] border border-[#262d3d] rounded-xl text-xs text-gray-300 outline-none focus:border-blue-500 shrink-0 max-w-[140px] font-medium"
           >
             <option value="All">All Categories</option>
             {tags.map(t => (
@@ -494,7 +495,7 @@ export const ProblemBrowser: React.FC<ProblemBrowserProps> = ({
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="px-3 py-2 bg-[#0a0d12] border border-[#262d3d] rounded-xl text-xs text-gray-300 outline-none focus:border-blue-500 shrink-0 font-medium"
+            className="px-3 py-2.5 bg-[#0a0d12] border border-[#262d3d] rounded-xl text-xs text-gray-300 outline-none focus:border-blue-500 shrink-0 font-medium"
           >
             <option value="All">All Statuses</option>
             <option value="Solved">Solved</option>
