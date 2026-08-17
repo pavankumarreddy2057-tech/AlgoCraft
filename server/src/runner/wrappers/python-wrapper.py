@@ -3,7 +3,8 @@ import json
 import time
 import traceback
 import io
-from typing import List, Dict, Any, Optional
+import inspect
+from typing import List, Dict, Any, Optional, Tuple, Set, Union
 
 class ListNode:
     def __init__(self, val=0, next=None):
@@ -41,7 +42,7 @@ class TreeNode:
         self.right = right
 
 def list_to_tree(arr):
-    if not arr or not isinstance(arr, list) or arr[0] is None:
+    if not arr or not isinstance(arr, list) or len(arr) == 0 or arr[0] is None:
         return None
     root = TreeNode(arr[0])
     queue = [root]
@@ -111,7 +112,6 @@ def deep_compare(actual, expected):
     if isinstance(norm_a, list) and isinstance(norm_e, list):
         if len(norm_a) != len(norm_e):
             return False
-        # Try sorted comparison if elements are sortable
         try:
             sorted_a = sorted([sorted(x) if isinstance(x, list) else x for x in norm_a])
             sorted_e = sorted([sorted(x) if isinstance(x, list) else x for x in norm_e])
@@ -128,9 +128,9 @@ def deep_compare(actual, expected):
 
 def convert_arg_for_tree_or_list(param_name, arg_val):
     name_lower = param_name.lower()
-    if ('head' in name_lower or 'list' in name_lower) and isinstance(arg_val, list):
+    if ('head' in name_lower or name_lower.startswith('list') or name_lower.startswith('l1') or name_lower.startswith('l2') or 'linked' in name_lower) and isinstance(arg_val, list):
         return list_to_linked_list(arg_val)
-    if ('root' in name_lower or 'tree' in name_lower or param_name in ['p', 'q']) and isinstance(arg_val, list):
+    if ('root' in name_lower or name_lower == 'tree' or param_name in ['p', 'q']) and isinstance(arg_val, list):
         return list_to_tree(arg_val)
     return arg_val
 
@@ -157,8 +157,13 @@ def main():
         "Dict": Dict,
         "Any": Any,
         "Optional": Optional,
+        "Tuple": Tuple,
+        "Set": Set,
+        "Union": Union,
         "__builtins__": __builtins__
     }
+
+    initial_globals = set(user_globals.keys())
 
     try:
         exec(user_code, user_globals)
@@ -183,12 +188,18 @@ def main():
     elif entry_point and entry_point in user_globals and callable(user_globals[entry_point]):
         target_func = user_globals[entry_point]
     else:
+        # Prioritize new user-defined functions
         for name, val in user_globals.items():
-            if callable(val) and not name.startswith("_") and name not in [
-                "ListNode", "TreeNode", "list_to_linked_list", "linked_list_to_list", "list_to_tree", "tree_to_list"
-            ]:
-                target_func = val
-                break
+            if name not in initial_globals and callable(val) and not name.startswith("_"):
+                if inspect.isfunction(val):
+                    target_func = val
+                    break
+
+        if not target_func:
+            for name, val in user_globals.items():
+                if callable(val) and not name.startswith("_") and name not in initial_globals:
+                    target_func = val
+                    break
 
     if not target_func:
         print(json.dumps({
@@ -207,7 +218,6 @@ def main():
         args = []
         kwargs = {}
         if isinstance(raw_input, dict):
-            # Process trees & lists in kwargs
             for k, v in raw_input.items():
                 kwargs[k] = convert_arg_for_tree_or_list(k, v)
         elif isinstance(raw_input, list):

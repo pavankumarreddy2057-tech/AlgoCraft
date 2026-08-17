@@ -1,0 +1,115 @@
+{
+  "slug": "exchange-seats",
+  "title": "Exchange Seats",
+  "category": "sql",
+  "difficulty": "Medium",
+  "tags": [
+    "SQL",
+    "Database",
+    "SQL 50",
+    "Amazon"
+  ],
+  "statement_md": "Write a solution to swap the seat id of every two consecutive students. If the number of students is odd, the id of the last student is not swapped.\n\nReturn the result table ordered by `id` in **ascending order**.\n\nTable: `Seat` (`id INT PRIMARY KEY, student VARCHAR(255)`)",
+  "constraints": [
+    "id is an autoincrement column starting from 1."
+  ],
+  "examples": [
+    {
+      "input": {
+        "schema": "CREATE TABLE Seat (id INT PRIMARY KEY, student VARCHAR(255)); INSERT INTO Seat VALUES (1, \"Abbot\"), (2, \"Doris\"), (3, \"Emerson\"), (4, \"Green\"), (5, \"Jeames\");",
+        "query": "SELECT CASE WHEN id % 2 = 1 AND id = (SELECT COUNT(*) FROM Seat) THEN id WHEN id % 2 = 1 THEN id + 1 ELSE id - 1 END AS id, student FROM Seat ORDER BY id;"
+      },
+      "output": [
+        {
+          "id": 1,
+          "student": "Doris"
+        },
+        {
+          "id": 2,
+          "student": "Abbot"
+        },
+        {
+          "id": 3,
+          "student": "Green"
+        },
+        {
+          "id": 4,
+          "student": "Emerson"
+        },
+        {
+          "id": 5,
+          "student": "Jeames"
+        }
+      ]
+    }
+  ],
+  "starter_code": {
+    "sql": "-- Write your SQL query here\nSELECT \n  CASE \n    WHEN id % 2 = 1 AND id = (SELECT COUNT(*) FROM Seat) THEN id \n    WHEN id % 2 = 1 THEN id + 1 \n    ELSE id - 1 \n  END AS id, \n  student \nFROM Seat \nORDER BY id;\n"
+  },
+  "reference_solution": {
+    "sql": "SELECT \n  CASE \n    WHEN id % 2 = 1 AND id = (SELECT COUNT(*) FROM Seat) THEN id \n    WHEN id % 2 = 1 THEN id + 1 \n    ELSE id - 1 \n  END AS id, \n  student \nFROM Seat \nORDER BY id;"
+  },
+  "sample_test_cases": [
+    {
+      "input": {
+        "init_sql": "CREATE TABLE Seat (id INT PRIMARY KEY, student VARCHAR(255)); INSERT INTO Seat VALUES (1, \"Abbot\"), (2, \"Doris\"), (3, \"Emerson\"), (4, \"Green\"), (5, \"Jeames\");"
+      },
+      "expected_output": [
+        {
+          "id": 1,
+          "student": "Doris"
+        },
+        {
+          "id": 2,
+          "student": "Abbot"
+        },
+        {
+          "id": 3,
+          "student": "Green"
+        },
+        {
+          "id": 4,
+          "student": "Emerson"
+        },
+        {
+          "id": 5,
+          "student": "Jeames"
+        }
+      ]
+    }
+  ],
+  "test_cases": [
+    {
+      "input": {
+        "init_sql": "CREATE TABLE Seat (id INT PRIMARY KEY, student VARCHAR(255)); INSERT INTO Seat VALUES (1, \"Abbot\"), (2, \"Doris\"), (3, \"Emerson\"), (4, \"Green\"), (5, \"Jeames\");"
+      },
+      "expected_output": [
+        {
+          "id": 1,
+          "student": "Doris"
+        },
+        {
+          "id": 2,
+          "student": "Abbot"
+        },
+        {
+          "id": 3,
+          "student": "Green"
+        },
+        {
+          "id": 4,
+          "student": "Emerson"
+        },
+        {
+          "id": 5,
+          "student": "Jeames"
+        }
+      ]
+    }
+  ],
+  "hints": [
+    "Use a `CASE` statement on `id % 2`.",
+    "For odd `id`, change to `id + 1` (unless it is the max id). For even `id`, change to `id - 1`."
+  ],
+  "editorial_md": "Conditional ID manipulation using CASE."
+}

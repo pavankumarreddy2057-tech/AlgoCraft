@@ -1,0 +1,285 @@
+{
+  "slug": "spiral-matrix",
+  "title": "Spiral Matrix",
+  "category": "arrays-and-hashing",
+  "difficulty": "Medium",
+  "tags": [
+    "Matrix",
+    "Array",
+    "Simulation",
+    "Blind 75",
+    "NeetCode 150",
+    "Microsoft",
+    "Apple"
+  ],
+  "statement_md": "Given an `m x n` `matrix`, return *all elements of the* `matrix` *in spiral order*.",
+  "constraints": [
+    "m == matrix.length",
+    "n == matrix[i].length",
+    "1 <= m, n <= 10",
+    "-100 <= matrix[i][j] <= 100"
+  ],
+  "examples": [
+    {
+      "input": {
+        "matrix": [
+          [
+            1,
+            2,
+            3
+          ],
+          [
+            4,
+            5,
+            6
+          ],
+          [
+            7,
+            8,
+            9
+          ]
+        ]
+      },
+      "output": [
+        1,
+        2,
+        3,
+        6,
+        9,
+        8,
+        7,
+        4,
+        5
+      ]
+    },
+    {
+      "input": {
+        "matrix": [
+          [
+            1,
+            2,
+            3,
+            4
+          ],
+          [
+            5,
+            6,
+            7,
+            8
+          ],
+          [
+            9,
+            10,
+            11,
+            12
+          ]
+        ]
+      },
+      "output": [
+        1,
+        2,
+        3,
+        4,
+        8,
+        12,
+        11,
+        10,
+        9,
+        5,
+        6,
+        7
+      ]
+    }
+  ],
+  "starter_code": {
+    "python": "def spiralOrder(matrix: list[list[int]]) -> list[int]:\n    # Write your solution here\n    pass\n",
+    "javascript": "function spiralOrder(matrix) {\n  // Write your solution here\n}\n"
+  },
+  "reference_solution": {
+    "python": "def spiralOrder(matrix: list[list[int]]) -> list[int]:\n    res = []\n    if not matrix:\n        return res\n    top, bottom = 0, len(matrix) - 1\n    left, right = 0, len(matrix[0]) - 1\n    \n    while top <= bottom and left <= right:\n        # Traverse right\n        for col in range(left, right + 1):\n            res.append(matrix[top][col])\n        top += 1\n        \n        # Traverse down\n        for row in range(top, bottom + 1):\n            res.append(matrix[row][right])\n        right -= 1\n        \n        if top <= bottom:\n            # Traverse left\n            for col in range(right, left - 1, -1):\n                res.append(matrix[bottom][col])\n            bottom -= 1\n            \n        if left <= right:\n            # Traverse up\n            for row in range(bottom, top - 1, -1):\n                res.append(matrix[row][left])\n            left += 1\n            \n    return res\n",
+    "javascript": "function spiralOrder(matrix) {\n  const res = [];\n  if (!matrix || matrix.length === 0) return res;\n  let top = 0, bottom = matrix.length - 1;\n  let left = 0, right = matrix[0].length - 1;\n  \n  while (top <= bottom && left <= right) {\n    for (let c = left; c <= right; c++) res.push(matrix[top][c]);\n    top++;\n    for (let r = top; r <= bottom; r++) res.push(matrix[r][right]);\n    right--;\n    if (top <= bottom) {\n      for (let c = right; c >= left; c--) res.push(matrix[bottom][c]);\n      bottom--;\n    }\n    if (left <= right) {\n      for (let r = bottom; r >= top; r--) res.push(matrix[r][left]);\n      left++;\n    }\n  }\n  return res;\n}\n"
+  },
+  "sample_test_cases": [
+    {
+      "input": {
+        "matrix": [
+          [
+            1,
+            2,
+            3
+          ],
+          [
+            4,
+            5,
+            6
+          ],
+          [
+            7,
+            8,
+            9
+          ]
+        ]
+      },
+      "expected_output": [
+        1,
+        2,
+        3,
+        6,
+        9,
+        8,
+        7,
+        4,
+        5
+      ]
+    },
+    {
+      "input": {
+        "matrix": [
+          [
+            1,
+            2,
+            3,
+            4
+          ],
+          [
+            5,
+            6,
+            7,
+            8
+          ],
+          [
+            9,
+            10,
+            11,
+            12
+          ]
+        ]
+      },
+      "expected_output": [
+        1,
+        2,
+        3,
+        4,
+        8,
+        12,
+        11,
+        10,
+        9,
+        5,
+        6,
+        7
+      ]
+    }
+  ],
+  "test_cases": [
+    {
+      "input": {
+        "matrix": [
+          [
+            1,
+            2,
+            3
+          ],
+          [
+            4,
+            5,
+            6
+          ],
+          [
+            7,
+            8,
+            9
+          ]
+        ]
+      },
+      "expected_output": [
+        1,
+        2,
+        3,
+        6,
+        9,
+        8,
+        7,
+        4,
+        5
+      ]
+    },
+    {
+      "input": {
+        "matrix": [
+          [
+            1,
+            2,
+            3,
+            4
+          ],
+          [
+            5,
+            6,
+            7,
+            8
+          ],
+          [
+            9,
+            10,
+            11,
+            12
+          ]
+        ]
+      },
+      "expected_output": [
+        1,
+        2,
+        3,
+        4,
+        8,
+        12,
+        11,
+        10,
+        9,
+        5,
+        6,
+        7
+      ]
+    },
+    {
+      "input": {
+        "matrix": [
+          [
+            1
+          ]
+        ]
+      },
+      "expected_output": [
+        1
+      ],
+      "hidden": true
+    },
+    {
+      "input": {
+        "matrix": [
+          [
+            1,
+            2
+          ],
+          [
+            3,
+            4
+          ]
+        ]
+      },
+      "expected_output": [
+        1,
+        2,
+        4,
+        3
+      ],
+      "hidden": true
+    }
+  ],
+  "hints": [
+    "Maintain 4 boundary pointers: top, bottom, left, right.",
+    "Iterate along top boundary, then right boundary, bottom boundary, left boundary, contracting borders after each step."
+  ],
+  "editorial_md": "Boundary simulation with 4 pointers contracting inward."
+}

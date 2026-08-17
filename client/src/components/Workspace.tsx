@@ -11,7 +11,8 @@ import {
   Loader2,
   Bot,
   Layers,
-  Terminal
+  Terminal,
+  ChevronRight
 } from 'lucide-react';
 import { ProblemDetail, ExecutionResult, SubmissionHistoryItem } from '../types/index.js';
 import { 
@@ -27,6 +28,7 @@ import { HintsAndSolution } from './HintsAndSolution.js';
 import { ProblemNotesDrawer } from './ProblemNotesDrawer.js';
 import { AIMentorDrawer } from './AIMentorDrawer.js';
 import { BigOBenchmarkModal } from './BigOBenchmarkModal.js';
+import { SuccessModal } from './SuccessModal.js';
 
 interface WorkspaceProps {
   slug: string;
@@ -58,6 +60,7 @@ export const Workspace: React.FC<WorkspaceProps> = ({
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [executionResult, setExecutionResult] = useState<ExecutionResult | null>(null);
   const [history, setHistory] = useState<SubmissionHistoryItem[]>([]);
+  const [isSuccessOpen, setIsSuccessOpen] = useState<boolean>(false);
 
   // V2 Drawer & Modal States
   const [isNotesOpen, setIsNotesOpen] = useState<boolean>(false);
@@ -73,6 +76,7 @@ export const Workspace: React.FC<WorkspaceProps> = ({
       try {
         setLoading(true);
         setExecutionResult(null);
+        setIsSuccessOpen(false);
         const data = await fetchProblemDetail(slug);
         setProblemData(data.problem);
         setIsBookmarked(!!data.spaced_repetition?.flagged_review);
@@ -156,8 +160,12 @@ export const Workspace: React.FC<WorkspaceProps> = ({
       onRefreshStats();
       const updatedHist = await fetchSubmissionHistory(slug);
       setHistory(updatedHist);
-      // Auto-switch to results tab on mobile
-      setMobileTab('results');
+
+      if (res.execution.status === 'Accepted') {
+        setIsSuccessOpen(true);
+      } else {
+        setMobileTab('results');
+      }
     } catch (err: any) {
       setExecutionResult({
         success: false,
@@ -215,29 +223,29 @@ export const Workspace: React.FC<WorkspaceProps> = ({
   }
 
   return (
-    <div className="flex-1 flex flex-col h-[calc(100vh-3.5rem)] overflow-hidden bg-[#0d1117] relative">
+    <div className="flex-1 flex flex-col h-[calc(100vh-3.5rem)] overflow-hidden bg-[#0a0d12] relative">
       
       {/* Sub-header Bar */}
-      <div className="h-10 border-b border-[#30363d] bg-[#161b22] px-3 md:px-4 flex items-center justify-between select-none shrink-0">
+      <div className="h-10 border-b border-[#262d3d] bg-[#12161f] px-3 md:px-4 flex items-center justify-between select-none shrink-0">
         <div className="flex items-center gap-2 md:gap-3 min-w-0">
           <button
             onClick={onBack}
-            className="p-1 rounded-md text-gray-400 hover:text-white hover:bg-[#21262d] transition-colors flex items-center gap-1 text-xs font-semibold shrink-0"
+            className="p-1 rounded-md text-gray-400 hover:text-white hover:bg-[#1a202c] transition-colors flex items-center gap-1 text-xs font-semibold shrink-0"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Problem Bank</span>
+            <span className="hidden sm:inline">Problem Library</span>
           </button>
           <span className="text-gray-600 hidden sm:inline">|</span>
           <span className="text-xs font-bold text-white truncate max-w-[180px] sm:max-w-xs">
             {problemData.id}. {problemData.title}
           </span>
           <span
-            className={`text-[10px] font-semibold px-2 py-0.2 rounded shrink-0 ${
+            className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${
               problemData.difficulty === 'Easy'
-                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
                 : problemData.difficulty === 'Medium'
-                ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
+                : 'bg-rose-500/10 text-rose-400 border border-rose-500/30'
             }`}
           >
             {problemData.difficulty}
@@ -247,8 +255,8 @@ export const Workspace: React.FC<WorkspaceProps> = ({
         <div className="flex items-center gap-1.5 shrink-0">
           <button
             onClick={handleToggleBookmark}
-            className={`p-1.5 rounded-lg border border-[#30363d] ${
-              isBookmarked ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'text-gray-400 hover:text-white bg-[#21262d]'
+            className={`p-1.5 rounded-lg border border-[#262d3d] ${
+              isBookmarked ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'text-gray-400 hover:text-white bg-[#1a202c]'
             } transition-colors`}
             title="Bookmark Problem"
           >
@@ -258,11 +266,11 @@ export const Workspace: React.FC<WorkspaceProps> = ({
       </div>
 
       {/* Mobile Tab Switcher (< md screens) */}
-      <div className="md:hidden flex items-center justify-around h-10 border-b border-[#30363d] bg-[#161b22] px-1 select-none shrink-0">
+      <div className="md:hidden flex items-center justify-around h-10 border-b border-[#262d3d] bg-[#12161f] px-1 select-none shrink-0">
         <button
           onClick={() => setMobileTab('description')}
           className={`flex-1 py-1.5 text-xs font-semibold flex items-center justify-center gap-1 border-b-2 transition ${
-            mobileTab === 'description' ? 'border-emerald-400 text-emerald-400' : 'border-transparent text-gray-400'
+            mobileTab === 'description' ? 'border-emerald-400 text-emerald-400 font-bold' : 'border-transparent text-gray-400'
           }`}
         >
           <FileText className="w-3.5 h-3.5" />
@@ -271,7 +279,7 @@ export const Workspace: React.FC<WorkspaceProps> = ({
         <button
           onClick={() => setMobileTab('editor')}
           className={`flex-1 py-1.5 text-xs font-semibold flex items-center justify-center gap-1 border-b-2 transition ${
-            mobileTab === 'editor' ? 'border-blue-400 text-blue-400' : 'border-transparent text-gray-400'
+            mobileTab === 'editor' ? 'border-blue-400 text-blue-400 font-bold' : 'border-transparent text-gray-400'
           }`}
         >
           <Code2 className="w-3.5 h-3.5" />
@@ -280,7 +288,7 @@ export const Workspace: React.FC<WorkspaceProps> = ({
         <button
           onClick={() => setMobileTab('results')}
           className={`flex-1 py-1.5 text-xs font-semibold flex items-center justify-center gap-1 border-b-2 transition relative ${
-            mobileTab === 'results' ? 'border-purple-400 text-purple-400' : 'border-transparent text-gray-400'
+            mobileTab === 'results' ? 'border-purple-400 text-purple-400 font-bold' : 'border-transparent text-gray-400'
           }`}
         >
           <Terminal className="w-3.5 h-3.5" />
@@ -303,42 +311,42 @@ export const Workspace: React.FC<WorkspaceProps> = ({
       {/* ========================================================================= */}
       <div className="hidden md:flex flex-1 overflow-hidden">
         {/* Left Side: Description, Hints & Editorial, Submissions */}
-        <div className="w-1/2 flex flex-col border-r border-[#30363d] bg-[#0d1117] overflow-hidden">
-          <div className="h-10 border-b border-[#30363d] bg-[#161b22] px-3 flex items-center gap-1 select-none shrink-0">
+        <div className="w-1/2 flex flex-col border-r border-[#262d3d] bg-[#0a0d12] overflow-hidden">
+          <div className="h-10 border-b border-[#262d3d] bg-[#12161f] px-3 flex items-center gap-1 select-none shrink-0">
             <button
               onClick={() => setActiveLeftTab('description')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-md flex items-center gap-1.5 transition-colors ${
+              className={`px-3 py-1.5 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition-colors ${
                 activeLeftTab === 'description'
-                  ? 'bg-[#21262d] text-white border border-[#30363d]'
+                  ? 'bg-[#1a202c] text-white border border-[#262d3d]'
                   : 'text-gray-400 hover:text-gray-200'
               }`}
             >
               <FileText className="w-3.5 h-3.5 text-emerald-400" />
-              Description
+              <span>Description</span>
             </button>
 
             <button
               onClick={() => setActiveLeftTab('editorial')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-md flex items-center gap-1.5 transition-colors ${
+              className={`px-3 py-1.5 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition-colors ${
                 activeLeftTab === 'editorial'
-                  ? 'bg-[#21262d] text-white border border-[#30363d]'
+                  ? 'bg-[#1a202c] text-white border border-[#262d3d]'
                   : 'text-gray-400 hover:text-gray-200'
               }`}
             >
               <BookOpen className="w-3.5 h-3.5 text-sky-400" />
-              Hints & Editorial
+              <span>Hints & Solution</span>
             </button>
 
             <button
               onClick={() => setActiveLeftTab('submissions')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-md flex items-center gap-1.5 transition-colors ${
+              className={`px-3 py-1.5 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition-colors ${
                 activeLeftTab === 'submissions'
-                  ? 'bg-[#21262d] text-white border border-[#30363d]'
+                  ? 'bg-[#1a202c] text-white border border-[#262d3d]'
                   : 'text-gray-400 hover:text-gray-200'
               }`}
             >
               <History className="w-3.5 h-3.5 text-purple-400" />
-              Submissions ({history.length})
+              <span>Submissions ({history.length})</span>
             </button>
           </div>
 
@@ -360,7 +368,7 @@ export const Workspace: React.FC<WorkspaceProps> = ({
         </div>
 
         {/* Right Side: Monaco Code Editor + Resizable Test Runner */}
-        <div id="right-workspace-pane" className="w-1/2 flex flex-col bg-[#161b22] overflow-hidden relative">
+        <div id="right-workspace-pane" className="w-1/2 flex flex-col bg-[#0f141c] overflow-hidden relative">
           <div style={{ height: `${editorHeightPercent}%` }} className="w-full">
             <CodeEditor
               language={language}
@@ -381,7 +389,7 @@ export const Workspace: React.FC<WorkspaceProps> = ({
           {/* Resizable Divider Handle */}
           <div
             onMouseDown={handleMouseDown}
-            className="h-2 bg-[#0d1117] hover:bg-emerald-500/50 cursor-row-resize border-y border-[#30363d] flex items-center justify-center transition-colors z-20 shrink-0 select-none"
+            className="h-2 bg-[#0a0d12] hover:bg-emerald-500/50 cursor-row-resize border-y border-[#262d3d] flex items-center justify-center transition-colors z-20 shrink-0 select-none"
           >
             <div className="w-8 h-1 rounded-full bg-gray-600" />
           </div>
@@ -402,7 +410,7 @@ export const Workspace: React.FC<WorkspaceProps> = ({
       {/* ========================================================================= */}
       {/* 2. Mobile Single-Tab View (md:hidden) */}
       {/* ========================================================================= */}
-      <div className="md:hidden flex-1 flex flex-col overflow-hidden bg-[#0d1117]">
+      <div className="md:hidden flex-1 flex flex-col overflow-hidden bg-[#0a0d12]">
         {mobileTab === 'description' && (
           <div className="flex-1 overflow-y-auto p-4 space-y-5">
             <DescriptionContent problemData={problemData} />
@@ -412,12 +420,12 @@ export const Workspace: React.FC<WorkspaceProps> = ({
         {mobileTab === 'editor' && (
           <div className="flex-1 flex flex-col overflow-hidden">
             {/* Quick Touch Symbol Toolbar */}
-            <div className="h-8 bg-[#1c2128] border-b border-[#30363d] px-2 flex items-center gap-1.5 overflow-x-auto select-none shrink-0">
+            <div className="h-8 bg-[#18202c] border-b border-[#262d3d] px-2 flex items-center gap-1.5 overflow-x-auto select-none shrink-0">
               {['Tab', 'def ', 'return ', ':', '()', '[]', '{}', '""', "''", '==', '!=', '<=', '>='].map((sym) => (
                 <button
                   key={sym}
                   onClick={() => insertSymbol(sym === 'Tab' ? '    ' : sym)}
-                  className="px-2 py-0.5 bg-[#0d1117] hover:bg-[#21262d] text-gray-200 text-[11px] font-mono rounded border border-[#30363d] shrink-0"
+                  className="px-2 py-0.5 bg-[#0a0d12] hover:bg-[#262d3d] text-gray-200 text-[11px] font-mono rounded border border-[#262d3d] shrink-0"
                 >
                   {sym}
                 </button>
@@ -456,7 +464,15 @@ export const Workspace: React.FC<WorkspaceProps> = ({
         )}
       </div>
 
-      {/* V2 Drawers & Modals */}
+      {/* Celebratory Accepted Confetti Modal */}
+      <SuccessModal
+        isOpen={isSuccessOpen}
+        onClose={() => setIsSuccessOpen(false)}
+        problemTitle={`${problemData.id}. ${problemData.title}`}
+        execution={executionResult}
+      />
+
+      {/* Drawers & Modals */}
       <ProblemNotesDrawer
         slug={slug}
         isOpen={isNotesOpen}
@@ -494,18 +510,18 @@ function DescriptionContent({ problemData }: { problemData: ProblemDetail }) {
         </h1>
         <div className="flex flex-wrap items-center gap-2">
           <span
-            className={`text-xs font-bold px-2 py-0.5 rounded ${
+            className={`text-xs font-bold px-2.5 py-0.5 rounded-full ${
               problemData.difficulty === 'Easy'
-                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
                 : problemData.difficulty === 'Medium'
-                ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
+                : 'bg-rose-500/10 text-rose-400 border border-rose-500/30'
             }`}
           >
             {problemData.difficulty}
           </span>
           {problemData.tags.map(tag => (
-            <span key={tag} className="text-xs px-2 py-0.5 rounded bg-[#161b22] text-gray-300 border border-[#30363d]">
+            <span key={tag} className="text-xs px-2.5 py-0.5 rounded-lg bg-[#12161f] text-gray-300 border border-[#262d3d]">
               {tag}
             </span>
           ))}
@@ -521,7 +537,7 @@ function DescriptionContent({ problemData }: { problemData: ProblemDetail }) {
       <div className="space-y-4">
         <h3 className="text-sm font-bold text-white">Examples</h3>
         {problemData.examples.map((ex, idx) => (
-          <div key={idx} className="p-3.5 rounded-xl bg-[#161b22] border border-[#30363d] space-y-2 text-xs">
+          <div key={idx} className="p-4 rounded-xl bg-[#12161f] border border-[#262d3d] space-y-2 text-xs">
             <div className="font-semibold text-gray-300">Example {idx + 1}:</div>
             <div className="space-y-1 font-mono text-gray-300">
               <div>
@@ -545,7 +561,7 @@ function DescriptionContent({ problemData }: { problemData: ProblemDetail }) {
       {problemData.constraints && problemData.constraints.length > 0 && (
         <div className="space-y-2">
           <h3 className="text-sm font-bold text-white">Constraints</h3>
-          <ul className="list-disc list-inside text-xs text-gray-300 space-y-1 bg-[#161b22] p-3.5 rounded-xl border border-[#30363d] font-mono">
+          <ul className="list-disc list-inside text-xs text-gray-300 space-y-1 bg-[#12161f] p-4 rounded-xl border border-[#262d3d] font-mono">
             {problemData.constraints.map((c, idx) => (
               <li key={idx}>{c}</li>
             ))}
@@ -570,7 +586,7 @@ function SubmissionsContent({ history }: { history: SubmissionHistoryItem[] }) {
           {history.map((sub) => (
             <div
               key={sub.id}
-              className="p-3 rounded-xl bg-[#161b22] border border-[#30363d] flex items-center justify-between text-xs"
+              className="p-3.5 rounded-xl bg-[#12161f] border border-[#262d3d] flex items-center justify-between text-xs"
             >
               <div className="flex items-center gap-2.5">
                 {sub.status === 'Accepted' ? (

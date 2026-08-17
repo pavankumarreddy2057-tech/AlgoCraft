@@ -1,0 +1,234 @@
+{
+  "slug": "clone-graph",
+  "title": "Clone Graph",
+  "category": "graphs",
+  "difficulty": "Medium",
+  "tags": [
+    "Graphs",
+    "BFS",
+    "DFS",
+    "Hash Table",
+    "Blind 75",
+    "NeetCode 150",
+    "Meta",
+    "Amazon"
+  ],
+  "statement_md": "Given a reference of a node in a **connected** undirected graph represented as an adjacency list, return a **deep copy** (clone) of the graph.\n\nEach node in the graph contains a value (`val`) and a list (`neighbors`) of its neighbors.",
+  "constraints": [
+    "The number of nodes in the graph is in the range [0, 100].",
+    "1 <= Node.val <= 100",
+    "Node.val is unique for each node.",
+    "There are no repeated edges and no self-loops in the graph."
+  ],
+  "examples": [
+    {
+      "input": {
+        "adjList": [
+          [
+            2,
+            4
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            1,
+            3
+          ]
+        ]
+      },
+      "output": [
+        [
+          2,
+          4
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      "explanation": "4 nodes connected in a cycle."
+    },
+    {
+      "input": {
+        "adjList": [
+          []
+        ]
+      },
+      "output": [
+        []
+      ],
+      "explanation": "1 node with no neighbors."
+    },
+    {
+      "input": {
+        "adjList": []
+      },
+      "output": [],
+      "explanation": "Empty graph."
+    }
+  ],
+  "starter_code": {
+    "python": "def cloneGraph(adjList: list[list[int]]) -> list[list[int]]:\n    # Write your solution here\n    pass\n",
+    "javascript": "function cloneGraph(adjList) {\n  // Write your solution here\n}\n"
+  },
+  "reference_solution": {
+    "python": "def cloneGraph(adjList: list[list[int]]) -> list[list[int]]:\n    if not adjList:\n        return []\n    if adjList == [[]]:\n        return [[]]\n    \n    # Deep copy the adjacency list representation\n    return [list(neighbors) for neighbors in adjList]\n",
+    "javascript": "function cloneGraph(adjList) {\n  if (!adjList || adjList.length === 0) return [];\n  if (adjList.length === 1 && adjList[0].length === 0) return [[]];\n  return adjList.map(neighbors => [...neighbors]);\n}\n"
+  },
+  "sample_test_cases": [
+    {
+      "input": {
+        "adjList": [
+          [
+            2,
+            4
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            1,
+            3
+          ]
+        ]
+      },
+      "expected_output": [
+        [
+          2,
+          4
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          1,
+          3
+        ]
+      ]
+    },
+    {
+      "input": {
+        "adjList": [
+          []
+        ]
+      },
+      "expected_output": [
+        []
+      ]
+    },
+    {
+      "input": {
+        "adjList": []
+      },
+      "expected_output": []
+    }
+  ],
+  "test_cases": [
+    {
+      "input": {
+        "adjList": [
+          [
+            2,
+            4
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            1,
+            3
+          ]
+        ]
+      },
+      "expected_output": [
+        [
+          2,
+          4
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          1,
+          3
+        ]
+      ]
+    },
+    {
+      "input": {
+        "adjList": [
+          []
+        ]
+      },
+      "expected_output": [
+        []
+      ]
+    },
+    {
+      "input": {
+        "adjList": []
+      },
+      "expected_output": []
+    },
+    {
+      "input": {
+        "adjList": [
+          [
+            2
+          ],
+          [
+            1
+          ]
+        ]
+      },
+      "expected_output": [
+        [
+          2
+        ],
+        [
+          1
+        ]
+      ],
+      "hidden": true
+    }
+  ],
+  "hints": [
+    "Use a Hash Map to map original nodes to their cloned copies.",
+    "Perform BFS or DFS. When visiting a neighbor, create its clone if not already created, and link them."
+  ],
+  "editorial_md": "Graph traversal with a HashMap mapping old nodes to cloned nodes."
+}

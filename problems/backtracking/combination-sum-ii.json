@@ -1,0 +1,231 @@
+{
+  "slug": "combination-sum-ii",
+  "title": "Combination Sum II",
+  "category": "backtracking",
+  "difficulty": "Medium",
+  "tags": [
+    "Backtracking",
+    "Array",
+    "Blind 75",
+    "NeetCode 150",
+    "Amazon",
+    "Meta"
+  ],
+  "statement_md": "Given a collection of candidate numbers (`candidates`) and a target number (`target`), find all unique combinations in `candidates` where the candidate numbers sum to `target`.\n\nEach number in `candidates` may only be used **once** in the combination.\n\n**Note:** The solution set must not contain duplicate combinations.",
+  "constraints": [
+    "1 <= candidates.length <= 100",
+    "1 <= candidates[i] <= 50",
+    "1 <= target <= 30"
+  ],
+  "examples": [
+    {
+      "input": {
+        "candidates": [
+          10,
+          1,
+          2,
+          7,
+          6,
+          1,
+          5
+        ],
+        "target": 8
+      },
+      "output": [
+        [
+          1,
+          1,
+          6
+        ],
+        [
+          1,
+          2,
+          5
+        ],
+        [
+          1,
+          7
+        ],
+        [
+          2,
+          6
+        ]
+      ]
+    },
+    {
+      "input": {
+        "candidates": [
+          2,
+          5,
+          2,
+          1,
+          2
+        ],
+        "target": 5
+      },
+      "output": [
+        [
+          1,
+          2,
+          2
+        ],
+        [
+          5
+        ]
+      ]
+    }
+  ],
+  "starter_code": {
+    "python": "def combinationSum2(candidates: list[int], target: int) -> list[list[int]]:\n    # Write your solution here\n    pass\n",
+    "javascript": "function combinationSum2(candidates, target) {\n  // Write your solution here\n}\n"
+  },
+  "reference_solution": {
+    "python": "def combinationSum2(candidates: list[int], target: int) -> list[list[int]]:\n    candidates.sort()\n    res = []\n    def backtrack(start, curr_target, path):\n        if curr_target == 0:\n            res.append(list(path))\n            return\n        if curr_target < 0:\n            return\n        for i in range(start, len(candidates)):\n            if i > start and candidates[i] == candidates[i - 1]:\n                continue\n            if candidates[i] > curr_target:\n                break\n            path.append(candidates[i])\n            backtrack(i + 1, curr_target - candidates[i], path)\n            path.pop()\n    backtrack(0, target, [])\n    return res\n",
+    "javascript": "function combinationSum2(candidates, target) {\n  candidates.sort((a, b) => a - b);\n  const res = [];\n  function backtrack(start, currTarget, path) {\n    if (currTarget === 0) {\n      res.push([...path]);\n      return;\n    }\n    if (currTarget < 0) return;\n    for (let i = start; i < candidates.length; i++) {\n      if (i > start && candidates[i] === candidates[i - 1]) continue;\n      if (candidates[i] > currTarget) break;\n      path.push(candidates[i]);\n      backtrack(i + 1, currTarget - candidates[i], path);\n      path.pop();\n    }\n  }\n  backtrack(0, target, []);\n  return res;\n}\n"
+  },
+  "sample_test_cases": [
+    {
+      "input": {
+        "candidates": [
+          10,
+          1,
+          2,
+          7,
+          6,
+          1,
+          5
+        ],
+        "target": 8
+      },
+      "expected_output": [
+        [
+          1,
+          1,
+          6
+        ],
+        [
+          1,
+          2,
+          5
+        ],
+        [
+          1,
+          7
+        ],
+        [
+          2,
+          6
+        ]
+      ]
+    },
+    {
+      "input": {
+        "candidates": [
+          2,
+          5,
+          2,
+          1,
+          2
+        ],
+        "target": 5
+      },
+      "expected_output": [
+        [
+          1,
+          2,
+          2
+        ],
+        [
+          5
+        ]
+      ]
+    }
+  ],
+  "test_cases": [
+    {
+      "input": {
+        "candidates": [
+          10,
+          1,
+          2,
+          7,
+          6,
+          1,
+          5
+        ],
+        "target": 8
+      },
+      "expected_output": [
+        [
+          1,
+          1,
+          6
+        ],
+        [
+          1,
+          2,
+          5
+        ],
+        [
+          1,
+          7
+        ],
+        [
+          2,
+          6
+        ]
+      ]
+    },
+    {
+      "input": {
+        "candidates": [
+          2,
+          5,
+          2,
+          1,
+          2
+        ],
+        "target": 5
+      },
+      "expected_output": [
+        [
+          1,
+          2,
+          2
+        ],
+        [
+          5
+        ]
+      ]
+    },
+    {
+      "input": {
+        "candidates": [
+          1
+        ],
+        "target": 1
+      },
+      "expected_output": [
+        [
+          1
+        ]
+      ],
+      "hidden": true
+    },
+    {
+      "input": {
+        "candidates": [
+          1
+        ],
+        "target": 2
+      },
+      "expected_output": [],
+      "hidden": true
+    }
+  ],
+  "hints": [
+    "Sort candidates first to easily skip duplicates at the same recursive depth (`i > start and candidates[i] == candidates[i-1]`).",
+    "Pass `i + 1` into the next recursive call since each element can only be used once."
+  ],
+  "editorial_md": "Sort candidates and skip duplicate consecutive elements during backtracking."
+}

@@ -110,7 +110,7 @@ export async function runSQLCode(options: SQLRunOptions): Promise<SQLExecutionRe
 
     try {
       // 1. Execute schema DDL & seed data
-      const ddl = tc.schema_ddl || (typeof tc.input === 'string' ? tc.input : '');
+      const ddl = tc.schema_ddl || (typeof tc.input === 'string' ? tc.input : tc.input?.init_sql || tc.input?.schema || '');
       if (ddl) {
         db.exec(ddl);
       }

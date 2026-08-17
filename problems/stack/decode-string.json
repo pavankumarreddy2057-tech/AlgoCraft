@@ -1,0 +1,102 @@
+{
+  "slug": "decode-string",
+  "title": "Decode String",
+  "category": "stack",
+  "difficulty": "Medium",
+  "tags": [
+    "Stack",
+    "String",
+    "Recursion",
+    "Google",
+    "Bloomberg",
+    "Cisco"
+  ],
+  "statement_md": "Given an encoded string, return its decoded string.\n\nThe encoding rule is: `k[encoded_string]`, where the `encoded_string` inside the square brackets is being repeated exactly `k` times. Note that `k` is guaranteed to be a positive integer.",
+  "constraints": [
+    "1 <= s.length <= 30",
+    "s consists of lowercase English letters, digits, and square brackets '[]'.",
+    "s is guaranteed to be a valid input.",
+    "All the integers in s are in the range [1, 300]."
+  ],
+  "examples": [
+    {
+      "input": {
+        "s": "3[a]2[bc]"
+      },
+      "output": "aaabcbc"
+    },
+    {
+      "input": {
+        "s": "3[a2[c]]"
+      },
+      "output": "accaccacc"
+    },
+    {
+      "input": {
+        "s": "2[abc]3[cd]ef"
+      },
+      "output": "abcabccdcdcdef"
+    }
+  ],
+  "starter_code": {
+    "python": "def decodeString(s: str) -> str:\n    # Write your solution here\n    pass\n",
+    "javascript": "function decodeString(s) {\n  // Write your solution here\n}\n"
+  },
+  "reference_solution": {
+    "python": "def decodeString(s: str) -> str:\n    stack = []\n    curr_str = \"\"\n    curr_num = 0\n    for ch in s:\n        if ch.isdigit():\n            curr_num = curr_num * 10 + int(ch)\n        elif ch == '[':\n            stack.append((curr_str, curr_num))\n            curr_str = \"\"\n            curr_num = 0\n        elif ch == ']':\n            prev_str, num = stack.pop()\n            curr_str = prev_str + curr_str * num\n        else:\n            curr_str += ch\n    return curr_str\n",
+    "javascript": "function decodeString(s) {\n  const stack = [];\n  let currStr = '';\n  let currNum = 0;\n  for (const ch of s) {\n    if (ch >= '0' && ch <= '9') {\n      currNum = currNum * 10 + Number(ch);\n    } else if (ch === '[') {\n      stack.push([currStr, currNum]);\n      currStr = '';\n      currNum = 0;\n    } else if (ch === ']') {\n      const [prevStr, num] = stack.pop();\n      currStr = prevStr + currStr.repeat(num);\n    } else {\n      currStr += ch;\n    }\n  }\n  return currStr;\n}\n"
+  },
+  "sample_test_cases": [
+    {
+      "input": {
+        "s": "3[a]2[bc]"
+      },
+      "expected_output": "aaabcbc"
+    },
+    {
+      "input": {
+        "s": "3[a2[c]]"
+      },
+      "expected_output": "accaccacc"
+    },
+    {
+      "input": {
+        "s": "2[abc]3[cd]ef"
+      },
+      "expected_output": "abcabccdcdcdef"
+    }
+  ],
+  "test_cases": [
+    {
+      "input": {
+        "s": "3[a]2[bc]"
+      },
+      "expected_output": "aaabcbc"
+    },
+    {
+      "input": {
+        "s": "3[a2[c]]"
+      },
+      "expected_output": "accaccacc"
+    },
+    {
+      "input": {
+        "s": "2[abc]3[cd]ef"
+      },
+      "expected_output": "abcabccdcdcdef"
+    },
+    {
+      "input": {
+        "s": "abc"
+      },
+      "expected_output": "abc",
+      "hidden": true
+    }
+  ],
+  "hints": [
+    "Use a stack storing `(previous_string, multiplier)`.",
+    "When encountering `[`, push current state and reset.",
+    "When encountering `]`, pop and concatenate `prev_str + curr_str * num`."
+  ],
+  "editorial_md": "Stack-based bracket expansion with nested multipliers."
+}

@@ -137,10 +137,10 @@ function deepCompare(actual, expected) {
 
 function convertArgForTreeOrList(key, val) {
   const k = (key || '').toLowerCase();
-  if ((k.includes('head') || k.includes('list')) && Array.isArray(val)) {
+  if ((k.includes('head') || k.startsWith('list') || k.startsWith('l1') || k.startsWith('l2') || k.includes('linked')) && Array.isArray(val)) {
     return listToLinkedList(val);
   }
-  if ((k.includes('root') || k.includes('tree') || key === 'p' || key === 'q') && Array.isArray(val)) {
+  if ((k.includes('root') || k === 'tree' || k === 'p' || k === 'q') && Array.isArray(val)) {
     return listToTree(val);
   }
   return val;

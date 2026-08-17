@@ -1,0 +1,120 @@
+{
+  "slug": "regular-expression-matching",
+  "title": "Regular Expression Matching",
+  "category": "dynamic-programming",
+  "difficulty": "Hard",
+  "tags": [
+    "Dynamic Programming",
+    "Recursion",
+    "String",
+    "Google",
+    "Meta",
+    "Apple"
+  ],
+  "statement_md": "Given an input string `s` and a pattern `p`, implement regular expression matching with support for `'.'` and `'*'` where:\n- `'.'` Matches any single character.\n- `'*'` Matches zero or more of the preceding element.\n\nThe matching should cover the **entire** input string (not partial).",
+  "constraints": [
+    "1 <= s.length <= 20",
+    "1 <= p.length <= 20",
+    "s contains only lowercase English letters.",
+    "p contains only lowercase English letters, '.', and '*'.",
+    "It is guaranteed for each appearance of the character '*', there will be a previous valid character to match."
+  ],
+  "examples": [
+    {
+      "input": {
+        "s": "aa",
+        "p": "a"
+      },
+      "output": false
+    },
+    {
+      "input": {
+        "s": "aa",
+        "p": "a*"
+      },
+      "output": true
+    },
+    {
+      "input": {
+        "s": "ab",
+        "p": ".*"
+      },
+      "output": true
+    }
+  ],
+  "starter_code": {
+    "python": "def isMatch(s: str, p: str) -> bool:\n    # Write your solution here\n    pass\n",
+    "javascript": "function isMatch(s, p) {\n  // Write your solution here\n}\n"
+  },
+  "reference_solution": {
+    "python": "def isMatch(s: str, p: str) -> bool:\n    memo = {}\n    \n    def dfs(i, j):\n        if (i, j) in memo:\n            return memo[(i, j)]\n        if i >= len(s) and j >= len(p):\n            return True\n        if j >= len(p):\n            return False\n            \n        match = i < len(s) and (s[i] == p[j] or p[j] == '.')\n        \n        if (j + 1) < len(p) and p[j + 1] == '*':\n            memo[(i, j)] = dfs(i, j + 2) or (match and dfs(i + 1, j))\n            return memo[(i, j)]\n            \n        if match:\n            memo[(i, j)] = dfs(i + 1, j + 1)\n            return memo[(i, j)]\n            \n        memo[(i, j)] = False\n        return False\n        \n    return dfs(0, 0)\n",
+    "javascript": "function isMatch(s, p) {\n  const memo = new Map();\n  function dfs(i, j) {\n    const key = `${i},${j}`;\n    if (memo.has(key)) return memo.get(key);\n    if (i >= s.length && j >= p.length) return true;\n    if (j >= p.length) return false;\n    \n    const match = i < s.length && (s[i] === p[j] || p[j] === '.');\n    let res = false;\n    if (j + 1 < p.length && p[j + 1] === '*') {\n      res = dfs(i, j + 2) || (match && dfs(i + 1, j));\n    } else if (match) {\n      res = dfs(i + 1, j + 1);\n    }\n    memo.set(key, res);\n    return res;\n  }\n  return dfs(0, 0);\n}\n"
+  },
+  "sample_test_cases": [
+    {
+      "input": {
+        "s": "aa",
+        "p": "a"
+      },
+      "expected_output": false
+    },
+    {
+      "input": {
+        "s": "aa",
+        "p": "a*"
+      },
+      "expected_output": true
+    },
+    {
+      "input": {
+        "s": "ab",
+        "p": ".*"
+      },
+      "expected_output": true
+    }
+  ],
+  "test_cases": [
+    {
+      "input": {
+        "s": "aa",
+        "p": "a"
+      },
+      "expected_output": false
+    },
+    {
+      "input": {
+        "s": "aa",
+        "p": "a*"
+      },
+      "expected_output": true
+    },
+    {
+      "input": {
+        "s": "ab",
+        "p": ".*"
+      },
+      "expected_output": true
+    },
+    {
+      "input": {
+        "s": "aab",
+        "p": "c*a*b"
+      },
+      "expected_output": true,
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "mississippi",
+        "p": "mis*is*p*."
+      },
+      "expected_output": false,
+      "hidden": true
+    }
+  ],
+  "hints": [
+    "Top-down memoization on `(i, j)` where `i` indexes `s` and `j` indexes `p`.",
+    "Handle `*` either by skipping `j + 2` or consuming one matching character `i + 1`."
+  ],
+  "editorial_md": "Top-down Dynamic Programming covering `*` repeat and skip transitions."
+}

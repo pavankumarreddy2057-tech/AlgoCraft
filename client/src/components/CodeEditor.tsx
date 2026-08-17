@@ -6,14 +6,14 @@ import {
   RotateCcw, 
   Timer, 
   Pause, 
-  Code2, 
-  Type, 
   Loader2,
   Check,
   Bot,
   FileText,
   Activity,
-  Terminal
+  Copy,
+  Sparkles,
+  AlignLeft
 } from 'lucide-react';
 
 interface CodeEditorProps {
@@ -48,7 +48,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
   const [fontSize, setFontSize] = useState<number>(14);
   const [timerSeconds, setTimerSeconds] = useState<number>(0);
   const [timerRunning, setTimerRunning] = useState<boolean>(true);
-  const [vimMode, setVimMode] = useState<boolean>(false);
+  const [isCopied, setIsCopied] = useState<boolean>(false);
   const editorRef = useRef<any>(null);
 
   // Timer interval
@@ -68,6 +68,22 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
+  const handleCopyCode = async () => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 1800);
+    } catch (e) {
+      console.error('Failed to copy code:', e);
+    }
+  };
+
+  const handleFormatCode = () => {
+    if (editorRef.current) {
+      editorRef.current.getAction('editor.action.formatDocument')?.run();
+    }
+  };
+
   const handleEditorDidMount = (editor: any, monaco: any) => {
     editorRef.current = editor;
 
@@ -76,21 +92,21 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
       base: 'vs-dark',
       inherit: true,
       rules: [
-        { token: 'comment', foreground: '7d8799', fontStyle: 'italic' },
-        { token: 'keyword', foreground: 'ff7b72', fontStyle: 'bold' },
-        { token: 'identifier', foreground: 'd2a8ff' },
-        { token: 'string', foreground: 'a5d6ff' },
-        { token: 'number', foreground: '79c0ff' }
+        { token: 'comment', foreground: '64748b', fontStyle: 'italic' },
+        { token: 'keyword', foreground: 'f43f5e', fontStyle: 'bold' },
+        { token: 'identifier', foreground: 'c084fc' },
+        { token: 'string', foreground: '60a5fa' },
+        { token: 'number', foreground: '38bdf8' }
       ],
       colors: {
-        'editor.background': '#161b22',
-        'editor.foreground': '#e6edf3',
-        'editor.lineHighlightBackground': '#21262d55',
-        'editorCursor.foreground': '#2ea043',
-        'editorLineNumber.foreground': '#484f58',
-        'editorLineNumber.activeForeground': '#e6edf3',
-        'editor.selectionBackground': '#1f6feb44',
-        'editor.inactiveSelectionBackground': '#1f6feb22'
+        'editor.background': '#0f141c',
+        'editor.foreground': '#f1f5f9',
+        'editor.lineHighlightBackground': '#18202c',
+        'editorCursor.foreground': '#10b981',
+        'editorLineNumber.foreground': '#475569',
+        'editorLineNumber.activeForeground': '#f8fafc',
+        'editor.selectionBackground': '#3b82f633',
+        'editor.inactiveSelectionBackground': '#3b82f61a'
       }
     });
     monaco.editor.setTheme('algocraft-dark');
@@ -105,16 +121,17 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
   };
 
   return (
-    <div className="h-full flex flex-col bg-[#161b22] select-none">
+    <div className="h-full flex flex-col bg-[#0f141c] select-none">
+      
       {/* Top Toolbar */}
-      <div className="h-10 border-b border-[#30363d] px-3 flex items-center justify-between bg-[#161b22] text-xs">
+      <div className="h-10 border-b border-[#262d3d] px-3 flex items-center justify-between bg-[#12161f] text-xs">
         {/* Left: Language selector & tools */}
         <div className="flex items-center gap-2">
           <div className="relative">
             <select
               value={language}
               onChange={(e) => onChangeLanguage(e.target.value as any)}
-              className="bg-[#21262d] border border-[#30363d] text-gray-200 rounded-md px-2 py-1 pr-6 text-xs font-semibold focus:outline-none focus:border-emerald-500 cursor-pointer appearance-none"
+              className="bg-[#1a202c] border border-[#262d3d] text-gray-200 rounded-lg px-2.5 py-1 pr-6 text-xs font-semibold focus:outline-none focus:border-blue-500 cursor-pointer appearance-none"
             >
               <option value="python">Python 3</option>
               <option value="javascript">JavaScript (Node.js)</option>
@@ -129,11 +146,11 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
           {onOpenMentor && (
             <button
               onClick={onOpenMentor}
-              className="px-2 py-1 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border border-purple-500/30 rounded-md flex items-center gap-1 font-semibold transition-colors"
+              className="px-2.5 py-1 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border border-purple-500/30 rounded-lg flex items-center gap-1.5 font-semibold transition-colors"
               title="Open Socratic AI Mentor"
             >
               <Bot className="w-3.5 h-3.5" />
-              AI Mentor
+              <span>AI Mentor</span>
             </button>
           )}
 
@@ -141,11 +158,11 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
           {onOpenNotes && (
             <button
               onClick={onOpenNotes}
-              className="px-2 py-1 bg-[#21262d] hover:bg-[#30363d] text-gray-300 border border-[#30363d] rounded-md flex items-center gap-1 font-semibold transition-colors"
+              className="px-2.5 py-1 bg-[#1a202c] hover:bg-[#262d3d] text-gray-300 border border-[#262d3d] rounded-lg flex items-center gap-1.5 font-semibold transition-colors"
               title="Open Problem Notes"
             >
               <FileText className="w-3.5 h-3.5 text-emerald-400" />
-              Notes
+              <span>Notes</span>
             </button>
           )}
 
@@ -153,19 +170,19 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
           {onOpenBenchmark && (
             <button
               onClick={onOpenBenchmark}
-              className="px-2 py-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-md flex items-center gap-1 font-semibold transition-colors"
+              className="px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-lg flex items-center gap-1.5 font-semibold transition-colors"
               title="Empirical Big-O Benchmarker"
             >
               <Activity className="w-3.5 h-3.5" />
-              Big-O
+              <span>Big-O</span>
             </button>
           )}
         </div>
 
-        {/* Right: Stopwatch, Font Sizing, Reset */}
-        <div className="flex items-center gap-3">
+        {/* Right: Stopwatch, Copy, Format, Font Sizing, Reset */}
+        <div className="flex items-center gap-2.5">
           {/* Stopwatch */}
-          <div className="flex items-center gap-1.5 font-mono text-gray-300 bg-[#21262d] px-2 py-0.5 rounded border border-[#30363d]">
+          <div className="flex items-center gap-1.5 font-mono text-gray-300 bg-[#1a202c] px-2.5 py-0.5 rounded-lg border border-[#262d3d]">
             <Timer className="w-3.5 h-3.5 text-emerald-400" />
             <span>{formatTimer(timerSeconds)}</span>
             <button
@@ -177,19 +194,37 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
             </button>
           </div>
 
+          {/* Copy Code */}
+          <button
+            onClick={handleCopyCode}
+            className="p-1 text-gray-400 hover:text-white hover:bg-[#1a202c] rounded-md transition"
+            title="Copy code to clipboard"
+          >
+            {isCopied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+          </button>
+
+          {/* Format Code */}
+          <button
+            onClick={handleFormatCode}
+            className="p-1 text-gray-400 hover:text-white hover:bg-[#1a202c] rounded-md transition"
+            title="Format Code"
+          >
+            <AlignLeft className="w-3.5 h-3.5" />
+          </button>
+
           {/* Font size control */}
-          <div className="flex items-center gap-1 text-gray-400">
+          <div className="flex items-center gap-1 text-gray-400 bg-[#1a202c] px-1.5 py-0.5 rounded-lg border border-[#262d3d]">
             <button
               onClick={() => setFontSize(s => Math.max(11, s - 1))}
-              className="p-1 hover:text-white rounded"
+              className="px-1 hover:text-white rounded"
               title="Decrease Font Size"
             >
               A-
             </button>
-            <span className="text-[11px] font-mono text-gray-300">{fontSize}px</span>
+            <span className="text-[10px] font-mono text-gray-300">{fontSize}px</span>
             <button
               onClick={() => setFontSize(s => Math.min(22, s + 1))}
-              className="p-1 hover:text-white rounded"
+              className="px-1 hover:text-white rounded"
               title="Increase Font Size"
             >
               A+
@@ -199,8 +234,8 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
           {/* Reset Code */}
           <button
             onClick={onResetCode}
-            className="p-1 text-gray-400 hover:text-rose-400 transition-colors"
-            title="Reset code to original template"
+            className="p-1 text-gray-400 hover:text-rose-400 hover:bg-[#1a202c] rounded-md transition-colors"
+            title="Reset code template"
           >
             <RotateCcw className="w-3.5 h-3.5" />
           </button>
@@ -234,37 +269,37 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
       </div>
 
       {/* Bottom Action Footer Bar */}
-      <div className="h-11 border-t border-[#30363d] px-3 bg-[#161b22] flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-2 text-[11px] text-gray-500 font-mono">
-          <span>Run: <kbd className="px-1 py-0.5 bg-[#21262d] rounded border border-[#30363d] text-gray-300">Ctrl+Enter</kbd></span>
-          <span>Submit: <kbd className="px-1 py-0.5 bg-[#21262d] rounded border border-[#30363d] text-gray-300">Ctrl+Shift+Enter</kbd></span>
+      <div className="h-11 border-t border-[#262d3d] px-3 bg-[#12161f] flex items-center justify-between shrink-0">
+        <div className="hidden sm:flex items-center gap-2 text-[11px] text-gray-500 font-mono">
+          <span>Run: <kbd className="px-1.5 py-0.5 bg-[#1a202c] rounded border border-[#262d3d] text-gray-300">Ctrl+Enter</kbd></span>
+          <span>Submit: <kbd className="px-1.5 py-0.5 bg-[#1a202c] rounded border border-[#262d3d] text-gray-300">Ctrl+Shift+Enter</kbd></span>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 ml-auto sm:ml-0">
           <button
             onClick={onRun}
             disabled={isRunning || isSubmitting}
-            className="px-3.5 py-1.5 bg-[#21262d] hover:bg-[#30363d] disabled:opacity-50 text-gray-200 border border-[#30363d] rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors shadow-sm"
+            className="px-3.5 py-1.5 bg-[#1a202c] hover:bg-[#262d3d] disabled:opacity-50 text-gray-200 border border-[#262d3d] rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors shadow-sm active:scale-95"
           >
             {isRunning ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-400" />
             ) : (
               <Play className="w-3.5 h-3.5 text-emerald-400 fill-emerald-400" />
             )}
-            Run Code
+            <span>Run Code</span>
           </button>
 
           <button
             onClick={onSubmit}
             disabled={isRunning || isSubmitting}
-            className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors shadow-md"
+            className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors shadow-md shadow-emerald-600/20 active:scale-95"
           >
             {isSubmitting ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
             ) : (
               <Send className="w-3.5 h-3.5" />
             )}
-            Submit
+            <span>Submit Solution</span>
           </button>
         </div>
       </div>

@@ -1,0 +1,110 @@
+{
+  "slug": "interleaving-string",
+  "title": "Interleaving String",
+  "category": "dynamic-programming",
+  "difficulty": "Medium",
+  "tags": [
+    "Dynamic Programming",
+    "String",
+    "Blind 75",
+    "NeetCode 150",
+    "Google",
+    "Amazon"
+  ],
+  "statement_md": "Given strings `s1`, `s2`, and `s3`, find whether `s3` is formed by an **interleaving** of `s1` and `s2`.\n\nAn interleaving of two strings `s` and `t` is a configuration where `s` and `t` are divided into `n` and `m` substrings respectively, such that `s = s1 + s2 + ... + sn` and `t = t1 + t2 + ... + tm` and the concatenation matches `s3`.",
+  "constraints": [
+    "0 <= s1.length, s2.length <= 100",
+    "0 <= s3.length <= 200",
+    "s1, s2, and s3 consist of lowercase English letters."
+  ],
+  "examples": [
+    {
+      "input": {
+        "s1": "aabcc",
+        "s2": "dbbca",
+        "s3": "aadbbcbcac"
+      },
+      "output": true
+    },
+    {
+      "input": {
+        "s1": "aabcc",
+        "s2": "dbbca",
+        "s3": "aadbbbaccc"
+      },
+      "output": false
+    },
+    {
+      "input": {
+        "s1": "",
+        "s2": "",
+        "s3": ""
+      },
+      "output": true
+    }
+  ],
+  "starter_code": {
+    "python": "def isInterleave(s1: str, s2: str, s3: str) -> bool:\n    # Write your solution here\n    pass\n",
+    "javascript": "function isInterleave(s1, s2, s3) {\n  // Write your solution here\n}\n"
+  },
+  "reference_solution": {
+    "python": "def isInterleave(s1: str, s2: str, s3: str) -> bool:\n    if len(s1) + len(s2) != len(s3):\n        return False\n    memo = {}\n    def dfs(i, j):\n        if i == len(s1) and j == len(s2):\n            return True\n        if (i, j) in memo:\n            return memo[(i, j)]\n        k = i + j\n        ans = False\n        if i < len(s1) and s1[i] == s3[k]:\n            ans = ans or dfs(i + 1, j)\n        if j < len(s2) and s2[j] == s3[k]:\n            ans = ans or dfs(i, j + 1)\n        memo[(i, j)] = ans\n        return ans\n    return dfs(0, 0)\n",
+    "javascript": "function isInterleave(s1, s2, s3) {\n  if (s1.length + s2.length !== s3.length) return false;\n  const memo = new Map();\n  function dfs(i, j) {\n    if (i === s1.length && j === s2.length) return true;\n    const key = `${i},${j}`;\n    if (memo.has(key)) return memo.get(key);\n    const k = i + j;\n    let ans = false;\n    if (i < s1.length && s1[i] === s3[k]) ans = ans || dfs(i + 1, j);\n    if (j < s2.length && s2[j] === s3[k]) ans = ans || dfs(i, j + 1);\n    memo.set(key, ans);\n    return ans;\n  }\n  return dfs(0, 0);\n}\n"
+  },
+  "sample_test_cases": [
+    {
+      "input": {
+        "s1": "aabcc",
+        "s2": "dbbca",
+        "s3": "aadbbcbcac"
+      },
+      "expected_output": true
+    },
+    {
+      "input": {
+        "s1": "aabcc",
+        "s2": "dbbca",
+        "s3": "aadbbbaccc"
+      },
+      "expected_output": false
+    },
+    {
+      "input": {
+        "s1": "",
+        "s2": "",
+        "s3": ""
+      },
+      "expected_output": true
+    }
+  ],
+  "test_cases": [
+    {
+      "input": {
+        "s1": "aabcc",
+        "s2": "dbbca",
+        "s3": "aadbbcbcac"
+      },
+      "expected_output": true
+    },
+    {
+      "input": {
+        "s1": "aabcc",
+        "s2": "dbbca",
+        "s3": "aadbbbaccc"
+      },
+      "expected_output": false
+    },
+    {
+      "input": {
+        "s1": "",
+        "s2": "",
+        "s3": ""
+      },
+      "expected_output": true
+    }
+  ],
+  "hints": [
+    "2D DP state: `dp[i][j]` represents whether `s3[0...i+j]` is formed by `s1[0...i]` and `s2[0...j]`."
+  ],
+  "editorial_md": "2D Dynamic programming on string indices."
+}

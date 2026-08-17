@@ -1,0 +1,138 @@
+{
+  "slug": "n-queens",
+  "title": "N-Queens",
+  "category": "backtracking",
+  "difficulty": "Hard",
+  "tags": [
+    "Backtracking",
+    "Recursion",
+    "Blind 75",
+    "NeetCode 150",
+    "Google",
+    "Meta"
+  ],
+  "statement_md": "The **n-queens** puzzle is the problem of placing `n` queens on an `n x n` chessboard such that no two queens attack each other.\n\nGiven an integer `n`, return *all distinct solutions to the **n-queens puzzle***. You may return the answer in **any order**.\n\nEach solution contains a distinct board configuration of the n-queens' placement, where `'Q'` and `'.'` both indicate a queen and an empty space, respectively.",
+  "constraints": [
+    "1 <= n <= 9"
+  ],
+  "examples": [
+    {
+      "input": {
+        "n": 4
+      },
+      "output": [
+        [
+          ".Q..",
+          "...Q",
+          "Q...",
+          "..Q."
+        ],
+        [
+          "..Q.",
+          "Q...",
+          "...Q",
+          ".Q.."
+        ]
+      ]
+    },
+    {
+      "input": {
+        "n": 1
+      },
+      "output": [
+        [
+          "Q"
+        ]
+      ]
+    }
+  ],
+  "starter_code": {
+    "python": "def solveNQueens(n: int) -> list[list[str]]:\n    # Write your solution here\n    pass\n",
+    "javascript": "function solveNQueens(n) {\n  // Write your solution here\n}\n"
+  },
+  "reference_solution": {
+    "python": "def solveNQueens(n: int) -> list[list[str]]:\n    col_set = set()\n    pos_diag = set() # (r + c)\n    neg_diag = set() # (r - c)\n    res = []\n    board = [[\".\"] * n for _ in range(n)]\n    \n    def backtrack(r):\n        if r == n:\n            res.append([\"\".join(row) for row in board])\n            return\n        for c in range(n):\n            if c in col_set or (r + c) in pos_diag or (r - c) in neg_diag:\n                continue\n            col_set.add(c)\n            pos_diag.add(r + c)\n            neg_diag.add(r - c)\n            board[r][c] = \"Q\"\n            \n            backtrack(r + 1)\n            \n            col_set.remove(c)\n            pos_diag.remove(r + c)\n            neg_diag.remove(r - c)\n            board[r][c] = \".\"\n            \n    backtrack(0)\n    return res\n",
+    "javascript": "function solveNQueens(n) {\n  const colSet = new Set();\n  const posDiag = new Set(); // r + c\n  const negDiag = new Set(); // r - c\n  const res = [];\n  const board = Array.from({ length: n }, () => Array(n).fill('.'));\n  \n  function backtrack(r) {\n    if (r === n) {\n      res.push(board.map(row => row.join('')));\n      return;\n    }\n    for (let c = 0; c < n; c++) {\n      if (colSet.has(c) || posDiag.has(r + c) || negDiag.has(r - c)) continue;\n      colSet.add(c);\n      posDiag.add(r + c);\n      negDiag.add(r - c);\n      board[r][c] = 'Q';\n      \n      backtrack(r + 1);\n      \n      colSet.delete(c);\n      posDiag.delete(r + c);\n      negDiag.delete(r - c);\n      board[r][c] = '.';\n    }\n  }\n  backtrack(0);\n  return res;\n}\n"
+  },
+  "sample_test_cases": [
+    {
+      "input": {
+        "n": 4
+      },
+      "expected_output": [
+        [
+          ".Q..",
+          "...Q",
+          "Q...",
+          "..Q."
+        ],
+        [
+          "..Q.",
+          "Q...",
+          "...Q",
+          ".Q.."
+        ]
+      ]
+    },
+    {
+      "input": {
+        "n": 1
+      },
+      "expected_output": [
+        [
+          "Q"
+        ]
+      ]
+    }
+  ],
+  "test_cases": [
+    {
+      "input": {
+        "n": 4
+      },
+      "expected_output": [
+        [
+          ".Q..",
+          "...Q",
+          "Q...",
+          "..Q."
+        ],
+        [
+          "..Q.",
+          "Q...",
+          "...Q",
+          ".Q.."
+        ]
+      ]
+    },
+    {
+      "input": {
+        "n": 1
+      },
+      "expected_output": [
+        [
+          "Q"
+        ]
+      ]
+    },
+    {
+      "input": {
+        "n": 2
+      },
+      "expected_output": [],
+      "hidden": true
+    },
+    {
+      "input": {
+        "n": 3
+      },
+      "expected_output": [],
+      "hidden": true
+    }
+  ],
+  "hints": [
+    "Place one queen per row.",
+    "Use 3 sets: columns, positive diagonals `(r + c)`, and negative diagonals `(r - c)`."
+  ],
+  "editorial_md": "Row-by-row backtracking with diagonal sets."
+}

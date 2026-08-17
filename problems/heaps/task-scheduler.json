@@ -1,0 +1,179 @@
+{
+  "slug": "task-scheduler",
+  "title": "Task Scheduler",
+  "category": "heaps",
+  "difficulty": "Medium",
+  "tags": [
+    "Heaps",
+    "Greedy",
+    "Hash Table",
+    "Counting",
+    "Blind 75",
+    "NeetCode 150",
+    "Meta",
+    "Uber"
+  ],
+  "statement_md": "You are given an array of CPU `tasks`, each represented by letters A to Z, and a cooldown period `n`. Each cycle or interval allows the completion of one task. Tasks can be completed in any order, but there's a constraint: **identical** tasks must be separated by at least `n` intervals due to cooling time.\n\nReturn the *minimum number of intervals* required to complete all tasks.",
+  "constraints": [
+    "1 <= tasks.length <= 10^4",
+    "tasks[i] is an uppercase English letter.",
+    "0 <= n <= 100"
+  ],
+  "examples": [
+    {
+      "input": {
+        "tasks": [
+          "A",
+          "A",
+          "A",
+          "B",
+          "B",
+          "B"
+        ],
+        "n": 2
+      },
+      "output": 8,
+      "explanation": "A -> B -> idle -> A -> B -> idle -> A -> B"
+    },
+    {
+      "input": {
+        "tasks": [
+          "A",
+          "C",
+          "A",
+          "B",
+          "D",
+          "B"
+        ],
+        "n": 1
+      },
+      "output": 6,
+      "explanation": "A -> B -> C -> D -> A -> B"
+    },
+    {
+      "input": {
+        "tasks": [
+          "A",
+          "A",
+          "A",
+          "B",
+          "B",
+          "B"
+        ],
+        "n": 3
+      },
+      "output": 10
+    }
+  ],
+  "starter_code": {
+    "python": "def leastInterval(tasks: list[str], n: int) -> int:\n    # Write your solution here\n    pass\n",
+    "javascript": "function leastInterval(tasks, n) {\n  // Write your solution here\n}\n"
+  },
+  "reference_solution": {
+    "python": "from collections import Counter\n\ndef leastInterval(tasks: list[str], n: int) -> int:\n    counts = Counter(tasks)\n    max_count = max(counts.values())\n    max_count_tasks = sum(1 for count in counts.values() if count == max_count)\n    \n    empty_slots = (max_count - 1) * (n + 1) + max_count_tasks\n    return max(len(tasks), empty_slots)\n",
+    "javascript": "function leastInterval(tasks, n) {\n  const map = {};\n  for (const t of tasks) map[t] = (map[t] || 0) + 1;\n  const values = Object.values(map);\n  const maxCount = Math.max(...values);\n  const maxCountTasks = values.filter(v => v === maxCount).length;\n  \n  const minIntervals = (maxCount - 1) * (n + 1) + maxCountTasks;\n  return Math.max(tasks.length, minIntervals);\n}\n"
+  },
+  "sample_test_cases": [
+    {
+      "input": {
+        "tasks": [
+          "A",
+          "A",
+          "A",
+          "B",
+          "B",
+          "B"
+        ],
+        "n": 2
+      },
+      "expected_output": 8
+    },
+    {
+      "input": {
+        "tasks": [
+          "A",
+          "C",
+          "A",
+          "B",
+          "D",
+          "B"
+        ],
+        "n": 1
+      },
+      "expected_output": 6
+    },
+    {
+      "input": {
+        "tasks": [
+          "A",
+          "A",
+          "A",
+          "B",
+          "B",
+          "B"
+        ],
+        "n": 3
+      },
+      "expected_output": 10
+    }
+  ],
+  "test_cases": [
+    {
+      "input": {
+        "tasks": [
+          "A",
+          "A",
+          "A",
+          "B",
+          "B",
+          "B"
+        ],
+        "n": 2
+      },
+      "expected_output": 8
+    },
+    {
+      "input": {
+        "tasks": [
+          "A",
+          "C",
+          "A",
+          "B",
+          "D",
+          "B"
+        ],
+        "n": 1
+      },
+      "expected_output": 6
+    },
+    {
+      "input": {
+        "tasks": [
+          "A",
+          "A",
+          "A",
+          "B",
+          "B",
+          "B"
+        ],
+        "n": 3
+      },
+      "expected_output": 10
+    },
+    {
+      "input": {
+        "tasks": [
+          "A"
+        ],
+        "n": 2
+      },
+      "expected_output": 1,
+      "hidden": true
+    }
+  ],
+  "hints": [
+    "The most frequent task dictates the minimum number of chunks `(max_freq - 1) * (n + 1)`.",
+    "Add the count of tasks that share the maximum frequency."
+  ],
+  "editorial_md": "Greedy slot arrangement based on the highest frequency task."
+}

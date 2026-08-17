@@ -1,0 +1,108 @@
+{
+  "slug": "basic-calculator-ii",
+  "title": "Basic Calculator II",
+  "category": "stack",
+  "difficulty": "Medium",
+  "tags": [
+    "Stack",
+    "Math",
+    "String",
+    "Meta",
+    "Amazon",
+    "Microsoft"
+  ],
+  "statement_md": "Given a string `s` which represents an expression, *evaluate this expression and return its value*.\n\nThe integer division should truncate toward zero.\n\nYou may assume that the given expression is always valid. All intermediate results will be in the range of `[-2^31, 2^31 - 1]`.",
+  "constraints": [
+    "1 <= s.length <= 3 * 10^5",
+    "s consists of integers and operators ('+', '-', '*', '/') separated by some number of spaces.",
+    "s represents a valid expression.",
+    "All the integers in the expression are non-negative integers in the range [0, 2^31 - 1]."
+  ],
+  "examples": [
+    {
+      "input": {
+        "s": "3+2*2"
+      },
+      "output": 7
+    },
+    {
+      "input": {
+        "s": " 3/2 "
+      },
+      "output": 1
+    },
+    {
+      "input": {
+        "s": " 3+5 / 2 "
+      },
+      "output": 5
+    }
+  ],
+  "starter_code": {
+    "python": "def calculate(s: str) -> int:\n    # Write your solution here\n    pass\n",
+    "javascript": "function calculate(s) {\n  // Write your solution here\n}\n"
+  },
+  "reference_solution": {
+    "python": "def calculate(s: str) -> int:\n    stack = []\n    curr_num = 0\n    op = '+'\n    for i, ch in enumerate(s):\n        if ch.isdigit():\n            curr_num = curr_num * 10 + int(ch)\n        if ch in \"+-*/\" or i == len(s) - 1:\n            if ch == ' ' and i == len(s) - 1:\n                pass\n            if op == '+':\n                stack.append(curr_num)\n            elif op == '-':\n                stack.append(-curr_num)\n            elif op == '*':\n                stack.append(stack.pop() * curr_num)\n            elif op == '/':\n                top = stack.pop()\n                stack.append(int(top / curr_num)) # truncate towards 0\n            op = ch\n            curr_num = 0\n    return sum(stack)\n",
+    "javascript": "function calculate(s) {\n  const stack = [];\n  let currNum = 0;\n  let op = '+';\n  for (let i = 0; i < s.length; i++) {\n    const ch = s[i];\n    if (ch >= '0' && ch <= '9') {\n      currNum = currNum * 10 + Number(ch);\n    }\n    if ((ch === '+' || ch === '-' || ch === '*' || ch === '/') || i === s.length - 1) {\n      if (op === '+') {\n        stack.push(currNum);\n      } else if (op === '-') {\n        stack.push(-currNum);\n      } else if (op === '*') {\n        stack.push(stack.pop() * currNum);\n      } else if (op === '/') {\n        const top = stack.pop();\n        stack.push(Math.trunc(top / currNum));\n      }\n      op = ch;\n      currNum = 0;\n    }\n  }\n  return stack.reduce((acc, val) => acc + val, 0);\n}\n"
+  },
+  "sample_test_cases": [
+    {
+      "input": {
+        "s": "3+2*2"
+      },
+      "expected_output": 7
+    },
+    {
+      "input": {
+        "s": " 3/2 "
+      },
+      "expected_output": 1
+    },
+    {
+      "input": {
+        "s": " 3+5 / 2 "
+      },
+      "expected_output": 5
+    }
+  ],
+  "test_cases": [
+    {
+      "input": {
+        "s": "3+2*2"
+      },
+      "expected_output": 7
+    },
+    {
+      "input": {
+        "s": " 3/2 "
+      },
+      "expected_output": 1
+    },
+    {
+      "input": {
+        "s": " 3+5 / 2 "
+      },
+      "expected_output": 5
+    },
+    {
+      "input": {
+        "s": "42"
+      },
+      "expected_output": 42,
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "1-1+1"
+      },
+      "expected_output": 1,
+      "hidden": true
+    }
+  ],
+  "hints": [
+    "Maintain previous operator `op`. When an operator or end of string is encountered, push number onto stack according to `op`.",
+    "`*` and `/` resolve immediately with `stack.pop()`. At the end, sum the stack."
+  ],
+  "editorial_md": "Single pass using a stack to handle operator precedence."
+}

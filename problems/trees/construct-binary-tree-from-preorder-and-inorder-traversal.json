@@ -1,0 +1,136 @@
+{
+  "slug": "construct-binary-tree-from-preorder-and-inorder-traversal",
+  "title": "Construct Binary Tree from Preorder and Inorder Traversal",
+  "category": "trees",
+  "difficulty": "Medium",
+  "tags": [
+    "Trees",
+    "Binary Tree",
+    "Divide and Conquer",
+    "Blind 75",
+    "NeetCode 150",
+    "Amazon",
+    "Microsoft"
+  ],
+  "statement_md": "Given two integer arrays `preorder` and `inorder` where `preorder` is the preorder traversal of a binary tree and `inorder` is the inorder traversal of the same tree, construct and return the *binary tree* in level-order list format.",
+  "constraints": [
+    "1 <= preorder.length <= 3000",
+    "inorder.length == preorder.length",
+    "-3000 <= preorder[i], inorder[i] <= 3000",
+    "preorder and inorder consist of unique values."
+  ],
+  "examples": [
+    {
+      "input": {
+        "preorder": [
+          3,
+          9,
+          20,
+          15,
+          7
+        ],
+        "inorder": [
+          9,
+          3,
+          15,
+          20,
+          7
+        ]
+      },
+      "output": [
+        3,
+        9,
+        20,
+        null,
+        null,
+        15,
+        7
+      ]
+    }
+  ],
+  "starter_code": {
+    "python": "def buildTree(preorder: list[int], inorder: list[int]) -> list:\n    # Write your solution here\n    pass\n",
+    "javascript": "function buildTree(preorder, inorder) {\n  // Write your solution here\n}\n"
+  },
+  "reference_solution": {
+    "python": "def buildTree(preorder: list[int], inorder: list[int]) -> list:\n    if not preorder or not inorder:\n        return []\n    root_val = preorder[0]\n    mid = inorder.index(root_val)\n    # Serialize level order\n    def build(pre, inord):\n        if not pre or not inord:\n            return None\n        r = TreeNode(pre[0])\n        m = inord.index(pre[0])\n        r.left = build(pre[1:m+1], inord[:m])\n        r.right = build(pre[m+1:], inord[m+1:])\n        return r\n    root_node = build(preorder, inorder)\n    return tree_to_list(root_node)\n",
+    "javascript": "function buildTree(preorder, inorder) {\n  if (!preorder || !inorder || preorder.length === 0) return [];\n  function build(pre, inord) {\n    if (!pre.length || !inord.length) return null;\n    const r = new TreeNode(pre[0]);\n    const m = inord.indexOf(pre[0]);\n    r.left = build(pre.slice(1, m + 1), inord.slice(0, m));\n    r.right = build(pre.slice(m + 1), inord.slice(m + 1));\n    return r;\n  }\n  const root = build(preorder, inorder);\n  return treeToList(root);\n}\n"
+  },
+  "sample_test_cases": [
+    {
+      "input": {
+        "preorder": [
+          3,
+          9,
+          20,
+          15,
+          7
+        ],
+        "inorder": [
+          9,
+          3,
+          15,
+          20,
+          7
+        ]
+      },
+      "expected_output": [
+        3,
+        9,
+        20,
+        null,
+        null,
+        15,
+        7
+      ]
+    }
+  ],
+  "test_cases": [
+    {
+      "input": {
+        "preorder": [
+          3,
+          9,
+          20,
+          15,
+          7
+        ],
+        "inorder": [
+          9,
+          3,
+          15,
+          20,
+          7
+        ]
+      },
+      "expected_output": [
+        3,
+        9,
+        20,
+        null,
+        null,
+        15,
+        7
+      ]
+    },
+    {
+      "input": {
+        "preorder": [
+          -1
+        ],
+        "inorder": [
+          -1
+        ]
+      },
+      "expected_output": [
+        -1
+      ],
+      "hidden": true
+    }
+  ],
+  "hints": [
+    "First element of preorder is always root.",
+    "Find root in inorder to split into left and right subtrees."
+  ],
+  "editorial_md": "Recursive divide and conquer on root index split in inorder traversal."
+}

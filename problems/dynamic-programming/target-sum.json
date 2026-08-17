@@ -1,0 +1,119 @@
+{
+  "slug": "target-sum",
+  "title": "Target Sum",
+  "category": "dynamic-programming",
+  "difficulty": "Medium",
+  "tags": [
+    "Dynamic Programming",
+    "Backtracking",
+    "Knapsack",
+    "Blind 75",
+    "NeetCode 150",
+    "Meta",
+    "Amazon"
+  ],
+  "statement_md": "You are given an integer array `nums` and an integer `target`.\n\nYou want to build an expression out of nums by adding one of the symbols `'+'` and `'-'` before each integer in nums and then concatenate all the integers.\n\nReturn the number of different **expressions** that you can build, which evaluates to `target`.",
+  "constraints": [
+    "1 <= nums.length <= 20",
+    "0 <= nums[i] <= 1000",
+    "0 <= sum(nums[i]) <= 1000",
+    "-1000 <= target <= 1000"
+  ],
+  "examples": [
+    {
+      "input": {
+        "nums": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "target": 3
+      },
+      "output": 5,
+      "explanation": "-1+1+1+1+1=3, +1-1+1+1+1=3, +1+1-1+1+1=3, +1+1+1-1+1=3, +1+1+1+1-1=3"
+    },
+    {
+      "input": {
+        "nums": [
+          1
+        ],
+        "target": 1
+      },
+      "output": 1
+    }
+  ],
+  "starter_code": {
+    "python": "def findTargetSumWays(nums: list[int], target: int) -> int:\n    # Write your solution here\n    pass\n",
+    "javascript": "function findTargetSumWays(nums, target) {\n  // Write your solution here\n}\n"
+  },
+  "reference_solution": {
+    "python": "def findTargetSumWays(nums: list[int], target: int) -> int:\n    memo = {}\n    def backtrack(i, total):\n        if i == len(nums):\n            return 1 if total == target else 0\n        if (i, total) in memo:\n            return memo[(i, total)]\n        memo[(i, total)] = backtrack(i + 1, total + nums[i]) + backtrack(i + 1, total - nums[i])\n        return memo[(i, total)]\n    return backtrack(0, 0)\n",
+    "javascript": "function findTargetSumWays(nums, target) {\n  const memo = new Map();\n  function backtrack(i, total) {\n    if (i === nums.length) return total === target ? 1 : 0;\n    const key = `${i},${total}`;\n    if (memo.has(key)) return memo.get(key);\n    const ways = backtrack(i + 1, total + nums[i]) + backtrack(i + 1, total - nums[i]);\n    memo.set(key, ways);\n    return ways;\n  }\n  return backtrack(0, 0);\n}\n"
+  },
+  "sample_test_cases": [
+    {
+      "input": {
+        "nums": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "target": 3
+      },
+      "expected_output": 5
+    },
+    {
+      "input": {
+        "nums": [
+          1
+        ],
+        "target": 1
+      },
+      "expected_output": 1
+    }
+  ],
+  "test_cases": [
+    {
+      "input": {
+        "nums": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "target": 3
+      },
+      "expected_output": 5
+    },
+    {
+      "input": {
+        "nums": [
+          1
+        ],
+        "target": 1
+      },
+      "expected_output": 1
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          0
+        ],
+        "target": 1
+      },
+      "expected_output": 2,
+      "hidden": true
+    }
+  ],
+  "hints": [
+    "Formulate as subset sum: `P - N = target` and `P + N = sum` -> `2P = target + sum`.",
+    "Or use memoized DFS on `(index, current_sum)`."
+  ],
+  "editorial_md": "0/1 Knapsack reduction or memoized DFS."
+}

@@ -1,0 +1,283 @@
+{
+  "slug": "lru-cache",
+  "title": "LRU Cache",
+  "category": "arrays-and-hashing",
+  "difficulty": "Medium",
+  "tags": [
+    "Design",
+    "Hash Table",
+    "Linked List",
+    "Doubly-Linked List",
+    "Blind 75",
+    "NeetCode 150",
+    "Google",
+    "Amazon"
+  ],
+  "statement_md": "Design a data structure that follows the constraints of a **Least Recently Used (LRU) cache**.\n\nImplement the `LRUCache` class:\n- `LRUCache(int capacity)` Initialize the LRU cache with positive size `capacity`.\n- `int get(int key)` Return the value of the `key` if the key exists, otherwise return `-1`.\n- `void put(int key, int value)` Update the value of the `key` if the `key` exists. Otherwise, add the `key-value` pair to the cache. If the number of keys exceeds the `capacity` from this operation, **evict** the least recently used key.\n\nThe functions `get` and `put` must each run in `O(1)` average time complexity.",
+  "constraints": [
+    "1 <= capacity <= 3000",
+    "0 <= key <= 10^4",
+    "0 <= value <= 10^5",
+    "At most 2 * 10^5 calls will be made to get and put."
+  ],
+  "examples": [
+    {
+      "input": {
+        "operations": [
+          "LRUCache",
+          "put",
+          "put",
+          "get",
+          "put",
+          "get",
+          "put",
+          "get",
+          "get",
+          "get"
+        ],
+        "values": [
+          [
+            2
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            1
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            2
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            1
+          ],
+          [
+            3
+          ],
+          [
+            4
+          ]
+        ]
+      },
+      "output": [
+        null,
+        null,
+        null,
+        1,
+        null,
+        -1,
+        null,
+        -1,
+        3,
+        4
+      ]
+    }
+  ],
+  "starter_code": {
+    "python": "class LRUCache:\n    def __init__(self, capacity: int):\n        pass\n\n    def get(self, key: int) -> int:\n        pass\n\n    def put(self, key: int, value: int) -> None:\n        pass\n\ndef solve(operations: list[str], values: list[list[int]]) -> list:\n    # Test runner adapter\n    pass\n",
+    "javascript": "class LRUCache {\n  constructor(capacity) {}\n  get(key) {}\n  put(key, value) {}\n}\n\nfunction solve(operations, values) {\n  // Test runner adapter\n}\n"
+  },
+  "reference_solution": {
+    "python": "class Node:\n    def __init__(self, key, val):\n        self.key = key\n        self.val = val\n        self.prev = None\n        self.next = None\n\nclass LRUCache:\n    def __init__(self, capacity: int):\n        self.cap = capacity\n        self.cache = {}\n        self.left = Node(0, 0)\n        self.right = Node(0, 0)\n        self.left.next = self.right\n        self.right.prev = self.left\n\n    def remove(self, node):\n        prev, nxt = node.prev, node.next\n        prev.next = nxt\n        nxt.prev = prev\n\n    def insert(self, node):\n        prev, nxt = self.right.prev, self.right\n        prev.next = node\n        nxt.prev = node\n        node.prev = prev\n        node.next = nxt\n\n    def get(self, key: int) -> int:\n        if key in self.cache:\n            self.remove(self.cache[key])\n            self.insert(self.cache[key])\n            return self.cache[key].val\n        return -1\n\n    def put(self, key: int, value: int) -> None:\n        if key in self.cache:\n            self.remove(self.cache[key])\n        self.cache[key] = Node(key, value)\n        self.insert(self.cache[key])\n\n        if len(self.cache) > self.cap:\n            lru = self.left.next\n            self.remove(lru)\n            del self.cache[lru.key]\n\ndef solve(operations: list[str], values: list[list[int]]) -> list:\n    res = []\n    cache = None\n    for op, val in zip(operations, values):\n        if op == \"LRUCache\":\n            cache = LRUCache(val[0])\n            res.append(None)\n        elif op == \"put\":\n            cache.put(val[0], val[1])\n            res.append(None)\n        elif op == \"get\":\n            res.append(cache.get(val[0]))\n    return res\n",
+    "javascript": "class Node {\n  constructor(key, val) {\n    this.key = key;\n    this.val = val;\n    this.prev = null;\n    this.next = null;\n  }\n}\n\nclass LRUCache {\n  constructor(capacity) {\n    this.cap = capacity;\n    this.cache = new Map();\n    this.left = new Node(0, 0);\n    this.right = new Node(0, 0);\n    this.left.next = this.right;\n    this.right.prev = this.left;\n  }\n\n  remove(node) {\n    const prev = node.prev;\n    const next = node.next;\n    prev.next = next;\n    next.prev = prev;\n  }\n\n  insert(node) {\n    const prev = this.right.prev;\n    const next = this.right;\n    prev.next = node;\n    next.prev = node;\n    node.prev = prev;\n    node.next = next;\n  }\n\n  get(key) {\n    if (this.cache.has(key)) {\n      const node = this.cache.get(key);\n      this.remove(node);\n      this.insert(node);\n      return node.val;\n    }\n    return -1;\n  }\n\n  put(key, value) {\n    if (this.cache.has(key)) {\n      this.remove(this.cache.get(key));\n    }\n    const node = new Node(key, value);\n    this.cache.set(key, node);\n    this.insert(node);\n\n    if (this.cache.size > this.cap) {\n      const lru = this.left.next;\n      this.remove(lru);\n      this.cache.delete(lru.key);\n    }\n  }\n}\n\nfunction solve(operations, values) {\n  const res = [];\n  let cache = null;\n  for (let i = 0; i < operations.length; i++) {\n    const op = operations[i];\n    const val = values[i];\n    if (op === \"LRUCache\") {\n      cache = new LRUCache(val[0]);\n      res.push(null);\n    } else if (op === \"put\") {\n      cache.put(val[0], val[1]);\n      res.push(null);\n    } else if (op === \"get\") {\n      res.push(cache.get(val[0]));\n    }\n  }\n  return res;\n}\n"
+  },
+  "sample_test_cases": [
+    {
+      "input": {
+        "operations": [
+          "LRUCache",
+          "put",
+          "put",
+          "get",
+          "put",
+          "get",
+          "put",
+          "get",
+          "get",
+          "get"
+        ],
+        "values": [
+          [
+            2
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            1
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            2
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            1
+          ],
+          [
+            3
+          ],
+          [
+            4
+          ]
+        ]
+      },
+      "expected_output": [
+        null,
+        null,
+        null,
+        1,
+        null,
+        -1,
+        null,
+        -1,
+        3,
+        4
+      ]
+    }
+  ],
+  "test_cases": [
+    {
+      "input": {
+        "operations": [
+          "LRUCache",
+          "put",
+          "put",
+          "get",
+          "put",
+          "get",
+          "put",
+          "get",
+          "get",
+          "get"
+        ],
+        "values": [
+          [
+            2
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            1
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            2
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            1
+          ],
+          [
+            3
+          ],
+          [
+            4
+          ]
+        ]
+      },
+      "expected_output": [
+        null,
+        null,
+        null,
+        1,
+        null,
+        -1,
+        null,
+        -1,
+        3,
+        4
+      ]
+    },
+    {
+      "input": {
+        "operations": [
+          "LRUCache",
+          "put",
+          "get"
+        ],
+        "values": [
+          [
+            1
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            2
+          ]
+        ]
+      },
+      "expected_output": [
+        null,
+        null,
+        1
+      ],
+      "hidden": true
+    },
+    {
+      "input": {
+        "operations": [
+          "LRUCache",
+          "get"
+        ],
+        "values": [
+          [
+            1
+          ],
+          [
+            1
+          ]
+        ]
+      },
+      "expected_output": [
+        null,
+        -1
+      ],
+      "hidden": true
+    }
+  ],
+  "hints": [
+    "Combine a Hash Map with a Doubly Linked List.",
+    "The Hash Map provides O(1) key lookups.",
+    "The Doubly Linked List maintains access order and allows O(1) removal and insertion."
+  ],
+  "editorial_md": "HashMap + Doubly Linked List for O(1) LRU eviction and lookup."
+}

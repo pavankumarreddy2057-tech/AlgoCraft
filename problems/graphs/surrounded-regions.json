@@ -1,0 +1,225 @@
+{
+  "slug": "surrounded-regions",
+  "title": "Surrounded Regions",
+  "category": "graphs",
+  "difficulty": "Medium",
+  "tags": [
+    "Graphs",
+    "BFS",
+    "DFS",
+    "Matrix",
+    "Blind 75",
+    "NeetCode 150",
+    "Google",
+    "Amazon"
+  ],
+  "statement_md": "Given an `m x n` matrix `board` containing `'X'` and `'O'`, capture all regions that are 4-directionally **surrounded by** `'X'`.\n\nA region is captured by flipping all `'O'`s into `'X'`s in that surrounded region.",
+  "constraints": [
+    "m == board.length",
+    "n == board[i].length",
+    "1 <= m, n <= 200",
+    "board[i][j] is 'X' or 'O'."
+  ],
+  "examples": [
+    {
+      "input": {
+        "board": [
+          [
+            "X",
+            "X",
+            "X",
+            "X"
+          ],
+          [
+            "X",
+            "O",
+            "O",
+            "X"
+          ],
+          [
+            "X",
+            "X",
+            "O",
+            "X"
+          ],
+          [
+            "X",
+            "O",
+            "X",
+            "X"
+          ]
+        ]
+      },
+      "output": [
+        [
+          "X",
+          "X",
+          "X",
+          "X"
+        ],
+        [
+          "X",
+          "X",
+          "X",
+          "X"
+        ],
+        [
+          "X",
+          "X",
+          "X",
+          "X"
+        ],
+        [
+          "X",
+          "O",
+          "X",
+          "X"
+        ]
+      ]
+    }
+  ],
+  "starter_code": {
+    "python": "def solve(board: list[list[str]]) -> list[list[str]]:\n    # Modify board in-place and return it\n    pass\n",
+    "javascript": "function solve(board) {\n  // Modify board in-place and return it\n}\n"
+  },
+  "reference_solution": {
+    "python": "def solve(board: list[list[str]]) -> list[list[str]]:\n    if not board:\n        return board\n    R, C = len(board), len(board[0])\n    \n    def dfs(r, c):\n        if r < 0 or r >= R or c < 0 or c >= C or board[r][c] != 'O':\n            return\n        board[r][c] = 'T'\n        dfs(r + 1, c)\n        dfs(r - 1, c)\n        dfs(r, c + 1)\n        dfs(r, c - 1)\n        \n    # Mark border-connected 'O's as 'T'\n    for r in range(R):\n        dfs(r, 0)\n        dfs(r, C - 1)\n    for c in range(C):\n        dfs(0, c)\n        dfs(R - 1, c)\n        \n    for r in range(R):\n        for c in range(C):\n            if board[r][c] == 'O':\n                board[r][c] = 'X'\n            elif board[r][c] == 'T':\n                board[r][c] = 'O'\n    return board\n",
+    "javascript": "function solve(board) {\n  if (!board || board.length === 0) return board;\n  const R = board.length, C = board[0].length;\n  function dfs(r, c) {\n    if (r < 0 || r >= R || c < 0 || c >= C || board[r][c] !== 'O') return;\n    board[r][c] = 'T';\n    dfs(r + 1, c);\n    dfs(r - 1, c);\n    dfs(r, c + 1);\n    dfs(r, c - 1);\n  }\n  for (let r = 0; r < R; r++) { dfs(r, 0); dfs(r, C - 1); }\n  for (let c = 0; c < C; c++) { dfs(0, c); dfs(R - 1, c); }\n  for (let r = 0; r < R; r++) {\n    for (let c = 0; c < C; c++) {\n      if (board[r][c] === 'O') board[r][c] = 'X';\n      else if (board[r][c] === 'T') board[r][c] = 'O';\n    }\n  }\n  return board;\n}\n"
+  },
+  "sample_test_cases": [
+    {
+      "input": {
+        "board": [
+          [
+            "X",
+            "X",
+            "X",
+            "X"
+          ],
+          [
+            "X",
+            "O",
+            "O",
+            "X"
+          ],
+          [
+            "X",
+            "X",
+            "O",
+            "X"
+          ],
+          [
+            "X",
+            "O",
+            "X",
+            "X"
+          ]
+        ]
+      },
+      "expected_output": [
+        [
+          "X",
+          "X",
+          "X",
+          "X"
+        ],
+        [
+          "X",
+          "X",
+          "X",
+          "X"
+        ],
+        [
+          "X",
+          "X",
+          "X",
+          "X"
+        ],
+        [
+          "X",
+          "O",
+          "X",
+          "X"
+        ]
+      ]
+    }
+  ],
+  "test_cases": [
+    {
+      "input": {
+        "board": [
+          [
+            "X",
+            "X",
+            "X",
+            "X"
+          ],
+          [
+            "X",
+            "O",
+            "O",
+            "X"
+          ],
+          [
+            "X",
+            "X",
+            "O",
+            "X"
+          ],
+          [
+            "X",
+            "O",
+            "X",
+            "X"
+          ]
+        ]
+      },
+      "expected_output": [
+        [
+          "X",
+          "X",
+          "X",
+          "X"
+        ],
+        [
+          "X",
+          "X",
+          "X",
+          "X"
+        ],
+        [
+          "X",
+          "X",
+          "X",
+          "X"
+        ],
+        [
+          "X",
+          "O",
+          "X",
+          "X"
+        ]
+      ]
+    },
+    {
+      "input": {
+        "board": [
+          [
+            "X"
+          ]
+        ]
+      },
+      "expected_output": [
+        [
+          "X"
+        ]
+      ],
+      "hidden": true
+    }
+  ],
+  "hints": [
+    "Capture everything except the regions connected to the border 'O's.",
+    "Run DFS/BFS from the borders first."
+  ],
+  "editorial_md": "Boundary DFS uncapture marking."
+}
