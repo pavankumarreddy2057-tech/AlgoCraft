@@ -15,11 +15,13 @@ export class MailerService {
     const service = process.env.SMTP_SERVICE || process.env.EMAIL_SERVICE;
     const host = process.env.SMTP_HOST || process.env.EMAIL_HOST;
     const port = parseInt(process.env.SMTP_PORT || process.env.EMAIL_PORT || '587', 10);
-    const user = process.env.SMTP_USER || process.env.EMAIL_USER;
-    const pass = process.env.SMTP_PASS || process.env.EMAIL_PASS || process.env.SMTP_PASSWORD;
+    const user = (process.env.SMTP_USER || process.env.EMAIL_USER || '').trim();
+    let pass = (process.env.SMTP_PASS || process.env.EMAIL_PASS || process.env.SMTP_PASSWORD || '').trim();
 
     if (user && pass) {
-      if (service?.toLowerCase() === 'gmail' || (!host && user.includes('@gmail.com')) || host === 'smtp.gmail.com') {
+      // Remove any spaces from Gmail 16-character App Passwords (e.g. 'icda bxkp imbm ozth' -> 'icdabxkpimbmozth')
+      if (service?.toLowerCase() === 'gmail' || user.includes('@gmail.com') || host === 'smtp.gmail.com') {
+        pass = pass.replace(/\s+/g, '');
         this.transporter = nodemailer.createTransport({
           service: 'gmail',
           auth: { user, pass }
@@ -46,7 +48,17 @@ export class MailerService {
   static async sendOtpEmail(options: SendOtpMailOptions): Promise<{ success: boolean; isDev: boolean; devOtp?: string }> {
     const { email, code, expiresInMinutes = 10 } = options;
     const transporter = this.getTransporter();
-    const fromAddress = process.env.SMTP_FROM || process.env.EMAIL_FROM || `"AlgoCraft Security" <${process.env.SMTP_USER || 'noreply@sentinelhq.in'}>`;
+    
+    // Format From address cleanly
+    const rawFrom = process.env.SMTP_FROM || process.env.EMAIL_FROM;
+    let fromAddress = `"AlgoCraft Security" <${process.env.SMTP_USER || 'noreply@sentinelhq.in'}>`;
+    if (rawFrom) {
+      if (rawFrom.includes('<') && rawFrom.includes('>')) {
+        fromAddress = rawFrom;
+      } else if (rawFrom.includes('@')) {
+        fromAddress = `"AlgoCraft Security" <${rawFrom.trim()}>`;
+      }
+    }
 
     const htmlContent = `
       <!DOCTYPE html>
