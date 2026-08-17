@@ -1,11 +1,14 @@
-import { Router, Request, Response } from 'express';
+import { Router, Response } from 'express';
 import { dbManager } from '../db/database.js';
+import { AuthRequest, authenticateUser } from '../auth/jwt-middleware.js';
 
 export const statsRouter = Router();
 
 // GET /api/stats
-statsRouter.get('/', (req: Request, res: Response) => {
+statsRouter.get('/', authenticateUser, (req: AuthRequest, res: Response) => {
   try {
+    const userId = req.user ? req.user.id : 1;
+
     // 1. Difficulty solved breakdown
     const totalProblems = dbManager.query<{ difficulty: string; count: number }>(`
       SELECT difficulty, COUNT(*) as count FROM problems GROUP BY difficulty
@@ -15,9 +18,9 @@ statsRouter.get('/', (req: Request, res: Response) => {
       SELECT p.difficulty, COUNT(DISTINCT p.slug) as count
       FROM problems p
       JOIN submissions s ON p.slug = s.problem_slug
-      WHERE s.status = 'Accepted'
+      WHERE s.status = 'Accepted' AND s.user_id = ?
       GROUP BY p.difficulty
-    `);
+    `, [userId]);
 
     const difficultyStats = {
       Easy: { total: 0, solved: 0 },
@@ -44,8 +47,9 @@ statsRouter.get('/', (req: Request, res: Response) => {
     const activityRows = dbManager.query<{ date: string; submission_count: number; solved_count: number }>(`
       SELECT date, submission_count, solved_count 
       FROM daily_activity 
+      WHERE user_id = ?
       ORDER BY date ASC
-    `);
+    `, [userId]);
 
     let currentStreak = 0;
     let maxStreak = 0;
@@ -92,8 +96,6 @@ statsRouter.get('/', (req: Request, res: Response) => {
 
     // 3. 365-day activity heatmap data
     const heatmap: Record<string, { submissions: number; solved: number }> = {};
-    const oneYearAgo = new Date();
-    oneYearAgo.setDate(oneYearAgo.getDate() - 365);
 
     activityRows.forEach(r => {
       heatmap[r.date] = {
@@ -105,7 +107,7 @@ statsRouter.get('/', (req: Request, res: Response) => {
     // 4. Topic mastery breakdown
     const allProblems = dbManager.query<{ slug: string; tags: string }>('SELECT slug, tags FROM problems');
     const solvedSlugs = new Set(
-      dbManager.query<{ slug: string }>("SELECT DISTINCT problem_slug as slug FROM submissions WHERE status = 'Accepted'").map(r => r.slug)
+      dbManager.query<{ slug: string }>("SELECT DISTINCT problem_slug as slug FROM submissions WHERE status = 'Accepted' AND user_id = ?", [userId]).map(r => r.slug)
     );
 
     const tagMasteryMap: Record<string, { total: number; solved: number }> = {};
@@ -134,7 +136,7 @@ statsRouter.get('/', (req: Request, res: Response) => {
       .sort((a, b) => b.total - a.total);
 
     // 5. Total submissions count
-    const totalSubmissionsRow = dbManager.queryOne<{ count: number }>('SELECT COUNT(*) as count FROM submissions');
+    const totalSubmissionsRow = dbManager.queryOne<{ count: number }>('SELECT COUNT(*) as count FROM submissions WHERE user_id = ?', [userId]);
 
     res.json({
       success: true,

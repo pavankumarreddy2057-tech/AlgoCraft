@@ -8,6 +8,28 @@ const __dirname = path.dirname(__filename);
 
 const DB_PATH = process.env.DB_PATH || path.resolve(__dirname, '../../data/leetcode_offline.db');
 
+export interface UserRecord {
+  id: number;
+  email: string;
+  username: string;
+  avatar_url: string;
+  bio: string;
+  target_role: string;
+  score: number;
+  created_at: string;
+  last_active_at: string;
+}
+
+export interface OtpRecord {
+  id?: number;
+  email: string;
+  otp_hash: string;
+  expires_at: string;
+  attempts: number;
+  consumed: number;
+  created_at?: string;
+}
+
 export interface ProblemRecord {
   id?: number;
   slug: string;
@@ -30,6 +52,7 @@ export interface ProblemRecord {
 
 export interface SubmissionRecord {
   id?: number;
+  user_id: number;
   problem_slug: string;
   language: string;
   code: string;
@@ -44,6 +67,7 @@ export interface SubmissionRecord {
 }
 
 export interface SpacedRepetitionRecord {
+  user_id: number;
   problem_slug: string;
   interval_days: number;
   repetition_count: number;
@@ -74,72 +98,132 @@ class DatabaseManager {
       this.db = new this.SQL.Database();
     }
 
-    // Run schema
-    const schema = `
-      CREATE TABLE IF NOT EXISTS problems (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        slug TEXT UNIQUE NOT NULL,
-        title TEXT NOT NULL,
-        difficulty TEXT NOT NULL CHECK(difficulty IN ('Easy', 'Medium', 'Hard')),
-        tags TEXT NOT NULL,
-        statement_md TEXT NOT NULL,
-        constraints TEXT NOT NULL,
-        examples TEXT NOT NULL,
-        starter_code TEXT NOT NULL,
-        test_cases TEXT NOT NULL,
-        reference_solution TEXT NOT NULL,
-        hints TEXT NOT NULL,
-        time_limit_ms INTEGER DEFAULT 2000,
-        memory_limit_mb INTEGER DEFAULT 128,
-        editorial_md TEXT DEFAULT '',
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      );
+    // Run V2 schema
+    const schemaPath = path.resolve(__dirname, 'schema.sql');
+    let schema = '';
+    if (fs.existsSync(schemaPath)) {
+      schema = fs.readFileSync(schemaPath, 'utf-8');
+    } else {
+      schema = `
+        CREATE TABLE IF NOT EXISTS users (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          email TEXT UNIQUE NOT NULL,
+          username TEXT UNIQUE NOT NULL,
+          avatar_url TEXT DEFAULT '',
+          bio TEXT DEFAULT '',
+          target_role TEXT DEFAULT 'Software Engineer',
+          score INTEGER DEFAULT 0,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          last_active_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
 
-      CREATE TABLE IF NOT EXISTS submissions (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        problem_slug TEXT NOT NULL,
-        language TEXT NOT NULL,
-        code TEXT NOT NULL,
-        status TEXT NOT NULL,
-        runtime_ms REAL DEFAULT 0,
-        memory_kb REAL DEFAULT 0,
-        test_cases_passed INTEGER NOT NULL DEFAULT 0,
-        total_test_cases INTEGER NOT NULL DEFAULT 0,
-        error_message TEXT DEFAULT '',
-        results_json TEXT DEFAULT '[]',
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      );
+        CREATE TABLE IF NOT EXISTS otp_verifications (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          email TEXT NOT NULL,
+          otp_hash TEXT NOT NULL,
+          expires_at DATETIME NOT NULL,
+          attempts INTEGER DEFAULT 0,
+          consumed INTEGER DEFAULT 0,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
 
-      CREATE INDEX IF NOT EXISTS idx_submissions_slug ON submissions(problem_slug);
-      CREATE INDEX IF NOT EXISTS idx_submissions_created_at ON submissions(created_at);
+        CREATE TABLE IF NOT EXISTS problems (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          slug TEXT UNIQUE NOT NULL,
+          title TEXT NOT NULL,
+          difficulty TEXT NOT NULL CHECK(difficulty IN ('Easy', 'Medium', 'Hard')),
+          tags TEXT NOT NULL,
+          statement_md TEXT NOT NULL,
+          constraints TEXT NOT NULL,
+          examples TEXT NOT NULL,
+          starter_code TEXT NOT NULL,
+          test_cases TEXT NOT NULL,
+          reference_solution TEXT NOT NULL,
+          hints TEXT NOT NULL,
+          time_limit_ms INTEGER DEFAULT 2000,
+          memory_limit_mb INTEGER DEFAULT 128,
+          editorial_md TEXT DEFAULT '',
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
 
-      CREATE TABLE IF NOT EXISTS spaced_repetition (
-        problem_slug TEXT PRIMARY KEY,
-        interval_days INTEGER DEFAULT 1,
-        repetition_count INTEGER DEFAULT 0,
-        ease_factor REAL DEFAULT 2.5,
-        last_reviewed_at DATETIME,
-        next_review_at DATETIME,
-        flagged_review INTEGER DEFAULT 0,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      );
+        CREATE TABLE IF NOT EXISTS submissions (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          user_id INTEGER NOT NULL DEFAULT 1,
+          problem_slug TEXT NOT NULL,
+          language TEXT NOT NULL,
+          code TEXT NOT NULL,
+          status TEXT NOT NULL,
+          runtime_ms REAL DEFAULT 0,
+          memory_kb REAL DEFAULT 0,
+          test_cases_passed INTEGER NOT NULL DEFAULT 0,
+          total_test_cases INTEGER NOT NULL DEFAULT 0,
+          error_message TEXT DEFAULT '',
+          results_json TEXT DEFAULT '[]',
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
 
-      CREATE TABLE IF NOT EXISTS daily_activity (
-        date TEXT PRIMARY KEY,
-        submission_count INTEGER DEFAULT 0,
-        solved_count INTEGER DEFAULT 0
-      );
+        CREATE TABLE IF NOT EXISTS spaced_repetition (
+          user_id INTEGER NOT NULL DEFAULT 1,
+          problem_slug TEXT NOT NULL,
+          interval_days INTEGER DEFAULT 1,
+          repetition_count INTEGER DEFAULT 0,
+          ease_factor REAL DEFAULT 2.5,
+          last_reviewed_at DATETIME,
+          next_review_at DATETIME,
+          flagged_review INTEGER DEFAULT 0,
+          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          PRIMARY KEY (user_id, problem_slug)
+        );
 
-      CREATE TABLE IF NOT EXISTS problem_notes (
-        problem_slug TEXT PRIMARY KEY,
-        notes_md TEXT DEFAULT '',
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      );
-    `;
+        CREATE TABLE IF NOT EXISTS daily_activity (
+          user_id INTEGER NOT NULL DEFAULT 1,
+          date TEXT NOT NULL,
+          submission_count INTEGER DEFAULT 0,
+          solved_count INTEGER DEFAULT 0,
+          PRIMARY KEY (user_id, date)
+        );
+
+        CREATE TABLE IF NOT EXISTS problem_notes (
+          user_id INTEGER NOT NULL DEFAULT 1,
+          problem_slug TEXT NOT NULL,
+          notes_md TEXT DEFAULT '',
+          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          PRIMARY KEY (user_id, problem_slug)
+        );
+
+        CREATE TABLE IF NOT EXISTS user_bookmarks (
+          user_id INTEGER NOT NULL DEFAULT 1,
+          problem_slug TEXT NOT NULL,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          PRIMARY KEY (user_id, problem_slug)
+        );
+      `;
+    }
 
     if (this.db) {
-      this.db.run(schema);
+      try {
+        this.db.run(schema);
+      } catch (err: any) {
+        console.warn('[DB] Schema setup note:', err.message);
+      }
+
+      // Ensure default guest user (id: 1) exists
+      try {
+        const guest = this.queryOne('SELECT id FROM users WHERE id = 1');
+        if (!guest) {
+          this.run(
+            `INSERT INTO users (id, email, username, avatar_url, bio, target_role, score) 
+             VALUES (1, 'guest@algocraft.io', 'Guest Coder', 'https://api.dicebear.com/7.x/bottts/svg?seed=guest', 'Practicing DSA offline with AlgoCraft', 'Full Stack Developer', 100)`
+          );
+        }
+      } catch (e) {}
+
+      // Safe schema migration for user_id column in existing submissions table
+      try {
+        this.db.run('ALTER TABLE submissions ADD COLUMN user_id INTEGER DEFAULT 1;');
+      } catch (e) {}
+
       this.save();
     }
     console.log(`[DB] SQLite Database ready at ${DB_PATH}`);

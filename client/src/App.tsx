@@ -1,17 +1,22 @@
 import React, { useState, useEffect } from 'react';
+import { AuthProvider } from './lib/auth-context.js';
 import { Navbar } from './components/Navbar.js';
 import { ProblemBrowser } from './components/ProblemBrowser.js';
 import { Workspace } from './components/Workspace.js';
 import { SpacedRepetitionModal } from './components/SpacedRepetitionModal.js';
 import { StatsDashboard } from './components/StatsDashboard.js';
+import { PersonalDashboard } from './components/PersonalDashboard.js';
+import { GlobalDashboard } from './components/GlobalDashboard.js';
 import { ProblemManagerModal } from './components/ProblemManagerModal.js';
 import { QuickSearchModal } from './components/QuickSearchModal.js';
 import { MockInterviewModal } from './components/MockInterviewModal.js';
+import { AuthModal } from './components/AuthModal.js';
 import { fetchStats, fetchProblems, fetchReviewQueue } from './lib/api.js';
 import { ProblemListItem, DashboardStats } from './types/index.js';
+import { Layers, User as UserIcon, Trophy, Brain, Briefcase } from 'lucide-react';
 
-export function App() {
-  const [currentView, setCurrentView] = useState<'problems' | 'stats' | 'review' | 'workspace'>('problems');
+function AppContent() {
+  const [currentView, setCurrentView] = useState<'problems' | 'dashboard' | 'leaderboard' | 'stats' | 'review' | 'workspace'>('problems');
   const [activeSlug, setActiveSlug] = useState<string | null>(null);
 
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -60,6 +65,7 @@ export function App() {
 
   return (
     <div className="h-screen w-screen flex flex-col bg-[#0d1117] text-gray-100 overflow-hidden font-sans">
+      
       {/* Global Top Navbar */}
       <Navbar
         currentView={currentView === 'workspace' ? 'problems' : currentView}
@@ -77,11 +83,24 @@ export function App() {
       />
 
       {/* Main View Router */}
-      <main className="flex-1 flex overflow-hidden">
+      <main className="flex-1 flex overflow-hidden pb-12 md:pb-0">
         {currentView === 'problems' && (
           <ProblemBrowser
             onSelectProblem={handleOpenProblem}
             onNavigateReview={() => setCurrentView('review')}
+          />
+        )}
+
+        {currentView === 'dashboard' && (
+          <PersonalDashboard
+            onOpenProblem={handleOpenProblem}
+            onNavigateReview={() => setCurrentView('review')}
+          />
+        )}
+
+        {currentView === 'leaderboard' && (
+          <GlobalDashboard
+            onOpenProblem={handleOpenProblem}
           />
         )}
 
@@ -111,6 +130,74 @@ export function App() {
         )}
       </main>
 
+      {/* Mobile Bottom Navigation Bar (Screens < 768px, hidden in workspace) */}
+      {currentView !== 'workspace' && (
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 h-13 bg-[#161b22]/95 backdrop-blur-md border-t border-[#30363d] px-2 flex items-center justify-around z-30 select-none">
+          <button
+            onClick={() => {
+              setActiveSlug(null);
+              setCurrentView('problems');
+            }}
+            className={`flex flex-col items-center justify-center py-1 flex-1 text-[10px] font-medium transition ${
+              currentView === 'problems' ? 'text-emerald-400 font-bold' : 'text-gray-400'
+            }`}
+          >
+            <Layers className="w-4 h-4 mb-0.5" />
+            <span>Problems</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setActiveSlug(null);
+              setCurrentView('dashboard');
+            }}
+            className={`flex flex-col items-center justify-center py-1 flex-1 text-[10px] font-medium transition ${
+              currentView === 'dashboard' ? 'text-blue-400 font-bold' : 'text-gray-400'
+            }`}
+          >
+            <UserIcon className="w-4 h-4 mb-0.5" />
+            <span>Dashboard</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setActiveSlug(null);
+              setCurrentView('leaderboard');
+            }}
+            className={`flex flex-col items-center justify-center py-1 flex-1 text-[10px] font-medium transition ${
+              currentView === 'leaderboard' ? 'text-amber-400 font-bold' : 'text-gray-400'
+            }`}
+          >
+            <Trophy className="w-4 h-4 mb-0.5" />
+            <span>Arena</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setActiveSlug(null);
+              setCurrentView('review');
+            }}
+            className={`flex flex-col items-center justify-center py-1 flex-1 text-[10px] font-medium transition relative ${
+              currentView === 'review' ? 'text-purple-400 font-bold' : 'text-gray-400'
+            }`}
+          >
+            <Brain className="w-4 h-4 mb-0.5" />
+            <span>Review</span>
+            {dueReviewsCount > 0 && (
+              <span className="absolute top-1 right-3 w-2 h-2 rounded-full bg-purple-500" />
+            )}
+          </button>
+
+          <button
+            onClick={() => setIsInterviewOpen(true)}
+            className="flex flex-col items-center justify-center py-1 flex-1 text-[10px] font-medium text-purple-300"
+          >
+            <Briefcase className="w-4 h-4 mb-0.5" />
+            <span>Interview</span>
+          </button>
+        </nav>
+      )}
+
       {/* Quick Search Modal (Ctrl + K) */}
       <QuickSearchModal
         isOpen={isSearchOpen}
@@ -119,20 +206,31 @@ export function App() {
         onSelectProblem={handleOpenProblem}
       />
 
-      {/* Problem Manager Modal (Import/Export/Validation) */}
+      {/* Problem Manager Modal */}
       <ProblemManagerModal
         isOpen={isManagerOpen}
         onClose={() => setIsManagerOpen(false)}
         onRefresh={loadGlobalData}
       />
 
-      {/* 45-Minute Timed Mock Interview Simulator */}
+      {/* Mock Interview Simulator */}
       <MockInterviewModal
         isOpen={isInterviewOpen}
         onClose={() => setIsInterviewOpen(false)}
         onOpenProblem={handleOpenProblem}
       />
+
+      {/* Email OTP Auth Modal */}
+      <AuthModal />
     </div>
+  );
+}
+
+export function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 

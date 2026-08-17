@@ -10,6 +10,13 @@ import { submissionsRouter } from './routes/submissions.js';
 import { reviewRouter } from './routes/review.js';
 import { statsRouter } from './routes/stats.js';
 import { adminRouter } from './routes/admin.js';
+import { notesRouter } from './routes/notes.js';
+import { mentorRouter } from './routes/mentor.js';
+import { interviewRouter } from './routes/interview.js';
+import { benchmarkRouter } from './runner/benchmark-runner.js';
+import { authRouter } from './routes/auth.js';
+import { userRouter } from './routes/user.js';
+import { leaderboardRouter } from './routes/leaderboard.js';
 
 dotenv.config();
 
@@ -33,12 +40,10 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-import { notesRouter } from './routes/notes.js';
-import { mentorRouter } from './routes/mentor.js';
-import { interviewRouter } from './routes/interview.js';
-import { benchmarkRouter } from './runner/benchmark-runner.js';
-
 // API Routes
+app.use('/api/auth', authRouter);
+app.use('/api/user', userRouter);
+app.use('/api/leaderboard', leaderboardRouter);
 app.use('/api/problems', problemsRouter);
 app.use('/api/submissions', submissionsRouter);
 app.use('/api/review', reviewRouter);
@@ -76,7 +81,7 @@ async function bootstrap() {
 
     app.listen(PORT, () => {
       console.log(`\n======================================================`);
-      console.log(`  🚀 AlgoCraft Offline Platform Server running at:`);
+      console.log(`  🚀 AlgoCraft Platform V2 Server running at:`);
       console.log(`  👉 http://localhost:${PORT}`);
       console.log(`======================================================\n`);
     });

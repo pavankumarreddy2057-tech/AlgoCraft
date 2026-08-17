@@ -1,18 +1,20 @@
-import { Router, Request, Response } from 'express';
+import { Router, Response } from 'express';
 import { dbManager } from '../db/database.js';
 import type { ProblemRecord } from '../db/database.js';
 import { executeCode } from '../runner/index.js';
+import { AuthRequest, authenticateUser } from '../auth/jwt-middleware.js';
 
 export const submissionsRouter = Router();
 
 // Run sample / custom test cases without saving submission
-submissionsRouter.post('/:slug/run', async (req: Request, res: Response) => {
+submissionsRouter.post('/:slug/run', async (req: AuthRequest, res: Response) => {
   try {
     const { slug } = req.params;
     const { code, language = 'python', custom_test_cases } = req.body;
 
     if (!code || typeof code !== 'string') {
-      return res.status(400).json({ success: false, error: 'Code is required' });
+      res.status(400).json({ success: false, error: 'Code is required' });
+      return;
     }
 
     const problem = dbManager.queryOne<ProblemRecord>(
@@ -21,7 +23,8 @@ submissionsRouter.post('/:slug/run', async (req: Request, res: Response) => {
     );
 
     if (!problem) {
-      return res.status(404).json({ success: false, error: `Problem '${slug}' not found` });
+      res.status(404).json({ success: false, error: `Problem '${slug}' not found` });
+      return;
     }
 
     let testCasesToRun = [];
@@ -55,13 +58,15 @@ submissionsRouter.post('/:slug/run', async (req: Request, res: Response) => {
 });
 
 // Submit code against all test cases (sample + hidden) and record submission
-submissionsRouter.post('/:slug/submit', async (req: Request, res: Response) => {
+submissionsRouter.post('/:slug/submit', authenticateUser, async (req: AuthRequest, res: Response) => {
   try {
     const { slug } = req.params;
     const { code, language = 'python' } = req.body;
+    const userId = req.user ? req.user.id : 1;
 
     if (!code || typeof code !== 'string') {
-      return res.status(400).json({ success: false, error: 'Code is required' });
+      res.status(400).json({ success: false, error: 'Code is required' });
+      return;
     }
 
     const problem = dbManager.queryOne<ProblemRecord>(
@@ -70,7 +75,8 @@ submissionsRouter.post('/:slug/submit', async (req: Request, res: Response) => {
     );
 
     if (!problem) {
-      return res.status(404).json({ success: false, error: `Problem '${slug}' not found` });
+      res.status(404).json({ success: false, error: `Problem '${slug}' not found` });
+      return;
     }
 
     const allTestCases = JSON.parse(problem.test_cases || '[]');
@@ -86,10 +92,11 @@ submissionsRouter.post('/:slug/submit', async (req: Request, res: Response) => {
     // Save submission to DB
     dbManager.run(
       `INSERT INTO submissions (
-        problem_slug, language, code, status, runtime_ms, memory_kb,
+        user_id, problem_slug, language, code, status, runtime_ms, memory_kb,
         test_cases_passed, total_test_cases, error_message, results_json
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
+        userId,
         slug,
         language,
         code,
@@ -106,9 +113,12 @@ submissionsRouter.post('/:slug/submit', async (req: Request, res: Response) => {
     const submissionIdRow = dbManager.queryOne<{ id: number }>('SELECT last_insert_rowid() as id');
     const submissionId = submissionIdRow?.id;
 
-    // Update Daily Activity
+    // Update Daily Activity for this user
     const today = new Date().toISOString().slice(0, 10);
-    const existingActivity = dbManager.queryOne('SELECT * FROM daily_activity WHERE date = ?', [today]);
+    const existingActivity = dbManager.queryOne(
+      'SELECT * FROM daily_activity WHERE user_id = ? AND date = ?',
+      [userId, today]
+    );
 
     const isSolved = execResult.status === 'Accepted';
 
@@ -117,13 +127,13 @@ submissionsRouter.post('/:slug/submit', async (req: Request, res: Response) => {
         `UPDATE daily_activity SET 
           submission_count = submission_count + 1,
           solved_count = solved_count + ?
-         WHERE date = ?`,
-        [isSolved ? 1 : 0, today]
+         WHERE user_id = ? AND date = ?`,
+        [isSolved ? 1 : 0, userId, today]
       );
     } else {
       dbManager.run(
-        `INSERT INTO daily_activity (date, submission_count, solved_count) VALUES (?, 1, ?)`,
-        [today, isSolved ? 1 : 0]
+        `INSERT INTO daily_activity (user_id, date, submission_count, solved_count) VALUES (?, ?, 1, ?)`,
+        [userId, today, isSolved ? 1 : 0]
       );
     }
 
@@ -137,13 +147,14 @@ submissionsRouter.post('/:slug/submit', async (req: Request, res: Response) => {
   }
 });
 
-// GET /api/problems/:slug/submissions
-submissionsRouter.get('/:slug/history', (req: Request, res: Response) => {
+// GET /api/submissions/:slug/history
+submissionsRouter.get('/:slug/history', authenticateUser, (req: AuthRequest, res: Response) => {
   try {
     const { slug } = req.params;
+    const userId = req.user ? req.user.id : 1;
     const rows = dbManager.query(
-      'SELECT id, problem_slug, language, status, runtime_ms, memory_kb, test_cases_passed, total_test_cases, created_at FROM submissions WHERE problem_slug = ? ORDER BY id DESC LIMIT 50',
-      [slug]
+      'SELECT id, problem_slug, language, status, runtime_ms, memory_kb, test_cases_passed, total_test_cases, created_at FROM submissions WHERE problem_slug = ? AND user_id = ? ORDER BY id DESC LIMIT 50',
+      [slug, userId]
     );
 
     res.json({ success: true, submissions: rows });
@@ -153,14 +164,16 @@ submissionsRouter.get('/:slug/history', (req: Request, res: Response) => {
 });
 
 // GET /api/submissions (all global recent)
-submissionsRouter.get('/', (req: Request, res: Response) => {
+submissionsRouter.get('/', (req: AuthRequest, res: Response) => {
   try {
     const rows = dbManager.query(`
       SELECT 
         s.id, s.problem_slug, s.language, s.status, s.runtime_ms, s.memory_kb,
-        s.test_cases_passed, s.total_test_cases, s.created_at, p.title as problem_title, p.difficulty
+        s.test_cases_passed, s.total_test_cases, s.created_at, p.title as problem_title, p.difficulty,
+        u.username, u.avatar_url
       FROM submissions s
       JOIN problems p ON s.problem_slug = p.slug
+      LEFT JOIN users u ON s.user_id = u.id
       ORDER BY s.id DESC
       LIMIT 100
     `);

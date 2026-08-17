@@ -1,5 +1,36 @@
--- SQLite Schema for Offline Coding Practice Platform
+-- SQLite Schema for AlgoCraft V2 Platform
 
+-- 1. Users Table
+CREATE TABLE IF NOT EXISTS users (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  email TEXT UNIQUE NOT NULL,
+  username TEXT UNIQUE NOT NULL,
+  avatar_url TEXT DEFAULT '',
+  bio TEXT DEFAULT '',
+  target_role TEXT DEFAULT 'Software Engineer',
+  score INTEGER DEFAULT 0,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  last_active_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_score ON users(score);
+
+-- 2. OTP Verifications Table
+CREATE TABLE IF NOT EXISTS otp_verifications (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  email TEXT NOT NULL,
+  otp_hash TEXT NOT NULL,
+  expires_at DATETIME NOT NULL,
+  attempts INTEGER DEFAULT 0,
+  consumed INTEGER DEFAULT 0,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_otp_email ON otp_verifications(email);
+CREATE INDEX IF NOT EXISTS idx_otp_expires ON otp_verifications(expires_at);
+
+-- 3. Problems Table
 CREATE TABLE IF NOT EXISTS problems (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   slug TEXT UNIQUE NOT NULL,
@@ -47,9 +78,10 @@ CREATE TRIGGER IF NOT EXISTS problems_au AFTER UPDATE ON problems BEGIN
   VALUES (new.id, new.slug, new.title, new.statement_md, new.tags);
 END;
 
--- Submissions History
+-- 4. Submissions History
 CREATE TABLE IF NOT EXISTS submissions (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL DEFAULT 1,
   problem_slug TEXT NOT NULL,
   language TEXT NOT NULL,
   code TEXT NOT NULL,
@@ -61,16 +93,19 @@ CREATE TABLE IF NOT EXISTS submissions (
   error_message TEXT DEFAULT '',
   results_json TEXT DEFAULT '[]',
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (problem_slug) REFERENCES problems(slug) ON DELETE CASCADE
 );
 
+CREATE INDEX IF NOT EXISTS idx_submissions_user_id ON submissions(user_id);
 CREATE INDEX IF NOT EXISTS idx_submissions_slug ON submissions(problem_slug);
 CREATE INDEX IF NOT EXISTS idx_submissions_created_at ON submissions(created_at);
 CREATE INDEX IF NOT EXISTS idx_submissions_status ON submissions(status);
 
--- Spaced Repetition (SuperMemo-2 Algorithm)
+-- 5. Spaced Repetition (SuperMemo-2 Algorithm)
 CREATE TABLE IF NOT EXISTS spaced_repetition (
-  problem_slug TEXT PRIMARY KEY,
+  user_id INTEGER NOT NULL DEFAULT 1,
+  problem_slug TEXT NOT NULL,
   interval_days INTEGER DEFAULT 1,
   repetition_count INTEGER DEFAULT 0,
   ease_factor REAL DEFAULT 2.5,
@@ -78,23 +113,43 @@ CREATE TABLE IF NOT EXISTS spaced_repetition (
   next_review_at DATETIME,
   flagged_review INTEGER DEFAULT 0,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (user_id, problem_slug),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (problem_slug) REFERENCES problems(slug) ON DELETE CASCADE
 );
 
-CREATE INDEX IF NOT EXISTS idx_sr_next_review ON spaced_repetition(next_review_at);
-CREATE INDEX IF NOT EXISTS idx_sr_flagged ON spaced_repetition(flagged_review);
+CREATE INDEX IF NOT EXISTS idx_sr_user_next_review ON spaced_repetition(user_id, next_review_at);
+CREATE INDEX IF NOT EXISTS idx_sr_flagged ON spaced_repetition(user_id, flagged_review);
 
--- Daily Activity tracking for Heatmaps and Streaks
+-- 6. Daily Activity Tracking
 CREATE TABLE IF NOT EXISTS daily_activity (
-  date TEXT PRIMARY KEY, -- YYYY-MM-DD
+  user_id INTEGER NOT NULL DEFAULT 1,
+  date TEXT NOT NULL, -- YYYY-MM-DD
   submission_count INTEGER DEFAULT 0,
-  solved_count INTEGER DEFAULT 0
+  solved_count INTEGER DEFAULT 0,
+  PRIMARY KEY (user_id, date),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Problem Markdown Notes & Scratchpad
+CREATE INDEX IF NOT EXISTS idx_activity_user_date ON daily_activity(user_id, date);
+
+-- 7. Problem Markdown Notes & Scratchpad
 CREATE TABLE IF NOT EXISTS problem_notes (
-  problem_slug TEXT PRIMARY KEY,
+  user_id INTEGER NOT NULL DEFAULT 1,
+  problem_slug TEXT NOT NULL,
   notes_md TEXT DEFAULT '',
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (user_id, problem_slug),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (problem_slug) REFERENCES problems(slug) ON DELETE CASCADE
+);
+
+-- 8. User Problem Bookmarks / Favorites
+CREATE TABLE IF NOT EXISTS user_bookmarks (
+  user_id INTEGER NOT NULL DEFAULT 1,
+  problem_slug TEXT NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (user_id, problem_slug),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (problem_slug) REFERENCES problems(slug) ON DELETE CASCADE
 );

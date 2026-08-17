@@ -2,6 +2,18 @@ export type Difficulty = 'Easy' | 'Medium' | 'Hard';
 export type ProblemStatus = 'Solved' | 'Attempted' | 'Todo';
 export type SubmissionStatus = 'Accepted' | 'Wrong Answer' | 'Time Limit Exceeded' | 'Runtime Error' | 'Memory Limit Exceeded';
 
+export interface User {
+  id: number;
+  email: string;
+  username: string;
+  avatar_url: string;
+  bio: string;
+  target_role: string;
+  score: number;
+  created_at: string;
+  last_active_at: string;
+}
+
 export interface ProblemListItem {
   id: number;
   slug: string;
@@ -17,6 +29,7 @@ export interface ProblemListItem {
   total_submissions: number;
   time_limit_ms: number;
   memory_limit_mb: number;
+  is_bookmarked?: boolean;
 }
 
 export interface Example {
@@ -87,6 +100,8 @@ export interface ExecutionResult {
 export interface SubmissionHistoryItem {
   id: number;
   problem_slug: string;
+  problem_title?: string;
+  difficulty?: Difficulty;
   language: string;
   status: SubmissionStatus;
   runtime_ms: number;
@@ -99,7 +114,9 @@ export interface SubmissionHistoryItem {
 export interface ReviewQueueItem {
   id: number;
   slug: string;
+  problem_slug?: string;
   title: string;
+  problem_title?: string;
   difficulty: Difficulty;
   tags: string[];
   interval_days: number;
@@ -107,7 +124,7 @@ export interface ReviewQueueItem {
   ease_factor: number;
   last_reviewed_at?: string;
   next_review_at?: string;
-  flagged_review: number;
+  flagged_review?: number;
   last_status?: SubmissionStatus;
 }
 
@@ -129,4 +146,87 @@ export interface DashboardStats {
     solved: number;
     percentage: number;
   }>;
+}
+
+export interface CalendarDay {
+  date: string;
+  count: number;
+  solved: number;
+}
+
+export interface PersonalDashboardData {
+  user: User;
+  stats: {
+    totalBank: number;
+    totalSolved: number;
+    acceptanceRate: number;
+    currentStreak: number;
+    longestStreak: number;
+    difficulty: {
+      easy: { solved: number; total: number };
+      medium: { solved: number; total: number };
+      hard: { solved: number; total: number };
+    };
+  };
+  topicMastery: Array<{
+    topic: string;
+    total: number;
+    solved: number;
+    percentage: number;
+  }>;
+  calendar: CalendarDay[];
+  recentSubmissions: SubmissionHistoryItem[];
+  dueReviews: ReviewQueueItem[];
+  bookmarks: Array<{
+    problem_slug: string;
+    problem_title: string;
+    difficulty: Difficulty;
+    tags: string;
+    created_at: string;
+  }>;
+}
+
+export interface LeaderboardUser {
+  rank: number;
+  id: number;
+  username: string;
+  avatar_url: string;
+  bio: string;
+  target_role: string;
+  score: number;
+  solved_count: number;
+  total_submissions: number;
+  joined_at: string;
+}
+
+export interface GlobalPulseItem {
+  id: number;
+  problem_slug: string;
+  problem_title: string;
+  difficulty: Difficulty;
+  language: string;
+  runtime_ms: number;
+  created_at: string;
+  username: string;
+  avatar_url: string;
+}
+
+export interface LeaderboardData {
+  rankings: LeaderboardUser[];
+  pulse: GlobalPulseItem[];
+  champions: Record<string, any>;
+  stats: {
+    totalUsers: number;
+    totalSubmissions: number;
+    totalAccepted: number;
+    globalAcceptanceRate: number;
+    languageDistribution: Array<{ language: string; cnt: number }>;
+    hardestProblems: Array<{
+      slug: string;
+      title: string;
+      difficulty: Difficulty;
+      attempts: number;
+      accepted: number;
+    }>;
+  };
 }
