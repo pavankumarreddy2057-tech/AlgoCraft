@@ -1,10 +1,86 @@
 # ☁️ AWS Deployment Plan for AlgoCraft Platform
 
-This document outlines the production deployment architectures, operational runbooks, and cost-optimized infrastructure options for deploying **AlgoCraft** to Amazon Web Services (AWS).
+This document outlines production deployment architectures, operational runbooks, and SSL configuration for **AlgoCraft** on Amazon Web Services (AWS).
 
 ---
 
-## 🏛️ Architecture Options
+## 🛑 Resolving `NoInstallationError("Could not find a usable 'nginx' binary")`
+
+If you encounter this error when running `certbot --nginx`, it means **Nginx is running inside Docker rather than as a system package on the host OS**. 
+
+Choose one of the two solutions below:
+
+### Solution A: Standalone Certbot Mode (Recommended for Docker)
+
+1. **Ensure required directories exist on the host**:
+   ```bash
+   sudo mkdir -p /var/www/certbot
+   sudo mkdir -p /etc/letsencrypt
+   ```
+
+2. **Temporarily stop Docker or run Standalone Certbot**:
+   ```bash
+   # Option A1: Stop docker container on port 80 briefly (takes 5 seconds)
+   sudo docker compose -f deploy/aws/docker-compose.prod.yml down
+
+   # Request SSL certificate for your domain (replace yourdomain.com and your-email)
+   sudo certbot certonly --standalone -d yourdomain.com -m your-email@example.com --agree-tos -n
+
+   # Restart Docker containers (SSL certificates are mounted at /etc/letsencrypt)
+   sudo docker compose -f deploy/aws/docker-compose.prod.yml up -d
+   ```
+
+3. **Or Option A2: Webroot Challenge without stopping Docker**:
+   ```bash
+   sudo certbot certonly --webroot -w /var/www/certbot -d yourdomain.com -m your-email@example.com --agree-tos -n
+   ```
+
+4. **Auto-Renewal via Crontab**:
+   Add to `sudo crontab -e`:
+   ```cron
+   0 3 * * * certbot renew --quiet && docker exec algocraft-nginx nginx -s reload
+   ```
+
+---
+
+### Solution B: Host Nginx Mode (If you prefer Nginx directly on the EC2 OS)
+
+If you want Nginx installed directly on the Amazon Linux host machine:
+```bash
+# 1. Install Nginx on Amazon Linux 2023 host
+sudo dnf install -y nginx
+sudo systemctl enable --now nginx
+
+# 2. Run Certbot with Nginx plugin
+sudo certbot --nginx -d yourdomain.com
+
+# 3. Proxy to AlgoCraft on port 4000
+```
+In `/etc/nginx/conf.d/algocraft.conf`:
+```nginx
+server {
+    server_name yourdomain.com;
+
+    location / {
+        proxy_pass http://127.0.0.1:4000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+Reload Nginx:
+```bash
+sudo systemctl restart nginx
+```
+
+---
+
+## 🏛️ Deployment Architecture Options
 
 ```
                     ┌──────────────────────────────────────────────┐
@@ -35,109 +111,12 @@ This document outlines the production deployment architectures, operational runb
 
 ---
 
-## 🚀 Option 1: Fast & Cost-Effective (AWS EC2 / Lightsail with Docker Compose)
-
-> **Recommended for individual practice, coding bootcamps, or small teams.**  
-> **Estimated Cost**: ~$5/mo (Lightsail 1GB/2GB) or ~$10/mo (`t4g.small` on EC2).
-
-### Step 1: Launch EC2 Instance
-1. Go to **AWS Management Console** → **EC2** → **Launch Instance**.
-2. **Name**: `algocraft-production`
-3. **AMI**: **Amazon Linux 2023** or **Ubuntu 24.04 LTS**
-4. **Instance Type**: `t4g.small` (ARM Graviton) or `t3.small` (x86_64) — *2 vCPUs, 2 GB RAM*.
-5. **Key Pair**: Create or select your `.pem` key.
-6. **Network Settings / Security Group**:
-   - Allow **SSH (Port 22)** from your IP.
-   - Allow **HTTP (Port 80)** from `0.0.0.0/0`.
-   - Allow **HTTPS (Port 443)** from `0.0.0.0/0`.
-7. **Storage**: 20 GB gp3 SSD.
-8. **User Data**: Paste contents of `deploy/aws/ec2-user-data.sh`.
-
-### Step 2: Deploy Code
-SSH into the instance:
-```bash
-ssh -i your-key.pem ec2-user@<EC2-PUBLIC-IP>
-```
-
-Clone the repository and build:
-```bash
-cd /opt
-sudo git clone <YOUR_GIT_REPO_URL> algocraft
-cd algocraft
-
-# Launch container stack with Docker Compose
-sudo docker compose -f deploy/aws/docker-compose.prod.yml up -d --build
-```
-
-### Step 3: Configure Free Let's Encrypt SSL with Certbot (Optional)
-```bash
-sudo dnf install -y certbot python3-certbot-nginx   # or apt install certbot python3-certbot-nginx on Ubuntu
-sudo certbot --nginx -d yourdomain.com
-```
-
----
-
-## 🏗️ Option 2: High Availability (AWS ECS Fargate + EFS Persistent Volume)
-
-> **Recommended for organizations requiring multi-AZ fault tolerance and zero server management.**
-
-### 1. Build and Push Image to Amazon ECR
-```bash
-# Authenticate Docker to Amazon ECR
-aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com
-
-# Create ECR Repository
-aws ecr create-repository --repository-name algocraft --region us-east-1
-
-# Build and Tag Image
-docker build -t algocraft:latest .
-docker tag algocraft:latest <ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/algocraft:latest
-
-# Push Image
-docker push <ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/algocraft:latest
-```
-
-### 2. Create Amazon EFS for SQLite Persistence
-1. Go to **Amazon EFS** → **Create File System**.
-2. Select your target **VPC**.
-3. Create an Access Point:
-   - **Path**: `/algocraft-data`
-   - **POSIX User / Group**: `1000 / 1000`
-4. Copy the **File System ID** (`fs-XXXXXXX`).
-
-### 3. Register ECS Task Definition & Service
-1. Edit `deploy/aws/aws-ecs-task-def.json` and replace `ACCOUNT_ID` and `fs-XXXXXXX`.
-2. Register task definition:
-   ```bash
-   aws ecs register-task-definition --cli-input-json file://deploy/aws/aws-ecs-task-def.json
-   ```
-3. Create an **ECS Fargate Service** connected to an Application Load Balancer on port 4000.
-
----
-
-## 🔒 Security Best Practices for AWS Deployment
-
-1. **Sandboxed Subprocess Execution**:
-   - Memory limits (`--max-old-space-size=256`, 128MB per Python process).
-   - Strict time limits enforced via `child_process.spawn` timers (default 2000ms - 5000ms).
-   - Non-root user permissions inside Docker containers.
-2. **Database Backups**:
-   - Automated S3 daily backup script:
-     ```bash
-     aws s3 cp /app/server/data/leetcode_offline.db s3://your-backup-bucket/db-backup-$(date +%Y%m%d).db
-     ```
-3. **Health Monitoring**:
-   - Endpoint: `GET /api/health` returns `200 OK` with uptime metadata.
-   - Configure AWS Route 53 or CloudWatch synthetic canaries against `/api/health`.
-
----
-
 ## 🛠️ Operational Commands Cheat Sheet
 
 | Task | Command |
 | :--- | :--- |
-| **Start Stack** | `docker compose -f deploy/aws/docker-compose.prod.yml up -d` |
-| **Check Logs** | `docker compose -f deploy/aws/docker-compose.prod.yml logs -f` |
-| **Re-sync Problem Bank** | `docker exec -it algocraft-app npm run seed` |
-| **Run Test Validator** | `docker exec -it algocraft-app npm run validate` |
-| **Restart Stack** | `docker compose -f deploy/aws/docker-compose.prod.yml restart` |
+| **Start Stack** | `sudo docker compose -f deploy/aws/docker-compose.prod.yml up -d` |
+| **Check Logs** | `sudo docker compose -f deploy/aws/docker-compose.prod.yml logs -f` |
+| **Re-sync Problem Bank** | `sudo docker exec -it algocraft-app npm run seed` |
+| **Run Test Validator** | `sudo docker exec -it algocraft-app npm run validate` |
+| **Restart Stack** | `sudo docker compose -f deploy/aws/docker-compose.prod.yml restart` |

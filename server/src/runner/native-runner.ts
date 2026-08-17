@@ -60,7 +60,7 @@ export async function runNativeCode(options: RunOptions): Promise<ExecutionResul
   let scriptPath = '';
 
   if (language === 'python') {
-    cmd = 'python';
+    cmd = process.env.PYTHON_BIN || (process.platform === 'win32' ? 'python' : 'python3');
     const p1 = path.resolve(__dirname, 'wrappers/python-wrapper.py');
     const p2 = path.resolve(__dirname, '../../src/runner/wrappers/python-wrapper.py');
     scriptPath = fs.existsSync(p1) ? p1 : p2;

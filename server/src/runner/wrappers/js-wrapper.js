@@ -201,13 +201,28 @@ async function run() {
         const fnProp = protoProps.find(p => p !== 'constructor' && typeof sol[p] === 'function');
         if (fnProp) return sol[fnProp].bind(sol);
       }
-      if ('${entry_point}' && typeof globalThis['${entry_point}'] === 'function') {
-        return globalThis['${entry_point}'];
+      if ('${entry_point}') {
+        try {
+          const fn = eval('${entry_point}');
+          if (typeof fn === 'function') return fn;
+        } catch (e) {}
       }
-      for (const k of Object.keys(globalThis)) {
-        if (typeof globalThis[k] === 'function' && !['ListNode', 'TreeNode', 'listToLinkedList', 'linkedListToList', 'listToTree', 'treeToList', 'parseInt', 'parseFloat', 'isNaN', 'isFinite'].includes(k)) {
-          return globalThis[k];
+      // Match function declarations or const fn = ...
+      const names = [];
+      const fnRegex = /(?:function\\s+([a-zA-Z0-9_$]+)|(?:var|let|const)\\s+([a-zA-Z0-9_$]+)\\s*=)/g;
+      const codeStr = ${JSON.stringify(code)};
+      let m;
+      while ((m = fnRegex.exec(codeStr)) !== null) {
+        const name = m[1] || m[2];
+        if (name && !['ListNode', 'TreeNode', 'listToLinkedList', 'linkedListToList', 'listToTree', 'treeToList', 'parseInt', 'parseFloat', 'isNaN', 'isFinite'].includes(name)) {
+          names.push(name);
         }
+      }
+      for (const name of names) {
+        try {
+          const fn = eval(name);
+          if (typeof fn === 'function') return fn;
+        } catch (e) {}
       }
       return null;
     })()
