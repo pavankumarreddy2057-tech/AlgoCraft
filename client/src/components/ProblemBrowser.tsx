@@ -46,6 +46,70 @@ const SUGGESTED_SEARCHES = [
   'Dynamic Programming', 'Binary Tree', 'Two Pointers', 'Graph', 'Sliding Window', 'LRU Cache', 'SQL'
 ];
 
+// Canonical Blind 75 Slugs Set
+const BLIND_75_SLUGS = new Set([
+  'two-sum', 'valid-anagram', 'group-anagrams', 'top-k-frequent-elements', 'product-of-array-except-self', 
+  'longest-consecutive-sequence', 'valid-palindrome', '3sum', 'container-with-most-water', 
+  'best-time-to-buy-and-sell-stock', 'longest-substring-without-repeating-characters', 
+  'longest-repeating-character-replacement', 'minimum-window-substring', 'valid-parentheses', 
+  'find-minimum-in-rotated-sorted-array', 'search-in-rotated-sorted-array', 'reverse-linked-list', 
+  'merge-two-sorted-lists', 'linked-list-cycle', 'merge-k-sorted-lists', 'remove-nth-node-from-end-of-list', 
+  'reorder-list', 'invert-binary-tree', 'maximum-depth-of-binary-tree', 'same-tree', 'subtree-of-another-tree', 
+  'lowest-common-ancestor-of-a-binary-search-tree', 'binary-tree-level-order-traversal', 
+  'validate-binary-search-tree', 'kth-smallest-element-in-a-bst', 
+  'construct-binary-tree-from-preorder-and-inorder-traversal', 'binary-tree-maximum-path-sum', 
+  'serialize-and-deserialize-binary-tree', 'find-median-from-data-stream', 'combination-sum', 
+  'word-search', 'number-of-islands', 'clone-graph', 'pacific-atlantic-water-flow', 'course-schedule', 
+  'number-of-connected-components-in-an-undirected-graph', 'graph-valid-tree', 'climbing-stairs', 
+  'coin-change', 'longest-increasing-subsequence', 'word-break', 'combination-sum-iv', 'house-robber', 
+  'house-robber-ii', 'decode-ways', 'unique-paths', 'jump-game', 'insert-interval', 'merge-intervals', 
+  'non-overlapping-intervals', 'meeting-rooms', 'meeting-rooms-ii', 'rotate-image', 'set-matrix-zeroes', 
+  'spiral-matrix', 'number-of-1-bits', 'counting-bits', 'reverse-bits', 'missing-number', 'sum-of-two-integers'
+]);
+
+// Canonical FAANG & High-Frequency Company Mappings
+const COMPANY_SLUGS_MAP: Record<string, string[]> = {
+  google: [
+    'two-sum', 'course-schedule', 'lru-cache', 'word-ladder', 'merge-k-sorted-lists', 'trapping-rain-water',
+    'median-of-two-sorted-arrays', 'number-of-islands', 'word-search', 'bus-routes', 'alien-dictionary',
+    'network-delay-time', 'coin-change', 'edit-distance', 'evaluate-division', 'sliding-window-maximum',
+    'k-closest-points-to-origin', 'longest-increasing-subsequence', 'maximum-subarray', 'group-anagrams'
+  ],
+  meta: [
+    '3sum', 'subarray-sum-equals-k', 'kth-largest-element-in-an-array', 'lowest-common-ancestor-of-a-binary-search-tree',
+    'merge-intervals', 'product-of-array-except-self', 'valid-palindrome', 'binary-tree-vertical-order-traversal',
+    'binary-tree-right-side-view', 'simplify-path', 'word-break', 'clone-graph', 'add-strings', 'valid-parentheses',
+    'minimum-remove-to-make-valid-parentheses', 'next-permutation'
+  ],
+  amazon: [
+    'lru-cache', 'top-k-frequent-elements', 'k-closest-points-to-origin', 'meeting-rooms-ii', 'course-schedule-ii',
+    'word-break', 'coin-change', 'reorganize-string', 'task-scheduler', 'rotting-oranges', 'number-of-islands',
+    'critical-connections-in-a-network', 'merge-k-sorted-lists', 'two-sum', 'trapping-rain-water', 'search-a-2d-matrix'
+  ],
+  microsoft: [
+    'reverse-linked-list', 'lru-cache', 'group-anagrams', 'valid-parentheses', 'rotate-image', 'spiral-matrix',
+    'design-add-and-search-words-data-structure', 'longest-palindromic-substring', 'search-in-rotated-sorted-array',
+    'min-stack', 'set-matrix-zeroes', 'binary-tree-zigzag-level-order-traversal', 'merge-two-sorted-lists'
+  ],
+  apple: [
+    'two-sum', 'container-with-most-water', 'search-in-rotated-sorted-array', 'climbing-stairs',
+    'best-time-to-buy-and-sell-stock', 'jump-game', 'min-stack', 'intersection-of-two-linked-lists',
+    'invert-binary-tree', 'reverse-bits', 'valid-anagram'
+  ],
+  uber: [
+    'cheapest-flights-within-k-stops', 'network-delay-time', 'merge-intervals', 'insert-interval',
+    'meeting-rooms-ii', 'course-schedule', 'number-of-islands', 'word-ladder', 'lru-cache', 'reorder-list'
+  ],
+  netflix: [
+    'longest-substring-without-repeating-characters', 'sliding-window-maximum', 'find-median-from-data-stream',
+    'lru-cache', 'task-scheduler', 'longest-consecutive-sequence', 'group-anagrams', 'subsets'
+  ],
+  bloomberg: [
+    'min-stack', 'daily-temperatures', 'evaluate-reverse-polish-notation', 'top-k-frequent-words',
+    'valid-parentheses', 'two-sum', 'group-anagrams', 'design-underground-system', 'string-compression'
+  ]
+};
+
 // Helper to assign semantic tag colors
 function getTagColorClass(tag: string): string {
   if (!tag) return 'bg-[#1a202c] text-gray-300 border-[#262d3d]';
@@ -179,26 +243,32 @@ export const ProblemBrowser: React.FC<ProblemBrowserProps> = ({
     if (!Array.isArray(problems)) return [];
     return problems.filter(p => {
       const pTags = Array.isArray(p.tags) ? p.tags : [];
+      const slug = p.slug.toLowerCase();
 
       // 1. Curated Track Filter
       if (activeTrack === 'blind75') {
-        const isBlind75 = pTags.some(t => t.toLowerCase().includes('blind 75'));
+        const isBlind75 = BLIND_75_SLUGS.has(slug) || pTags.some(t => t.toLowerCase().includes('blind 75'));
         if (!isBlind75) return false;
       } else if (activeTrack === 'neetcode150') {
-        const isNeet = pTags.some(t => t.toLowerCase().includes('neetcode') || t.toLowerCase().includes('blind 75'));
-        if (!isNeet) return false;
+        // NeetCode 150 includes all algorithmic curriculum questions (non-SQL)
+        const isSql = pTags.some(t => t.toLowerCase().includes('sql') || t.toLowerCase().includes('database'));
+        if (isSql) return false;
       } else if (activeTrack === 'faang') {
-        const isFaang = pTags.some(t => ['google', 'meta', 'amazon', 'microsoft', 'apple'].includes(t.toLowerCase()));
+        // FAANG questions
+        const isFaang = Object.values(COMPANY_SLUGS_MAP).some(slugList => slugList.includes(slug)) ||
+                        pTags.some(t => ['google', 'meta', 'amazon', 'microsoft', 'apple', 'uber', 'netflix'].includes(t.toLowerCase()));
         if (!isFaang) return false;
       } else if (activeTrack === 'sql') {
-        const isSql = pTags.some(t => t.toLowerCase().includes('sql'));
+        const isSql = pTags.some(t => t.toLowerCase().includes('sql') || t.toLowerCase().includes('database')) || slug.includes('sql');
         if (!isSql) return false;
       }
 
       // 2. Company Tag Filter
       if (selectedCompany) {
-        const hasCompany = pTags.some(t => t.toLowerCase() === selectedCompany.toLowerCase());
-        if (!hasCompany) return false;
+        const compKey = selectedCompany.toLowerCase();
+        const compSlugs = COMPANY_SLUGS_MAP[compKey] || [];
+        const matchesCompany = compSlugs.includes(slug) || pTags.some(t => t.toLowerCase() === compKey);
+        if (!matchesCompany) return false;
       }
 
       return true;
