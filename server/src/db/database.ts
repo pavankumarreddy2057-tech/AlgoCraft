@@ -239,9 +239,29 @@ class DatabaseManager {
         }
       } catch (e) {}
 
-      // Safe schema migration for user_id column in existing submissions table
+      // Safe schema migration for user_id column in existing tables
       try {
         this.db.run('ALTER TABLE submissions ADD COLUMN user_id INTEGER DEFAULT 1;');
+      } catch (e) {}
+
+      try {
+        this.db.run('ALTER TABLE spaced_repetition ADD COLUMN user_id INTEGER DEFAULT 1;');
+      } catch (e) {}
+
+      try {
+        this.db.run('UPDATE spaced_repetition SET user_id = 1 WHERE user_id IS NULL;');
+      } catch (e) {}
+
+      try {
+        this.db.run('ALTER TABLE daily_activity ADD COLUMN user_id INTEGER DEFAULT 1;');
+      } catch (e) {}
+
+      try {
+        this.db.run('ALTER TABLE problem_notes ADD COLUMN user_id INTEGER DEFAULT 1;');
+      } catch (e) {}
+
+      try {
+        this.db.run('ALTER TABLE user_bookmarks ADD COLUMN user_id INTEGER DEFAULT 1;');
       } catch (e) {}
 
       this.save();

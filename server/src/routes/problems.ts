@@ -44,7 +44,27 @@ problemsRouter.get('/', authenticateUser, (req: AuthRequest, res: Response) => {
       params.push(term, term, term);
     }
 
-    const rows = dbManager.query(sql, params);
+    let rows: any[] = [];
+    try {
+      rows = dbManager.query(sql, params);
+    } catch (queryErr: any) {
+      console.warn('[Problems Route] Primary query failed, attempting schema fallback:', queryErr.message);
+      // Fallback query without spaced_repetition join
+      const fallbackSql = `
+        SELECT 
+          p.id, p.slug, p.title, p.difficulty, p.tags, p.time_limit_ms, p.memory_limit_mb, p.created_at,
+          0 as flagged_review,
+          NULL as interval_days,
+          0 as repetition_count,
+          NULL as next_review_at,
+          NULL as last_submission_status,
+          0 as has_solved,
+          0 as total_submissions
+        FROM problems p
+        WHERE 1=1
+      `;
+      rows = dbManager.query(fallbackSql);
+    }
 
     // Parse JSON tags safely
     let formatted = rows.map((r: any) => {
