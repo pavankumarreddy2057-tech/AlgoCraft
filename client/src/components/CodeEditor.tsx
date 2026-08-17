@@ -13,7 +13,11 @@ import {
   Activity,
   Copy,
   Sparkles,
-  AlignLeft
+  AlignLeft,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Maximize2,
+  Minimize2
 } from 'lucide-react';
 
 interface CodeEditorProps {
@@ -27,6 +31,8 @@ interface CodeEditorProps {
   onOpenNotes?: () => void;
   onOpenMentor?: () => void;
   onOpenBenchmark?: () => void;
+  onToggleLeftPanel?: () => void;
+  isLeftPanelCollapsed?: boolean;
   isRunning: boolean;
   isSubmitting: boolean;
 }
@@ -42,6 +48,8 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
   onOpenNotes,
   onOpenMentor,
   onOpenBenchmark,
+  onToggleLeftPanel,
+  isLeftPanelCollapsed,
   isRunning,
   isSubmitting
 }) => {
@@ -124,9 +132,22 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
     <div className="h-full flex flex-col bg-[#0f141c] select-none">
       
       {/* Top Toolbar */}
-      <div className="h-10 border-b border-[#262d3d] px-3 flex items-center justify-between bg-[#12161f] text-xs">
-        {/* Left: Language selector & tools */}
+      <div className="h-11 border-b border-[#262d3d] px-3 flex items-center justify-between bg-[#12161f] text-xs">
+        {/* Left: Collapse Button & Language selector & Tools */}
         <div className="flex items-center gap-2">
+          
+          {/* Panel Collapse / Expand Button (Desktop) */}
+          {onToggleLeftPanel && (
+            <button
+              onClick={onToggleLeftPanel}
+              className="hidden md:flex p-1.5 text-gray-400 hover:text-white hover:bg-[#1a202c] rounded-lg border border-[#262d3d] transition"
+              title={isLeftPanelCollapsed ? "Expand Problem Statement Panel" : "Collapse Problem Statement (Full Editor Width)"}
+              aria-label="Toggle panel width"
+            >
+              {isLeftPanelCollapsed ? <PanelLeftOpen className="w-3.5 h-3.5 text-blue-400" /> : <PanelLeftClose className="w-3.5 h-3.5" />}
+            </button>
+          )}
+
           <div className="relative">
             <select
               value={language}
@@ -150,7 +171,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
               title="Open Socratic AI Mentor"
             >
               <Bot className="w-3.5 h-3.5" />
-              <span>AI Mentor</span>
+              <span className="hidden sm:inline">AI Mentor</span>
             </button>
           )}
 
@@ -162,7 +183,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
               title="Open Problem Notes"
             >
               <FileText className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Notes</span>
+              <span className="hidden sm:inline">Notes</span>
             </button>
           )}
 
@@ -170,7 +191,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
           {onOpenBenchmark && (
             <button
               onClick={onOpenBenchmark}
-              className="px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-lg flex items-center gap-1.5 font-semibold transition-colors"
+              className="hidden lg:flex px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-lg items-center gap-1.5 font-semibold transition-colors"
               title="Empirical Big-O Benchmarker"
             >
               <Activity className="w-3.5 h-3.5" />
@@ -179,16 +200,18 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
           )}
         </div>
 
-        {/* Right: Stopwatch, Copy, Format, Font Sizing, Reset */}
-        <div className="flex items-center gap-2.5">
-          {/* Stopwatch */}
-          <div className="flex items-center gap-1.5 font-mono text-gray-300 bg-[#1a202c] px-2.5 py-0.5 rounded-lg border border-[#262d3d]">
-            <Timer className="w-3.5 h-3.5 text-emerald-400" />
-            <span>{formatTimer(timerSeconds)}</span>
+        {/* Right: High-Prominence Digital Timer, Copy, Format, Font Sizing, Reset */}
+        <div className="flex items-center gap-2">
+          
+          {/* Prominent High-Contrast Elapsed Timer */}
+          <div className="flex items-center gap-1.5 font-mono text-emerald-400 bg-[#0a0d12] px-2.5 py-1 rounded-xl border border-emerald-500/30 shadow-sm shadow-emerald-500/10">
+            <Timer className={`w-3.5 h-3.5 ${timerRunning ? 'animate-pulse text-emerald-400' : 'text-gray-500'}`} />
+            <span className="text-xs font-bold text-gray-100">{formatTimer(timerSeconds)}</span>
             <button
               onClick={() => setTimerRunning(!timerRunning)}
-              className="text-gray-400 hover:text-white ml-0.5"
+              className="text-gray-400 hover:text-white ml-0.5 p-0.5"
               title={timerRunning ? "Pause timer" : "Resume timer"}
+              aria-label={timerRunning ? "Pause timer" : "Resume timer"}
             >
               <Pause className="w-3 h-3" />
             </button>
@@ -197,8 +220,9 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
           {/* Copy Code */}
           <button
             onClick={handleCopyCode}
-            className="p-1 text-gray-400 hover:text-white hover:bg-[#1a202c] rounded-md transition"
+            className="p-1.5 text-gray-400 hover:text-white hover:bg-[#1a202c] rounded-lg border border-transparent hover:border-[#262d3d] transition"
             title="Copy code to clipboard"
+            aria-label="Copy code"
           >
             {isCopied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
           </button>
@@ -206,14 +230,15 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
           {/* Format Code */}
           <button
             onClick={handleFormatCode}
-            className="p-1 text-gray-400 hover:text-white hover:bg-[#1a202c] rounded-md transition"
+            className="p-1.5 text-gray-400 hover:text-white hover:bg-[#1a202c] rounded-lg border border-transparent hover:border-[#262d3d] transition hidden sm:flex"
             title="Format Code"
+            aria-label="Format Code"
           >
             <AlignLeft className="w-3.5 h-3.5" />
           </button>
 
           {/* Font size control */}
-          <div className="flex items-center gap-1 text-gray-400 bg-[#1a202c] px-1.5 py-0.5 rounded-lg border border-[#262d3d]">
+          <div className="hidden sm:flex items-center gap-1 text-gray-400 bg-[#1a202c] px-1.5 py-0.5 rounded-lg border border-[#262d3d]">
             <button
               onClick={() => setFontSize(s => Math.max(11, s - 1))}
               className="px-1 hover:text-white rounded"
@@ -234,8 +259,9 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
           {/* Reset Code */}
           <button
             onClick={onResetCode}
-            className="p-1 text-gray-400 hover:text-rose-400 hover:bg-[#1a202c] rounded-md transition-colors"
+            className="p-1.5 text-gray-400 hover:text-rose-400 hover:bg-[#1a202c] rounded-lg border border-transparent hover:border-[#262d3d] transition-colors"
             title="Reset code template"
+            aria-label="Reset code template"
           >
             <RotateCcw className="w-3.5 h-3.5" />
           </button>

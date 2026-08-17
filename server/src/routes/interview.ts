@@ -7,6 +7,7 @@ export interface InterviewSession {
   sessionId: string;
   durationMinutes: number;
   startTime: string;
+  difficultyMode: string;
   problems: Array<{
     id: number;
     slug: string;
@@ -23,21 +24,42 @@ interviewRouter.post('/start', (req: Request, res: Response) => {
   try {
     const { category, difficulty = 'Mixed' } = req.body;
 
-    let sql = 'SELECT * FROM problems WHERE difficulty != "Hard"';
-    if (category && category !== 'All') {
-      sql += ` AND tags LIKE '%"${category}"%'`;
-    }
-    const pool1 = dbManager.query(sql);
+    let targetDiffs: [string, string] = ['Medium', 'Hard'];
 
-    let sql2 = 'SELECT * FROM problems WHERE difficulty IN ("Medium", "Hard")';
-    if (category && category !== 'All') {
-      sql2 += ` AND tags LIKE '%"${category}"%'`;
+    if (difficulty === 'Sprint') {
+      targetDiffs = ['Medium', 'Medium'];
+    } else if (difficulty === 'Championship') {
+      targetDiffs = ['Hard', 'Hard'];
+    } else if (difficulty === 'Warmup') {
+      targetDiffs = ['Easy', 'Medium'];
+    } else {
+      // Default: Mixed / Standard
+      targetDiffs = ['Medium', 'Hard'];
     }
-    const pool2 = dbManager.query(sql2);
+
+    let sql1 = `SELECT * FROM problems WHERE difficulty = ?`;
+    let sql2 = `SELECT * FROM problems WHERE difficulty = ?`;
+    const params1: any[] = [targetDiffs[0]];
+    const params2: any[] = [targetDiffs[1]];
+
+    if (category && category !== 'All') {
+      sql1 += ` AND tags LIKE ?`;
+      params1.push(`%"${category}"%`);
+      sql2 += ` AND tags LIKE ?`;
+      params2.push(`%"${category}"%`);
+    }
+
+    let pool1 = dbManager.query(sql1, params1);
+    let pool2 = dbManager.query(sql2, params2);
+
+    // Fallbacks if filtered pool is too small
+    if (pool1.length === 0) pool1 = dbManager.query('SELECT * FROM problems WHERE difficulty = "Medium"');
+    if (pool2.length === 0) pool2 = dbManager.query('SELECT * FROM problems WHERE difficulty = "Hard"');
+    if (pool2.length === 0) pool2 = dbManager.query('SELECT * FROM problems WHERE difficulty = "Medium"');
 
     const prob1 = pool1[Math.floor(Math.random() * pool1.length)] || pool1[0];
     const pool2Filtered = pool2.filter((p: any) => p.slug !== prob1?.slug);
-    const prob2 = pool2Filtered[Math.floor(Math.random() * pool2Filtered.length)] || pool2[0];
+    const prob2 = (pool2Filtered.length > 0 ? pool2Filtered : pool2)[Math.floor(Math.random() * (pool2Filtered.length || pool2.length))] || pool2[0];
 
     const chosenProblems = [prob1, prob2].filter(Boolean).map((p: any) => ({
       id: p.id,
@@ -53,6 +75,7 @@ interviewRouter.post('/start', (req: Request, res: Response) => {
       sessionId: 'intv_' + Date.now(),
       durationMinutes: 45,
       startTime: new Date().toISOString(),
+      difficultyMode: `${chosenProblems[0]?.difficulty || 'Medium'} + ${chosenProblems[1]?.difficulty || 'Hard'}`,
       problems: chosenProblems
     };
 
@@ -68,7 +91,7 @@ interviewRouter.post('/start', (req: Request, res: Response) => {
 // POST /api/interview/evaluate
 interviewRouter.post('/evaluate', (req: Request, res: Response) => {
   try {
-    const { timeSpentSeconds, results = [] } = req.body;
+    const { timeSpentSeconds, results = [], earlyExit = false } = req.body;
 
     const totalProblems = results.length || 2;
     const solvedCount = results.filter((r: any) => r.solved).length;
@@ -85,7 +108,10 @@ interviewRouter.post('/evaluate', (req: Request, res: Response) => {
     let verdict = 'Needs Practice';
     let summary = 'Keep practicing the core algorithmic patterns and edge-case handling.';
 
-    if (overallScore >= 85) {
+    if (earlyExit && solvedCount === 0) {
+      verdict = 'Incomplete';
+      summary = 'Interview ended early before completing problems.';
+    } else if (overallScore >= 85) {
       verdict = 'Strong Hire';
       summary = 'Exceptional problem-solving speed, clean algorithmic logic, and 100% test case accuracy.';
     } else if (overallScore >= 70) {

@@ -21,8 +21,8 @@ export interface ProblemListItem {
   difficulty: Difficulty;
   tags: string[];
   status: ProblemStatus;
-  last_submission_status?: SubmissionStatus;
-  interval_days: number;
+  interval_days?: number;
+  repetition_count?: number;
   next_review_at?: string;
   flagged_review: number;
   has_solved: number;

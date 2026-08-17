@@ -7,12 +7,14 @@ import {
   Code2, 
   FileText, 
   CheckCircle2, 
-  XCircle,
-  Loader2,
-  Bot,
-  Layers,
-  Terminal,
-  ChevronRight
+  XCircle, 
+  Loader2, 
+  Bot, 
+  Layers, 
+  Terminal, 
+  ChevronRight,
+  PanelLeftClose,
+  PanelLeftOpen
 } from 'lucide-react';
 import { ProblemDetail, ExecutionResult, SubmissionHistoryItem } from '../types/index.js';
 import { 
@@ -20,7 +22,7 @@ import {
   runCode, 
   submitCode, 
   fetchSubmissionHistory, 
-  toggleBookmark 
+  toggleReviewFlag 
 } from '../lib/api.js';
 import { CodeEditor } from './CodeEditor.js';
 import { TestRunnerPanel } from './TestRunnerPanel.js';
@@ -47,9 +49,10 @@ export const Workspace: React.FC<WorkspaceProps> = ({
   const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Desktop tab states
+  // Desktop tab and collapse states
   const [activeLeftTab, setActiveLeftTab] = useState<'description' | 'editorial' | 'submissions'>('description');
-  
+  const [isLeftPanelCollapsed, setIsLeftPanelCollapsed] = useState<boolean>(false);
+
   // Mobile active tab state
   const [mobileTab, setMobileTab] = useState<'description' | 'editor' | 'results' | 'mentor'>('description');
 
@@ -67,7 +70,7 @@ export const Workspace: React.FC<WorkspaceProps> = ({
   const [isMentorOpen, setIsMentorOpen] = useState<boolean>(false);
   const [isBenchmarkOpen, setIsBenchmarkOpen] = useState<boolean>(false);
 
-  // Split pane height state for desktop
+  // Split pane height state for desktop (editor vs test runner)
   const [editorHeightPercent, setEditorHeightPercent] = useState<number>(60);
   const [isDragging, setIsDragging] = useState<boolean>(false);
 
@@ -120,8 +123,8 @@ export const Workspace: React.FC<WorkspaceProps> = ({
 
   const handleToggleBookmark = async () => {
     try {
-      const res = await toggleBookmark(slug);
-      setIsBookmarked(res.isBookmarked);
+      const isFlagged = await toggleReviewFlag(slug);
+      setIsBookmarked(isFlagged);
       onRefreshStats();
     } catch (e) {
       console.error('Bookmark error:', e);
@@ -215,9 +218,9 @@ export const Workspace: React.FC<WorkspaceProps> = ({
 
   if (loading || !problemData) {
     return (
-      <div className="flex-1 flex items-center justify-center text-gray-400 gap-2">
+      <div className="flex-1 flex items-center justify-center text-gray-400 gap-2 bg-[#0a0d12]">
         <Loader2 className="w-5 h-5 animate-spin text-emerald-400" />
-        Loading workspace...
+        <span className="text-xs font-semibold">Loading problem workspace...</span>
       </div>
     );
   }
@@ -230,7 +233,8 @@ export const Workspace: React.FC<WorkspaceProps> = ({
         <div className="flex items-center gap-2 md:gap-3 min-w-0">
           <button
             onClick={onBack}
-            className="p-1 rounded-md text-gray-400 hover:text-white hover:bg-[#1a202c] transition-colors flex items-center gap-1 text-xs font-semibold shrink-0"
+            className="p-1 rounded-lg text-gray-400 hover:text-white hover:bg-[#1a202c] transition-colors flex items-center gap-1 text-xs font-semibold shrink-0"
+            title="Return to Problem Library"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Problem Library</span>
@@ -255,10 +259,10 @@ export const Workspace: React.FC<WorkspaceProps> = ({
         <div className="flex items-center gap-1.5 shrink-0">
           <button
             onClick={handleToggleBookmark}
-            className={`p-1.5 rounded-lg border border-[#262d3d] ${
+            className={`p-1.5 rounded-xl border border-[#262d3d] ${
               isBookmarked ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'text-gray-400 hover:text-white bg-[#1a202c]'
             } transition-colors`}
-            title="Bookmark Problem"
+            title={isBookmarked ? "Remove from Spaced Repetition Review" : "Add to Spaced Repetition Review Queue"}
           >
             <Bookmark className={`w-3.5 h-3.5 ${isBookmarked ? 'fill-amber-400' : ''}`} />
           </button>
@@ -310,65 +314,78 @@ export const Workspace: React.FC<WorkspaceProps> = ({
       {/* 1. Desktop Side-by-Side Split View (md:flex) */}
       {/* ========================================================================= */}
       <div className="hidden md:flex flex-1 overflow-hidden">
-        {/* Left Side: Description, Hints & Editorial, Submissions */}
-        <div className="w-1/2 flex flex-col border-r border-[#262d3d] bg-[#0a0d12] overflow-hidden">
-          <div className="h-10 border-b border-[#262d3d] bg-[#12161f] px-3 flex items-center gap-1 select-none shrink-0">
-            <button
-              onClick={() => setActiveLeftTab('description')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition-colors ${
-                activeLeftTab === 'description'
-                  ? 'bg-[#1a202c] text-white border border-[#262d3d]'
-                  : 'text-gray-400 hover:text-gray-200'
-              }`}
-            >
-              <FileText className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Description</span>
-            </button>
+        
+        {/* Left Side: Description, Hints & Editorial, Submissions (Collapsible) */}
+        {!isLeftPanelCollapsed && (
+          <div className="w-1/2 flex flex-col border-r border-[#262d3d] bg-[#0a0d12] overflow-hidden transition-all duration-200">
+            <div className="h-11 border-b border-[#262d3d] bg-[#12161f] px-3 flex items-center justify-between select-none shrink-0">
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setActiveLeftTab('description')}
+                  className={`px-3 py-1.5 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-colors ${
+                    activeLeftTab === 'description'
+                      ? 'bg-[#1a202c] text-white border border-[#262d3d]'
+                      : 'text-gray-400 hover:text-gray-200'
+                  }`}
+                >
+                  <FileText className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Description</span>
+                </button>
 
-            <button
-              onClick={() => setActiveLeftTab('editorial')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition-colors ${
-                activeLeftTab === 'editorial'
-                  ? 'bg-[#1a202c] text-white border border-[#262d3d]'
-                  : 'text-gray-400 hover:text-gray-200'
-              }`}
-            >
-              <BookOpen className="w-3.5 h-3.5 text-sky-400" />
-              <span>Hints & Solution</span>
-            </button>
+                <button
+                  onClick={() => setActiveLeftTab('editorial')}
+                  className={`px-3 py-1.5 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-colors ${
+                    activeLeftTab === 'editorial'
+                      ? 'bg-[#1a202c] text-white border border-[#262d3d]'
+                      : 'text-gray-400 hover:text-gray-200'
+                  }`}
+                >
+                  <BookOpen className="w-3.5 h-3.5 text-sky-400" />
+                  <span>Hints & Solution</span>
+                </button>
 
-            <button
-              onClick={() => setActiveLeftTab('submissions')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition-colors ${
-                activeLeftTab === 'submissions'
-                  ? 'bg-[#1a202c] text-white border border-[#262d3d]'
-                  : 'text-gray-400 hover:text-gray-200'
-              }`}
-            >
-              <History className="w-3.5 h-3.5 text-purple-400" />
-              <span>Submissions ({history.length})</span>
-            </button>
+                <button
+                  onClick={() => setActiveLeftTab('submissions')}
+                  className={`px-3 py-1.5 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-colors ${
+                    activeLeftTab === 'submissions'
+                      ? 'bg-[#1a202c] text-white border border-[#262d3d]'
+                      : 'text-gray-400 hover:text-gray-200'
+                  }`}
+                >
+                  <History className="w-3.5 h-3.5 text-purple-400" />
+                  <span>Submissions ({history.length})</span>
+                </button>
+              </div>
+
+              <button
+                onClick={() => setIsLeftPanelCollapsed(true)}
+                className="p-1 text-gray-400 hover:text-white hover:bg-[#1a202c] rounded-lg transition"
+                title="Collapse Panel (Maximize Code Editor)"
+              >
+                <PanelLeftClose className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              {activeLeftTab === 'description' && (
+                <DescriptionContent problemData={problemData} />
+              )}
+              {activeLeftTab === 'editorial' && (
+                <HintsAndSolution
+                  hints={problemData.hints}
+                  referenceSolution={problemData.reference_solution}
+                  editorialMd={problemData.editorial_md}
+                />
+              )}
+              {activeLeftTab === 'submissions' && (
+                <SubmissionsContent history={history} />
+              )}
+            </div>
           </div>
-
-          <div className="flex-1 overflow-y-auto p-6 space-y-6">
-            {activeLeftTab === 'description' && (
-              <DescriptionContent problemData={problemData} />
-            )}
-            {activeLeftTab === 'editorial' && (
-              <HintsAndSolution
-                hints={problemData.hints}
-                referenceSolution={problemData.reference_solution}
-                editorialMd={problemData.editorial_md}
-              />
-            )}
-            {activeLeftTab === 'submissions' && (
-              <SubmissionsContent history={history} />
-            )}
-          </div>
-        </div>
+        )}
 
         {/* Right Side: Monaco Code Editor + Resizable Test Runner */}
-        <div id="right-workspace-pane" className="w-1/2 flex flex-col bg-[#0f141c] overflow-hidden relative">
+        <div id="right-workspace-pane" className={`${isLeftPanelCollapsed ? 'w-full' : 'w-1/2'} flex flex-col bg-[#0f141c] overflow-hidden relative transition-all duration-200`}>
           <div style={{ height: `${editorHeightPercent}%` }} className="w-full">
             <CodeEditor
               language={language}
@@ -381,6 +398,8 @@ export const Workspace: React.FC<WorkspaceProps> = ({
               onOpenNotes={() => setIsNotesOpen(true)}
               onOpenMentor={() => setIsMentorOpen(true)}
               onOpenBenchmark={() => setIsBenchmarkOpen(true)}
+              onToggleLeftPanel={() => setIsLeftPanelCollapsed(!isLeftPanelCollapsed)}
+              isLeftPanelCollapsed={isLeftPanelCollapsed}
               isRunning={isRunning}
               isSubmitting={isSubmitting}
             />

@@ -1,29 +1,32 @@
 import { Router, Request, Response } from 'express';
 import { dbManager } from '../db/database.js';
 import type { ProblemRecord } from '../db/database.js';
+import { AuthRequest, authenticateUser } from '../auth/jwt-middleware.js';
 
 export const problemsRouter = Router();
 
 // GET /api/problems
-problemsRouter.get('/', (req: Request, res: Response) => {
+problemsRouter.get('/', authenticateUser, (req: AuthRequest, res: Response) => {
   try {
     const { difficulty, tag, status, search, sort = 'id', order = 'asc' } = req.query;
+    const userId = req.user ? req.user.id : 1;
 
     let sql = `
       SELECT 
         p.id, p.slug, p.title, p.difficulty, p.tags, p.time_limit_ms, p.memory_limit_mb, p.created_at,
         COALESCE(sr.flagged_review, 0) as flagged_review,
-        COALESCE(sr.interval_days, 1) as interval_days,
+        sr.interval_days,
+        sr.repetition_count,
         sr.next_review_at,
-        (SELECT status FROM submissions WHERE problem_slug = p.slug ORDER BY id DESC LIMIT 1) as last_submission_status,
-        (SELECT COUNT(*) FROM submissions WHERE problem_slug = p.slug AND status = 'Accepted') as has_solved,
-        (SELECT COUNT(*) FROM submissions WHERE problem_slug = p.slug) as total_submissions
+        (SELECT status FROM submissions WHERE problem_slug = p.slug AND user_id = ? ORDER BY id DESC LIMIT 1) as last_submission_status,
+        (SELECT COUNT(*) FROM submissions WHERE problem_slug = p.slug AND user_id = ? AND status = 'Accepted') as has_solved,
+        (SELECT COUNT(*) FROM submissions WHERE problem_slug = p.slug AND user_id = ?) as total_submissions
       FROM problems p
-      LEFT JOIN spaced_repetition sr ON p.slug = sr.problem_slug
+      LEFT JOIN spaced_repetition sr ON p.slug = sr.problem_slug AND sr.user_id = ?
       WHERE 1=1
     `;
 
-    const params: any[] = [];
+    const params: any[] = [userId, userId, userId, userId];
 
     if (difficulty && typeof difficulty === 'string' && difficulty !== 'All') {
       sql += ` AND p.difficulty = ?`;
@@ -47,6 +50,8 @@ problemsRouter.get('/', (req: Request, res: Response) => {
     let formatted = rows.map((r: any) => ({
       ...r,
       tags: JSON.parse(r.tags || '[]'),
+      interval_days: r.interval_days ?? null,
+      repetition_count: r.repetition_count ?? 0,
       status: r.has_solved > 0 ? 'Solved' : (r.total_submissions > 0 ? 'Attempted' : 'Todo')
     }));
 
@@ -88,14 +93,14 @@ problemsRouter.get('/meta/tags', (req: Request, res: Response) => {
     const rows = dbManager.query<{ tags: string }>('SELECT tags FROM problems');
     const tagCountMap: Record<string, number> = {};
 
-    rows.forEach(r => {
+    for (const r of rows) {
       try {
         const tags: string[] = JSON.parse(r.tags || '[]');
-        tags.forEach(t => {
+        for (const t of tags) {
           tagCountMap[t] = (tagCountMap[t] || 0) + 1;
-        });
+        }
       } catch (e) {}
-    });
+    }
 
     const result = Object.entries(tagCountMap)
       .map(([name, count]) => ({ name, count }))
@@ -108,62 +113,72 @@ problemsRouter.get('/meta/tags', (req: Request, res: Response) => {
 });
 
 // GET /api/problems/:slug
-problemsRouter.get('/:slug', (req: Request, res: Response) => {
+problemsRouter.get('/:slug', authenticateUser, (req: AuthRequest, res: Response) => {
   try {
     const { slug } = req.params;
-    const problem = dbManager.queryOne<ProblemRecord>(
+    const userId = req.user ? req.user.id : 1;
+
+    const row = dbManager.queryOne<ProblemRecord>(
       'SELECT * FROM problems WHERE slug = ?',
       [slug]
     );
 
-    if (!problem) {
-      return res.status(404).json({ success: false, error: `Problem '${slug}' not found` });
+    if (!row) {
+      res.status(404).json({ success: false, error: `Problem '${slug}' not found` });
+      return;
     }
 
-    const sr = dbManager.queryOne(
-      'SELECT * FROM spaced_repetition WHERE problem_slug = ?',
-      [slug]
+    const srRecord = dbManager.queryOne(
+      'SELECT * FROM spaced_repetition WHERE user_id = ? AND problem_slug = ?',
+      [userId, slug]
     );
 
     const latestSubmission = dbManager.queryOne(
-      'SELECT * FROM submissions WHERE problem_slug = ? ORDER BY id DESC LIMIT 1',
-      [slug]
+      'SELECT * FROM submissions WHERE user_id = ? AND problem_slug = ? ORDER BY id DESC LIMIT 1',
+      [userId, slug]
     );
 
-    const testCasesAll = JSON.parse(problem.test_cases || '[]');
-    // Sample test cases for the runner UI (non-hidden only by default)
-    const sampleCases = testCasesAll.filter((tc: any) => !tc.hidden);
+    const totalSubmissions = dbManager.queryOne<{ count: number }>(
+      'SELECT COUNT(*) as count FROM submissions WHERE user_id = ? AND problem_slug = ?',
+      [userId, slug]
+    );
+
+    const solvedSubmissions = dbManager.queryOne<{ count: number }>(
+      'SELECT COUNT(*) as count FROM submissions WHERE user_id = ? AND problem_slug = ? AND status = "Accepted"',
+      [userId, slug]
+    );
+
+    const testCasesParsed = JSON.parse(row.test_cases || '[]');
+    const sampleTestCases = testCasesParsed.filter((tc: any) => !tc.hidden);
+
+    const problem = {
+      id: row.id,
+      slug: row.slug,
+      title: row.title,
+      difficulty: row.difficulty,
+      tags: JSON.parse(row.tags || '[]'),
+      time_limit_ms: row.time_limit_ms,
+      memory_limit_mb: row.memory_limit_mb,
+      created_at: row.created_at,
+      statement_md: row.statement_md,
+      constraints: JSON.parse(row.constraints || '[]'),
+      examples: JSON.parse(row.examples || '[]'),
+      starter_code: JSON.parse(row.starter_code || '{}'),
+      hints: JSON.parse(row.hints || '[]'),
+      editorial_md: row.editorial_md || '',
+      reference_solution: JSON.parse(row.reference_solution || '{}'),
+      sample_test_cases: sampleTestCases
+    };
 
     res.json({
       success: true,
-      problem: {
-        id: problem.id,
-        slug: problem.slug,
-        title: problem.title,
-        difficulty: problem.difficulty,
-        tags: JSON.parse(problem.tags || '[]'),
-        statement_md: problem.statement_md,
-        constraints: JSON.parse(problem.constraints || '[]'),
-        examples: JSON.parse(problem.examples || '[]'),
-        starter_code: JSON.parse(problem.starter_code || '{}'),
-        sample_test_cases: sampleCases,
-        total_test_cases_count: testCasesAll.length,
-        hints: JSON.parse(problem.hints || '[]'),
-        editorial_md: problem.editorial_md || '',
-        reference_solution: JSON.parse(problem.reference_solution || '{}'),
-        time_limit_ms: problem.time_limit_ms,
-        memory_limit_mb: problem.memory_limit_mb
-      },
-      spaced_repetition: sr || {
-        interval_days: 1,
-        repetition_count: 0,
-        ease_factor: 2.5,
-        flagged_review: 0
-      },
-      latest_submission: latestSubmission ? {
-        ...latestSubmission,
-        results: JSON.parse(latestSubmission.results_json || '[]')
-      } : null
+      problem,
+      spaced_repetition: srRecord || null,
+      latest_submission: latestSubmission || null,
+      stats: {
+        total_submissions: totalSubmissions?.count || 0,
+        is_solved: (solvedSubmissions?.count || 0) > 0
+      }
     });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
