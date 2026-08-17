@@ -12,19 +12,32 @@ export class MailerService {
   private static getTransporter(): nodemailer.Transporter | null {
     if (this.transporter) return this.transporter;
 
-    const host = process.env.SMTP_HOST;
-    const port = parseInt(process.env.SMTP_PORT || '587', 10);
-    const user = process.env.SMTP_USER;
-    const pass = process.env.SMTP_PASS;
+    const service = process.env.SMTP_SERVICE || process.env.EMAIL_SERVICE;
+    const host = process.env.SMTP_HOST || process.env.EMAIL_HOST;
+    const port = parseInt(process.env.SMTP_PORT || process.env.EMAIL_PORT || '587', 10);
+    const user = process.env.SMTP_USER || process.env.EMAIL_USER;
+    const pass = process.env.SMTP_PASS || process.env.EMAIL_PASS || process.env.SMTP_PASSWORD;
 
-    if (host && user && pass) {
-      this.transporter = nodemailer.createTransport({
-        host,
-        port,
-        secure: port === 465,
-        auth: { user, pass }
-      });
-      return this.transporter;
+    if (user && pass) {
+      if (service?.toLowerCase() === 'gmail' || (!host && user.includes('@gmail.com')) || host === 'smtp.gmail.com') {
+        this.transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: { user, pass }
+        });
+        console.log('[Mailer] Initialized Gmail Transporter for:', user);
+        return this.transporter;
+      }
+
+      if (host) {
+        this.transporter = nodemailer.createTransport({
+          host,
+          port,
+          secure: port === 465,
+          auth: { user, pass }
+        });
+        console.log(`[Mailer] Initialized SMTP Transporter (${host}:${port}) for:`, user);
+        return this.transporter;
+      }
     }
 
     return null;
@@ -33,7 +46,7 @@ export class MailerService {
   static async sendOtpEmail(options: SendOtpMailOptions): Promise<{ success: boolean; isDev: boolean; devOtp?: string }> {
     const { email, code, expiresInMinutes = 10 } = options;
     const transporter = this.getTransporter();
-    const fromAddress = process.env.SMTP_FROM || 'AlgoCraft Security <noreply@sentinelhq.in>';
+    const fromAddress = process.env.SMTP_FROM || process.env.EMAIL_FROM || `"AlgoCraft Security" <${process.env.SMTP_USER || 'noreply@sentinelhq.in'}>`;
 
     const htmlContent = `
       <!DOCTYPE html>
@@ -52,7 +65,7 @@ export class MailerService {
                 <tr>
                   <td style="padding: 30px 40px; text-align: center; border-bottom: 1px solid #30363d; background: linear-gradient(180deg, #1c2128 0%, #161b22 100%);">
                     <div style="font-size: 28px; font-weight: 800; color: #58a6ff; letter-spacing: -0.5px;">⚡ AlgoCraft</div>
-                    <div style="font-size: 13px; color: #8b949e; margin-top: 4px;">Offline DSA Practice & Mastery Platform</div>
+                    <div style="font-size: 13px; color: #8b949e; margin-top: 4px;">DSA Practice & Interview Mastery Platform</div>
                   </td>
                 </tr>
                 <!-- Content -->
@@ -74,7 +87,7 @@ export class MailerService {
                 <!-- Footer -->
                 <tr>
                   <td style="padding: 20px 40px; text-align: center; border-top: 1px solid #21262d; background-color: #0d1117; font-size: 12px; color: #484f58;">
-                    AlgoCraft • Offline Coding & Mock Interview Platform • sentinelhq.in
+                    AlgoCraft • Coding Platform • sentinelhq.in
                   </td>
                 </tr>
               </table>
@@ -94,11 +107,11 @@ export class MailerService {
           text: `Your AlgoCraft verification code is: ${code}. It expires in ${expiresInMinutes} minutes.`,
           html: htmlContent
         });
-        console.log(`[Mailer] OTP email successfully sent to: ${email}`);
+        console.log(`[Mailer] ✅ Real OTP email successfully delivered to: ${email}`);
         return { success: true, isDev: false };
       } catch (err: any) {
-        console.error(`[Mailer] Failed to send email to ${email}:`, err.message);
-        // Fallback to dev log if SMTP server failed
+        console.error(`[Mailer] ❌ SMTP Error delivering email to ${email}:`, err.message);
+        throw new Error(`Failed to send real email: ${err.message}`);
       }
     }
 
