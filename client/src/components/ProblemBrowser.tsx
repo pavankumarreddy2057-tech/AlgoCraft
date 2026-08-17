@@ -5,21 +5,22 @@ import {
   Brain, 
   Tag, 
   ChevronRight, 
-  ChevronDown,
+  ChevronDown, 
   ChevronUp,
-  Filter,
-  Sparkles,
-  Bookmark,
-  Building2,
+  Filter, 
+  Sparkles, 
+  Bookmark, 
+  Building2, 
   ListFilter,
-  Flame,
-  Award,
-  Layers,
-  Code2,
-  Clock,
-  History,
+  Flame, 
+  Award, 
+  Layers, 
+  Code2, 
+  Clock, 
+  History, 
   X,
-  Star
+  Star,
+  RefreshCw
 } from 'lucide-react';
 import { ProblemListItem } from '../types/index.js';
 import { fetchProblems, fetchTags, toggleReviewFlag } from '../lib/api.js';
@@ -47,6 +48,7 @@ const SUGGESTED_SEARCHES = [
 
 // Helper to assign semantic tag colors
 function getTagColorClass(tag: string): string {
+  if (!tag) return 'bg-[#1a202c] text-gray-300 border-[#262d3d]';
   const t = tag.toLowerCase();
   
   // Data Structures (Blue / Cyan)
@@ -113,12 +115,13 @@ export const ProblemBrowser: React.FC<ProblemBrowserProps> = ({
           status: selectedStatus,
           search: searchQuery
         }),
-        fetchTags()
+        fetchTags().catch(() => [])
       ]);
-      setProblems(probRes.problems);
-      setTags(tagRes);
+      setProblems(probRes?.problems || []);
+      setTags(tagRes || []);
     } catch (err: any) {
       console.error('Failed to load problems:', err);
+      setProblems([]);
     } finally {
       setLoading(false);
     }
@@ -159,7 +162,6 @@ export const ProblemBrowser: React.FC<ProblemBrowserProps> = ({
   const handleToggleBookmark = async (e: React.MouseEvent, slug: string) => {
     e.stopPropagation();
     try {
-      // Connect star directly to SM-2 review queue
       const isFlagged = await toggleReviewFlag(slug);
       setProblems(prev => prev.map(p => p.slug === slug ? { ...p, flagged_review: isFlagged ? 1 : 0 } : p));
     } catch (err: any) {
@@ -174,25 +176,28 @@ export const ProblemBrowser: React.FC<ProblemBrowserProps> = ({
 
   // Filter problems client-side for curated tracks & company tags
   const filteredProblems = useMemo(() => {
+    if (!Array.isArray(problems)) return [];
     return problems.filter(p => {
+      const pTags = Array.isArray(p.tags) ? p.tags : [];
+
       // 1. Curated Track Filter
       if (activeTrack === 'blind75') {
-        const isBlind75 = p.tags.some(t => t.toLowerCase().includes('blind 75'));
+        const isBlind75 = pTags.some(t => t.toLowerCase().includes('blind 75'));
         if (!isBlind75) return false;
       } else if (activeTrack === 'neetcode150') {
-        const isNeet = p.tags.some(t => t.toLowerCase().includes('neetcode') || t.toLowerCase().includes('blind 75'));
+        const isNeet = pTags.some(t => t.toLowerCase().includes('neetcode') || t.toLowerCase().includes('blind 75'));
         if (!isNeet) return false;
       } else if (activeTrack === 'faang') {
-        const isFaang = p.tags.some(t => ['google', 'meta', 'amazon', 'microsoft', 'apple'].includes(t.toLowerCase()));
+        const isFaang = pTags.some(t => ['google', 'meta', 'amazon', 'microsoft', 'apple'].includes(t.toLowerCase()));
         if (!isFaang) return false;
       } else if (activeTrack === 'sql') {
-        const isSql = p.tags.some(t => t.toLowerCase().includes('sql'));
+        const isSql = pTags.some(t => t.toLowerCase().includes('sql'));
         if (!isSql) return false;
       }
 
       // 2. Company Tag Filter
       if (selectedCompany) {
-        const hasCompany = p.tags.some(t => t.toLowerCase() === selectedCompany.toLowerCase());
+        const hasCompany = pTags.some(t => t.toLowerCase() === selectedCompany.toLowerCase());
         if (!hasCompany) return false;
       }
 
@@ -210,142 +215,110 @@ export const ProblemBrowser: React.FC<ProblemBrowserProps> = ({
   const formatSM2Interval = (p: ProblemListItem) => {
     if (p.flagged_review === 1) {
       return (
-        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
-          Due
+        <span className="inline-flex items-center gap-1 font-semibold text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded-full border border-purple-500/30 text-[10px]">
+          <Brain className="w-3 h-3 text-purple-400" />
+          <span>Due</span>
         </span>
       );
     }
-    if (p.interval_days !== null && p.interval_days !== undefined && p.repetition_count && p.repetition_count > 0) {
+    if (p.interval_days !== null && p.interval_days !== undefined && p.interval_days > 0) {
       return (
-        <span className="font-mono text-purple-300 font-semibold">
+        <span className="font-mono text-gray-300 text-xs">
           {p.interval_days}d
         </span>
       );
     }
-    if (p.status === 'Solved') {
-      return <span className="text-gray-400 font-mono text-[11px]">1d</span>;
-    }
-    return <span className="text-gray-600 font-mono text-xs">—</span>;
+    return (
+      <span className="text-gray-600 font-mono text-xs">
+        —
+      </span>
+    );
   };
 
-  // Helper to render clear 3-state status indicator
-  const renderStatusIndicator = (status: string) => {
+  // 3-State Status indicator
+  const renderStatusIndicator = (status: 'Solved' | 'Attempted' | 'Todo') => {
     if (status === 'Solved') {
       return (
-        <div className="w-5 h-5 rounded-full bg-emerald-500/10 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shadow-sm shadow-emerald-500/20 mx-auto" title="Solved">
-          <CheckCircle2 className="w-3.5 h-3.5 fill-emerald-500/20" />
+        <div className="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shadow-sm shadow-emerald-500/20" title="Solved">
+          <CheckCircle2 className="w-3.5 h-3.5 fill-emerald-400/20" />
         </div>
       );
     }
     if (status === 'Attempted') {
       return (
-        <div className="w-5 h-5 rounded-full bg-amber-500/10 border border-amber-500/40 flex items-center justify-center text-amber-400 mx-auto" title="Attempted">
+        <div className="w-5 h-5 rounded-full bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400" title="Attempted (Not yet accepted)">
           <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
         </div>
       );
     }
     return (
-      <div className="w-5 h-5 rounded-full border border-gray-700 hover:border-gray-500 flex items-center justify-center mx-auto transition" title="Not Started">
-        <div className="w-1 h-1 rounded-full bg-gray-600" />
+      <div className="w-5 h-5 rounded-full border border-gray-700/80 flex items-center justify-center" title="Todo (Not started)">
+        <div className="w-1 h-1 rounded-full bg-gray-700" />
       </div>
     );
   };
 
   return (
-    <div className="flex-1 overflow-y-auto p-3 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-5">
+    <div className="flex-1 flex flex-col h-full overflow-y-auto bg-[#0a0d12] p-3 sm:p-6 lg:p-8 space-y-6">
       
-      {/* 1. Daily Review Reminder Banner */}
-      {dueProblemsCount > 0 && (
-        <div className="p-4 md:p-5 rounded-2xl bg-gradient-to-r from-purple-950/60 via-[#181d28] to-indigo-950/40 border border-purple-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl">
-          <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center border border-purple-500/30 shrink-0">
-              <Brain className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-gray-100 flex items-center gap-2">
-                <span>{dueProblemsCount} Problem(s) Ready for Spaced Review</span>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-purple-500/20 text-purple-300 border border-purple-500/30">
-                  SM-2
-                </span>
-              </h3>
-              <p className="text-xs text-gray-400 mt-0.5">
-                Practice today to lock algorithmic patterns into your long-term memory.
-              </p>
-            </div>
-          </div>
-
-          <button
-            onClick={onNavigateReview}
-            className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-bold shadow-md shadow-purple-600/20 transition-colors flex items-center gap-1.5 shrink-0 self-end sm:self-auto"
-          >
-            <span>Start Review</span>
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-      )}
-
-      {/* 2. Curated Tracks Tabs */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none select-none">
+      {/* 1. Curated Tracks Filter Bar */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin">
         {CURATED_TRACKS.map(track => {
           const Icon = track.icon;
           const isActive = activeTrack === track.id;
           return (
             <button
               key={track.id}
-              onClick={() => setActiveTrack(track.id)}
-              className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 border transition-all shrink-0 ${
+              onClick={() => {
+                setActiveTrack(track.id);
+                setSelectedCompany(null);
+              }}
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 border ${
                 isActive
-                  ? 'bg-blue-600/15 border-blue-500/40 text-blue-400 shadow-sm shadow-blue-500/10'
+                  ? 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-600/20'
                   : 'bg-[#12161f] border-[#262d3d] text-gray-400 hover:text-gray-200 hover:border-gray-600'
               }`}
             >
-              <Icon className="w-3.5 h-3.5" />
+              <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-white' : 'text-gray-400'}`} />
               <span>{track.label}</span>
             </button>
           );
         })}
       </div>
 
-      {/* 3. Company Filter Pills */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 select-none text-xs">
-        <span className="text-[11px] font-semibold text-gray-500 mr-1 shrink-0 flex items-center gap-1">
-          <Building2 className="w-3.5 h-3.5" />
-          Companies:
+      {/* 2. Top Company Pills */}
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-thin">
+        <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider shrink-0 flex items-center gap-1 mr-1">
+          <Building2 className="w-3 h-3 text-amber-400" />
+          <span>Companies:</span>
         </span>
-        <button
-          onClick={() => setSelectedCompany(null)}
-          className={`px-2.5 py-1 rounded-lg text-xs font-medium transition shrink-0 ${
-            selectedCompany === null
-              ? 'bg-[#262d3d] text-white font-semibold'
-              : 'text-gray-400 hover:text-gray-200 hover:bg-[#1a202c]'
-          }`}
-        >
-          All
-        </button>
-        {POPULAR_COMPANIES.map(company => {
-          const isSel = selectedCompany === company;
+        {POPULAR_COMPANIES.map(comp => {
+          const isSelected = selectedCompany?.toLowerCase() === comp.toLowerCase();
           return (
             <button
-              key={company}
-              onClick={() => setSelectedCompany(isSel ? null : company)}
-              className={`px-2.5 py-1 rounded-lg text-xs font-medium transition shrink-0 border ${
-                isSel
-                  ? 'bg-amber-500/15 border-amber-500/40 text-amber-300 font-semibold'
-                  : 'border-transparent text-gray-400 hover:text-gray-200 hover:bg-[#1a202c]'
+              key={comp}
+              onClick={() => {
+                setSelectedCompany(isSelected ? null : comp);
+                if (!isSelected) setActiveTrack('all');
+              }}
+              className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition border shrink-0 ${
+                isSelected
+                  ? 'bg-amber-500/20 border-amber-500 text-amber-300 shadow-sm'
+                  : 'bg-[#0a0d12] border-[#262d3d] text-gray-400 hover:text-gray-200 hover:border-gray-600'
               }`}
             >
-              {company}
+              {comp}
             </button>
           );
         })}
       </div>
 
-      {/* 4. Search and Filter Bar with Autocomplete Suggestions */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 bg-[#12161f] p-3 rounded-2xl border border-[#262d3d] relative">
+      {/* 3. Search Bar + Dropdown Filters */}
+      <div className="flex flex-col md:flex-row gap-3">
         
-        {/* Search Input Container */}
+        {/* Search with Autocomplete */}
         <div ref={searchContainerRef} className="relative flex-1">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
             type="text"
             value={searchQuery}
@@ -456,9 +429,33 @@ export const ProblemBrowser: React.FC<ProblemBrowserProps> = ({
             <option value="All">All Statuses</option>
             <option value="Solved">Solved</option>
             <option value="Attempted">Attempted</option>
-            <option value="Todo">Todo</option>
+            <option value="Unsolved">Todo</option>
           </select>
         </div>
+      </div>
+
+      {/* 4. Filter Summary / Counter Bar */}
+      <div className="flex items-center justify-between text-xs text-gray-400 px-1">
+        <div>
+          Showing <span className="font-bold text-gray-100">{filteredProblems.length}</span> questions
+          {activeTrack !== 'all' && (
+            <span> in <span className="text-blue-400 font-semibold">{CURATED_TRACKS.find(t => t.id === activeTrack)?.label}</span></span>
+          )}
+          {selectedCompany && (
+            <span> asked at <span className="text-amber-400 font-semibold">{selectedCompany}</span></span>
+          )}
+        </div>
+
+        {dueProblemsCount > 0 && (
+          <button
+            onClick={onNavigateReview}
+            className="text-xs text-purple-400 hover:text-purple-300 font-semibold flex items-center gap-1.5 transition"
+          >
+            <Brain className="w-3.5 h-3.5" />
+            <span>{dueProblemsCount} Review Cards Due</span>
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+        )}
       </div>
 
       {/* ========================================================================= */}
@@ -479,6 +476,7 @@ export const ProblemBrowser: React.FC<ProblemBrowserProps> = ({
           filteredProblems.map((p) => {
             const isExpanded = !!expandedTags[p.slug];
             const isBookmarked = p.flagged_review === 1;
+            const pTags = Array.isArray(p.tags) ? p.tags : [];
 
             return (
               <div
@@ -520,7 +518,7 @@ export const ProblemBrowser: React.FC<ProblemBrowserProps> = ({
                     {p.difficulty}
                   </span>
 
-                  {(isExpanded ? p.tags : p.tags.slice(0, 2)).map((tag) => (
+                  {(isExpanded ? pTags : pTags.slice(0, 2)).map((tag) => (
                     <span
                       key={tag}
                       className={`px-2 py-0.5 rounded-md text-[10px] font-medium border ${getTagColorClass(tag)}`}
@@ -529,12 +527,12 @@ export const ProblemBrowser: React.FC<ProblemBrowserProps> = ({
                     </span>
                   ))}
 
-                  {p.tags.length > 2 && (
+                  {pTags.length > 2 && (
                     <button
                       onClick={(e) => toggleTagExpand(e, p.slug)}
                       className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-[#1a202c] text-blue-400 hover:bg-[#262d3d] border border-[#262d3d] transition"
                     >
-                      {isExpanded ? 'Hide' : `+${p.tags.length - 2}`}
+                      {isExpanded ? 'Hide' : `+${pTags.length - 2}`}
                     </button>
                   )}
                 </div>
@@ -568,46 +566,49 @@ export const ProblemBrowser: React.FC<ProblemBrowserProps> = ({
         ) : filteredProblems.length === 0 ? (
           <div className="py-20 text-center space-y-2">
             <div className="text-sm font-bold text-gray-300">No problems found matching criteria</div>
-            <p className="text-xs text-gray-500">Try clearing filters or searching with a different term.</p>
+            <p className="text-xs text-gray-500">Try loosening your search or filter tags.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead>
-                <tr className="border-b border-[#262d3d] bg-[#0a0d12]/50 text-gray-400 font-semibold select-none">
-                  <th className="py-3.5 pl-4 w-12 text-center">Status</th>
-                  <th className="py-3.5 px-3">Title & Concept</th>
-                  <th className="py-3.5 px-3 w-28">Difficulty</th>
-                  <th className="py-3.5 px-3">Categories & Tags</th>
-                  <th className="py-3.5 px-3 w-28 text-center">SM-2 Review</th>
-                  <th className="py-3.5 pr-4 w-12 text-center">Review</th>
+                <tr className="border-b border-[#262d3d] bg-[#161b22] text-gray-400 font-semibold select-none">
+                  <th className="py-3 px-4 w-12 text-center">Status</th>
+                  <th className="py-3 px-4">Title</th>
+                  <th className="py-3 px-4 w-28">Difficulty</th>
+                  <th className="py-3 px-4">Category Tags</th>
+                  <th className="py-3 px-4 w-32">SM-2 Review</th>
+                  <th className="py-3 px-4 w-12 text-center">Star</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#1e2533]">
                 {filteredProblems.map((p) => {
-                  const isBookmarked = p.flagged_review === 1;
                   const isExpanded = !!expandedTags[p.slug];
+                  const isBookmarked = p.flagged_review === 1;
+                  const pTags = Array.isArray(p.tags) ? p.tags : [];
 
                   return (
                     <tr
                       key={p.slug}
                       onClick={() => onSelectProblem(p.slug)}
-                      className="hover:bg-[#181d28] cursor-pointer transition-colors group"
+                      className="hover:bg-[#181d28] transition group cursor-pointer"
                     >
-                      {/* 3-State Status Indicator */}
-                      <td className="py-3.5 pl-4 text-center">
-                        {renderStatusIndicator(p.status)}
-                      </td>
-
-                      {/* Problem Title */}
-                      <td className="py-3.5 px-3">
-                        <div className="font-semibold text-gray-100 group-hover:text-blue-400 transition-colors">
-                          {p.id}. {p.title}
+                      {/* Status */}
+                      <td className="py-3.5 px-4 text-center">
+                        <div className="flex justify-center">
+                          {renderStatusIndicator(p.status)}
                         </div>
                       </td>
 
-                      {/* Difficulty Badge */}
-                      <td className="py-3.5 px-3">
+                      {/* Title */}
+                      <td className="py-3.5 px-4">
+                        <div className="font-bold text-gray-100 group-hover:text-blue-400 transition-colors flex items-center gap-2">
+                          <span>{p.id}. {p.title}</span>
+                        </div>
+                      </td>
+
+                      {/* Difficulty */}
+                      <td className="py-3.5 px-4">
                         <span className={`px-2.5 py-0.5 rounded-full font-bold text-[11px] ${
                           p.difficulty === 'Easy'
                             ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
@@ -619,10 +620,10 @@ export const ProblemBrowser: React.FC<ProblemBrowserProps> = ({
                         </span>
                       </td>
 
-                      {/* Color-Coded & Expandable Tags Chips */}
-                      <td className="py-3.5 px-3">
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          {(isExpanded ? p.tags : p.tags.slice(0, 3)).map((tag) => (
+                      {/* Category Tags with expandable chips */}
+                      <td className="py-3.5 px-4">
+                        <div className="flex flex-wrap items-center gap-1.5 max-w-lg">
+                          {(isExpanded ? pTags : pTags.slice(0, 3)).map((tag) => (
                             <span
                               key={tag}
                               className={`px-2 py-0.5 rounded-md text-[10px] font-medium border ${getTagColorClass(tag)}`}
@@ -630,30 +631,29 @@ export const ProblemBrowser: React.FC<ProblemBrowserProps> = ({
                               {tag}
                             </span>
                           ))}
-                          
-                          {p.tags.length > 3 && (
+
+                          {pTags.length > 3 && (
                             <button
                               onClick={(e) => toggleTagExpand(e, p.slug)}
-                              className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-[#1a202c] text-blue-400 hover:bg-[#262d3d] border border-[#262d3d] transition cursor-pointer"
-                              title={isExpanded ? "Collapse tags" : "Expand all tags"}
+                              className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-[#0a0d12] text-blue-400 hover:bg-[#1a202c] border border-[#262d3d] transition"
                             >
-                              {isExpanded ? 'Hide' : `+${p.tags.length - 3}`}
+                              {isExpanded ? 'Hide' : `+${pTags.length - 3}`}
                             </button>
                           )}
                         </div>
                       </td>
 
-                      {/* Corrected SM-2 Spaced Repetition Metric */}
-                      <td className="py-3.5 px-3 text-center">
+                      {/* SM-2 Review Interval */}
+                      <td className="py-3.5 px-4">
                         {formatSM2Interval(p)}
                       </td>
 
-                      {/* Star / Bookmark Review Toggle */}
-                      <td className="py-3.5 pr-4 text-center">
+                      {/* Bookmark Star Toggle */}
+                      <td className="py-3.5 px-4 text-center">
                         <button
                           onClick={(e) => handleToggleBookmark(e, p.slug)}
-                          className="p-1 text-gray-500 hover:text-amber-400 transition-colors"
-                          title={isBookmarked ? "Remove from Spaced Repetition queue" : "Add to Spaced Repetition queue"}
+                          className="p-1.5 rounded-lg text-gray-500 hover:text-amber-400 hover:bg-[#1a202c] transition-colors"
+                          title={isBookmarked ? "Remove from Spaced Repetition Review" : "Add to Spaced Repetition Review"}
                         >
                           <Bookmark className={`w-4 h-4 ${isBookmarked ? 'text-amber-400 fill-amber-400' : ''}`} />
                         </button>
@@ -666,7 +666,6 @@ export const ProblemBrowser: React.FC<ProblemBrowserProps> = ({
           </div>
         )}
       </div>
-
     </div>
   );
 };

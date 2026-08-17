@@ -9,7 +9,7 @@ export const problemsRouter = Router();
 problemsRouter.get('/', authenticateUser, (req: AuthRequest, res: Response) => {
   try {
     const { difficulty, tag, status, search, sort = 'id', order = 'asc' } = req.query;
-    const userId = req.user ? req.user.id : 1;
+    const userId = Number(req.user ? req.user.id : 1) || 1;
 
     let sql = `
       SELECT 
@@ -18,15 +18,15 @@ problemsRouter.get('/', authenticateUser, (req: AuthRequest, res: Response) => {
         sr.interval_days,
         sr.repetition_count,
         sr.next_review_at,
-        (SELECT status FROM submissions WHERE problem_slug = p.slug AND user_id = ? ORDER BY id DESC LIMIT 1) as last_submission_status,
-        (SELECT COUNT(*) FROM submissions WHERE problem_slug = p.slug AND user_id = ? AND status = 'Accepted') as has_solved,
-        (SELECT COUNT(*) FROM submissions WHERE problem_slug = p.slug AND user_id = ?) as total_submissions
+        (SELECT status FROM submissions WHERE problem_slug = p.slug AND user_id = ${userId} ORDER BY id DESC LIMIT 1) as last_submission_status,
+        (SELECT COUNT(*) FROM submissions WHERE problem_slug = p.slug AND user_id = ${userId} AND status = 'Accepted') as has_solved,
+        (SELECT COUNT(*) FROM submissions WHERE problem_slug = p.slug AND user_id = ${userId}) as total_submissions
       FROM problems p
-      LEFT JOIN spaced_repetition sr ON p.slug = sr.problem_slug AND sr.user_id = ?
+      LEFT JOIN spaced_repetition sr ON p.slug = sr.problem_slug AND sr.user_id = ${userId}
       WHERE 1=1
     `;
 
-    const params: any[] = [userId, userId, userId, userId];
+    const params: any[] = [];
 
     if (difficulty && typeof difficulty === 'string' && difficulty !== 'All') {
       sql += ` AND p.difficulty = ?`;
@@ -44,16 +44,40 @@ problemsRouter.get('/', authenticateUser, (req: AuthRequest, res: Response) => {
       params.push(term, term, term);
     }
 
-    let rows = dbManager.query(sql, params);
+    const rows = dbManager.query(sql, params);
 
-    // Parse JSON tags
-    let formatted = rows.map((r: any) => ({
-      ...r,
-      tags: JSON.parse(r.tags || '[]'),
-      interval_days: r.interval_days ?? null,
-      repetition_count: r.repetition_count ?? 0,
-      status: r.has_solved > 0 ? 'Solved' : (r.total_submissions > 0 ? 'Attempted' : 'Todo')
-    }));
+    // Parse JSON tags safely
+    let formatted = rows.map((r: any) => {
+      let parsedTags: string[] = [];
+      try {
+        if (Array.isArray(r.tags)) {
+          parsedTags = r.tags;
+        } else if (typeof r.tags === 'string' && r.tags.trim().length > 0) {
+          parsedTags = JSON.parse(r.tags);
+        }
+      } catch (e) {
+        parsedTags = [];
+      }
+
+      return {
+        id: r.id,
+        slug: r.slug,
+        title: r.title,
+        difficulty: r.difficulty,
+        tags: Array.isArray(parsedTags) ? parsedTags : [],
+        time_limit_ms: r.time_limit_ms,
+        memory_limit_mb: r.memory_limit_mb,
+        created_at: r.created_at,
+        flagged_review: r.flagged_review ?? 0,
+        interval_days: r.interval_days ?? null,
+        repetition_count: r.repetition_count ?? 0,
+        next_review_at: r.next_review_at ?? null,
+        last_submission_status: r.last_submission_status ?? null,
+        has_solved: r.has_solved ?? 0,
+        total_submissions: r.total_submissions ?? 0,
+        status: (r.has_solved > 0) ? 'Solved' : ((r.total_submissions > 0) ? 'Attempted' : 'Todo')
+      };
+    });
 
     // Filter by solved status
     if (status && typeof status === 'string' && status !== 'All') {
@@ -69,8 +93,8 @@ problemsRouter.get('/', authenticateUser, (req: AuthRequest, res: Response) => {
     // Sort
     const isAsc = String(order).toLowerCase() === 'asc';
     formatted.sort((a, b) => {
-      let valA = a[sort as string] ?? a.id;
-      let valB = b[sort as string] ?? b.id;
+      let valA = (a as Record<string, any>)[sort as string] ?? a.id;
+      let valB = (b as Record<string, any>)[sort as string] ?? b.id;
       if (typeof valA === 'string') {
         return isAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
       }
@@ -83,6 +107,7 @@ problemsRouter.get('/', authenticateUser, (req: AuthRequest, res: Response) => {
       problems: formatted
     });
   } catch (err: any) {
+    console.error('Failed to get problems:', err);
     res.status(500).json({ success: false, error: err.message });
   }
 });
@@ -95,7 +120,7 @@ problemsRouter.get('/meta/tags', (req: Request, res: Response) => {
 
     for (const r of rows) {
       try {
-        const tags: string[] = JSON.parse(r.tags || '[]');
+        const tags: string[] = typeof r.tags === 'string' ? JSON.parse(r.tags || '[]') : (Array.isArray(r.tags) ? r.tags : []);
         for (const t of tags) {
           tagCountMap[t] = (tagCountMap[t] || 0) + 1;
         }
@@ -116,7 +141,7 @@ problemsRouter.get('/meta/tags', (req: Request, res: Response) => {
 problemsRouter.get('/:slug', authenticateUser, (req: AuthRequest, res: Response) => {
   try {
     const { slug } = req.params;
-    const userId = req.user ? req.user.id : 1;
+    const userId = Number(req.user ? req.user.id : 1) || 1;
 
     const row = dbManager.queryOne<ProblemRecord>(
       'SELECT * FROM problems WHERE slug = ?',
@@ -148,25 +173,72 @@ problemsRouter.get('/:slug', authenticateUser, (req: AuthRequest, res: Response)
       [userId, slug]
     );
 
-    const testCasesParsed = JSON.parse(row.test_cases || '[]');
+    let testCasesParsed: any[] = [];
+    try {
+      testCasesParsed = JSON.parse(row.test_cases || '[]');
+    } catch (e) {
+      testCasesParsed = [];
+    }
     const sampleTestCases = testCasesParsed.filter((tc: any) => !tc.hidden);
+
+    let parsedTags: string[] = [];
+    try {
+      parsedTags = JSON.parse(row.tags || '[]');
+    } catch (e) {
+      parsedTags = [];
+    }
+
+    let parsedConstraints: string[] = [];
+    try {
+      parsedConstraints = JSON.parse(row.constraints || '[]');
+    } catch (e) {
+      parsedConstraints = [];
+    }
+
+    let parsedExamples: any[] = [];
+    try {
+      parsedExamples = JSON.parse(row.examples || '[]');
+    } catch (e) {
+      parsedExamples = [];
+    }
+
+    let parsedStarterCode: any = {};
+    try {
+      parsedStarterCode = JSON.parse(row.starter_code || '{}');
+    } catch (e) {
+      parsedStarterCode = {};
+    }
+
+    let parsedHints: string[] = [];
+    try {
+      parsedHints = JSON.parse(row.hints || '[]');
+    } catch (e) {
+      parsedHints = [];
+    }
+
+    let parsedRefSol: any = {};
+    try {
+      parsedRefSol = JSON.parse(row.reference_solution || '{}');
+    } catch (e) {
+      parsedRefSol = {};
+    }
 
     const problem = {
       id: row.id,
       slug: row.slug,
       title: row.title,
       difficulty: row.difficulty,
-      tags: JSON.parse(row.tags || '[]'),
+      tags: parsedTags,
       time_limit_ms: row.time_limit_ms,
       memory_limit_mb: row.memory_limit_mb,
       created_at: row.created_at,
       statement_md: row.statement_md,
-      constraints: JSON.parse(row.constraints || '[]'),
-      examples: JSON.parse(row.examples || '[]'),
-      starter_code: JSON.parse(row.starter_code || '{}'),
-      hints: JSON.parse(row.hints || '[]'),
+      constraints: parsedConstraints,
+      examples: parsedExamples,
+      starter_code: parsedStarterCode,
+      hints: parsedHints,
       editorial_md: row.editorial_md || '',
-      reference_solution: JSON.parse(row.reference_solution || '{}'),
+      reference_solution: parsedRefSol,
       sample_test_cases: sampleTestCases
     };
 
