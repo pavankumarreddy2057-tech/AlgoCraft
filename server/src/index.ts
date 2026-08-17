@@ -3,6 +3,15 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load .env from multiple candidate paths (cwd, server/.env, root/.env)
+dotenv.config();
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+
 import { dbManager } from './db/database.js';
 import { syncProblemBank } from './db/seed-loader.js';
 import { problemsRouter } from './routes/problems.js';
@@ -17,11 +26,6 @@ import { benchmarkRouter } from './runner/benchmark-runner.js';
 import { authRouter } from './routes/auth.js';
 import { userRouter } from './routes/user.js';
 import { leaderboardRouter } from './routes/leaderboard.js';
-
-dotenv.config();
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -83,6 +87,11 @@ async function bootstrap() {
       console.log(`\n======================================================`);
       console.log(`  🚀 AlgoCraft Platform V2 Server running at:`);
       console.log(`  👉 http://localhost:${PORT}`);
+      if (process.env.SMTP_USER) {
+        console.log(`  📧 Real Email OTP enabled via: ${process.env.SMTP_USER}`);
+      } else {
+        console.log(`  ⚠️  No SMTP_USER configured in .env (falling back to dev log OTP)`);
+      }
       console.log(`======================================================\n`);
     });
   } catch (err: any) {
