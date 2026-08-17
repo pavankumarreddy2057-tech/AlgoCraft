@@ -49,16 +49,9 @@ export class MailerService {
     const { email, code, expiresInMinutes = 10 } = options;
     const transporter = this.getTransporter();
     
-    // Format From address cleanly
-    const rawFrom = process.env.SMTP_FROM || process.env.EMAIL_FROM;
-    let fromAddress = `"AlgoCraft Security" <${process.env.SMTP_USER || 'noreply@sentinelhq.in'}>`;
-    if (rawFrom) {
-      if (rawFrom.includes('<') && rawFrom.includes('>')) {
-        fromAddress = rawFrom;
-      } else if (rawFrom.includes('@')) {
-        fromAddress = `"AlgoCraft Security" <${rawFrom.trim()}>`;
-      }
-    }
+    // Extract clean sender email for RFC 5321 compliant SMTP envelope
+    const rawUser = process.env.SMTP_USER || process.env.EMAIL_USER || 'noreply@sentinelhq.in';
+    const senderEmail = rawUser.match(/[\w.+-]+@[\w.-]+\.\w+/)?.[0] || rawUser.trim();
 
     const htmlContent = `
       <!DOCTYPE html>
@@ -113,7 +106,10 @@ export class MailerService {
     if (transporter) {
       try {
         await transporter.sendMail({
-          from: fromAddress,
+          from: {
+            name: 'AlgoCraft Security',
+            address: senderEmail
+          },
           to: email,
           subject: `${code} is your AlgoCraft verification code`,
           text: `Your AlgoCraft verification code is: ${code}. It expires in ${expiresInMinutes} minutes.`,
