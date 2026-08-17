@@ -6,7 +6,22 @@ import { runNativeCode } from '../runner/native-runner.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const PROBLEMS_DIR = path.resolve(__dirname, '../../../problems');
+export function resolveProblemsDir(): string {
+  const candidates = [
+    path.resolve(process.cwd(), 'problems'),
+    path.resolve(process.cwd(), '../problems'),
+    path.resolve(__dirname, '../../../problems'),
+    path.resolve(__dirname, '../../../../problems'),
+    path.resolve(__dirname, '../../problems'),
+    '/opt/algocraft/problems'
+  ];
+  for (const c of candidates) {
+    if (fs.existsSync(c)) return c;
+  }
+  return path.resolve(process.cwd(), 'problems');
+}
+
+export const PROBLEMS_DIR = resolveProblemsDir();
 
 export interface ValidationIssue {
   type: 'error' | 'warning';

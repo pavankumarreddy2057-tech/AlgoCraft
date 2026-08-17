@@ -6,7 +6,25 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const DB_PATH = process.env.DB_PATH || path.resolve(__dirname, '../../data/leetcode_offline.db');
+export function resolveDbPath(): string {
+  if (process.env.DB_PATH) return process.env.DB_PATH;
+  const candidates = [
+    path.resolve(process.cwd(), 'server/data/leetcode_offline.db'),
+    path.resolve(process.cwd(), 'data/leetcode_offline.db'),
+    path.resolve(__dirname, '../../data/leetcode_offline.db'),
+    path.resolve(__dirname, '../../../data/leetcode_offline.db'),
+    '/opt/algocraft/server/data/leetcode_offline.db'
+  ];
+  for (const c of candidates) {
+    if (fs.existsSync(c)) return c;
+  }
+  if (fs.existsSync(path.resolve(process.cwd(), 'server'))) {
+    return path.resolve(process.cwd(), 'server/data/leetcode_offline.db');
+  }
+  return path.resolve(__dirname, '../../data/leetcode_offline.db');
+}
+
+const DB_PATH = resolveDbPath();
 
 export interface UserRecord {
   id: number;
@@ -81,18 +99,20 @@ export interface SpacedRepetitionRecord {
 class DatabaseManager {
   private db: SqlJsDatabase | null = null;
   private SQL: any = null;
+  private activeDbPath: string = DB_PATH;
 
   async init(): Promise<void> {
     if (this.db) return;
 
+    this.activeDbPath = resolveDbPath();
     this.SQL = await initSqlJs();
-    const dataDir = path.dirname(DB_PATH);
+    const dataDir = path.dirname(this.activeDbPath);
     if (!fs.existsSync(dataDir)) {
       fs.mkdirSync(dataDir, { recursive: true });
     }
 
-    if (fs.existsSync(DB_PATH)) {
-      const fileBuffer = fs.readFileSync(DB_PATH);
+    if (fs.existsSync(this.activeDbPath)) {
+      const fileBuffer = fs.readFileSync(this.activeDbPath);
       this.db = new this.SQL.Database(fileBuffer);
     } else {
       this.db = new this.SQL.Database();
@@ -226,14 +246,22 @@ class DatabaseManager {
 
       this.save();
     }
-    console.log(`[DB] SQLite Database ready at ${DB_PATH}`);
+    console.log(`[DB] SQLite Database ready at ${this.activeDbPath}`);
   }
 
   save(): void {
     if (!this.db) return;
-    const data = this.db.export();
-    const buffer = Buffer.from(data);
-    fs.writeFileSync(DB_PATH, buffer);
+    try {
+      const data = this.db.export();
+      const buffer = Buffer.from(data);
+      const dataDir = path.dirname(this.activeDbPath);
+      if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true });
+      }
+      fs.writeFileSync(this.activeDbPath, buffer);
+    } catch (e) {
+      console.error('[DB] Failed to save database to disk:', e);
+    }
   }
 
   getDb(): SqlJsDatabase {

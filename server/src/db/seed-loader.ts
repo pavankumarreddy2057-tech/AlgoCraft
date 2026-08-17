@@ -2,16 +2,15 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dbManager } from './database.js';
-import { getAllProblemFiles } from '../validator/problem-validator.js';
+import { getAllProblemFiles, resolveProblemsDir } from '../validator/problem-validator.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const PROBLEMS_DIR = path.resolve(__dirname, '../../../problems');
-
 export async function syncProblemBank(): Promise<{ added: number; updated: number; total: number }> {
   await dbManager.init();
-  const files = getAllProblemFiles(PROBLEMS_DIR);
+  const problemsDir = resolveProblemsDir();
+  const files = getAllProblemFiles(problemsDir);
 
   let added = 0;
   let updated = 0;
@@ -69,8 +68,8 @@ export async function syncProblemBank(): Promise<{ added: number; updated: numbe
 
         // Initialize spaced repetition row for new problem
         dbManager.run(
-          `INSERT OR IGNORE INTO spaced_repetition (problem_slug, interval_days, repetition_count, ease_factor, flagged_review)
-           VALUES (?, 1, 0, 2.5, 0)`,
+          `INSERT OR IGNORE INTO spaced_repetition (user_id, problem_slug, interval_days, repetition_count, ease_factor, flagged_review)
+           VALUES (1, ?, 1, 0, 2.5, 0)`,
           [slug]
         );
       }
@@ -79,18 +78,23 @@ export async function syncProblemBank(): Promise<{ added: number; updated: numbe
     }
   }
 
-  const countRow = dbManager.queryOne<{ count: number }>('SELECT COUNT(*) as count FROM problems');
-  const total = countRow ? countRow.count : 0;
+  dbManager.save();
+  const totalRow = dbManager.queryOne<{ count: number }>('SELECT COUNT(*) as count FROM problems');
+  const total = totalRow ? totalRow.count : 0;
+  console.log(`[Seed Loader] Synced ${files.length} problem files from ${problemsDir} (${added} new, ${updated} updated). Total in DB: ${total}`);
 
-  console.log(`[Seed Loader] Synced ${files.length} problem files (${added} new, ${updated} updated). Total in DB: ${total}`);
   return { added, updated, total };
 }
 
-if (process.argv[1] && process.argv[1].includes('seed-loader')) {
-  syncProblemBank().then(() => {
-    process.exit(0);
-  }).catch((err) => {
-    console.error('Seed loader error:', err);
-    process.exit(1);
-  });
+// Direct execution CLI
+if (process.argv[1] && process.argv[1].endsWith('seed-loader.ts')) {
+  syncProblemBank()
+    .then((res) => {
+      console.log(`[Seed Loader] Done. ${res.total} problems in DB.`);
+      process.exit(0);
+    })
+    .catch((err) => {
+      console.error('[Seed Loader] Fatal:', err);
+      process.exit(1);
+    });
 }
