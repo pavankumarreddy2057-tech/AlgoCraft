@@ -1,0 +1,70 @@
+{
+  "slug": "reverse-bits",
+  "title": "Reverse Bits",
+  "difficulty": "Easy",
+  "tags": [
+    "Divide and Conquer",
+    "Bit Manipulation"
+  ],
+  "statement_md": "Reverse bits of a given 32 bits unsigned integer `n`.",
+  "constraints": [
+    "The input must be a binary string of length 32 or integer."
+  ],
+  "examples": [
+    {
+      "input": {
+        "n": 43261596
+      },
+      "output": 964176192
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def reverseBits(self, n: int) -> int:\n        pass\n",
+    "javascript": "function reverseBits(n) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "n": 43261596
+      },
+      "expected_output": 964176192,
+      "hidden": false
+    },
+    {
+      "input": {
+        "n": 1
+      },
+      "expected_output": 2147483648,
+      "hidden": true
+    },
+    {
+      "input": {
+        "n": 0
+      },
+      "expected_output": 0,
+      "hidden": true
+    },
+    {
+      "input": {
+        "n": 4294967295
+      },
+      "expected_output": 4294967295,
+      "hidden": true
+    },
+    {
+      "input": {
+        "n": 2147483648
+      },
+      "expected_output": 1,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def reverseBits(self, n: int) -> int:\n        res = 0\n        for i in range(32):\n            bit = (n >> i) & 1\n            res |= (bit << (31 - i))\n        return res\n",
+    "javascript": "function reverseBits(n) {\n    let res = 0;\n    for (let i = 0; i < 32; i++) {\n        const bit = (n >>> i) & 1;\n        res = (res | (bit << (31 - i))) >>> 0;\n    }\n    return res;\n}\n"
+  },
+  "hints": [
+    "Bit shift each bit from pos `i` to pos `31 - i`."
+  ],
+  "editorial_md": "### Method: 32-Bit Bitwise Shifting\n- **Time Complexity**: $\\mathcal{O}(1)$\n- **Space Complexity**: $\\mathcal{O}(1)$"
+}

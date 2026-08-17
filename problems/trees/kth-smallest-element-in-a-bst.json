@@ -1,0 +1,129 @@
+{
+  "slug": "kth-smallest-element-in-a-bst",
+  "title": "Kth Smallest Element in a BST",
+  "difficulty": "Medium",
+  "tags": [
+    "Tree",
+    "Depth-First Search",
+    "Binary Search Tree",
+    "Binary Tree"
+  ],
+  "statement_md": "Given the `root` of a binary search tree, and an integer `k`, return *the* `k`-th *smallest value (**1-indexed**) of all the values of the nodes in the tree*.",
+  "constraints": [
+    "The number of nodes in the tree is n.",
+    "1 <= k <= n <= 10^4",
+    "0 <= Node.val <= 10^4"
+  ],
+  "examples": [
+    {
+      "input": {
+        "root": [
+          3,
+          1,
+          4,
+          null,
+          2
+        ],
+        "k": 1
+      },
+      "output": 1
+    },
+    {
+      "input": {
+        "root": [
+          5,
+          3,
+          6,
+          2,
+          4,
+          null,
+          null,
+          1
+        ],
+        "k": 3
+      },
+      "output": 3
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def kthSmallest(self, root: Optional[TreeNode], k: int) -> int:\n        pass\n",
+    "javascript": "function kthSmallest(root, k) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "root": [
+          3,
+          1,
+          4,
+          null,
+          2
+        ],
+        "k": 1
+      },
+      "expected_output": 1,
+      "hidden": false
+    },
+    {
+      "input": {
+        "root": [
+          5,
+          3,
+          6,
+          2,
+          4,
+          null,
+          null,
+          1
+        ],
+        "k": 3
+      },
+      "expected_output": 3,
+      "hidden": false
+    },
+    {
+      "input": {
+        "root": [
+          2,
+          1,
+          3
+        ],
+        "k": 2
+      },
+      "expected_output": 2,
+      "hidden": true
+    },
+    {
+      "input": {
+        "root": [
+          1
+        ],
+        "k": 1
+      },
+      "expected_output": 1,
+      "hidden": true
+    },
+    {
+      "input": {
+        "root": [
+          4,
+          2,
+          5,
+          1,
+          3
+        ],
+        "k": 4
+      },
+      "expected_output": 4,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def kthSmallest(self, root: Optional[TreeNode], k: int) -> int:\n        stack = []\n        curr = root\n        while stack or curr:\n            while curr:\n                stack.append(curr)\n                curr = curr.left\n            curr = stack.pop()\n            k -= 1\n            if k == 0:\n                return curr.val\n            curr = curr.right\n        return -1\n",
+    "javascript": "function kthSmallest(root, k) {\n    const stack = [];\n    let curr = root;\n    while (stack.length > 0 || curr) {\n        while (curr) {\n            stack.push(curr);\n            curr = curr.left;\n        }\n        curr = stack.pop();\n        k--;\n        if (k === 0) return curr.val;\n        curr = curr.right;\n    }\n    return -1;\n}\n"
+  },
+  "hints": [
+    "In-order traversal of a BST yields elements in strictly ascending order."
+  ],
+  "editorial_md": "### Method: Iterative In-Order Traversal with Stack\n- **Time Complexity**: $\\mathcal{O}(H + k)$\n- **Space Complexity**: $\\mathcal{O}(H)$"
+}

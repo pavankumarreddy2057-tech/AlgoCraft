@@ -1,0 +1,98 @@
+{
+  "slug": "longest-common-subsequence",
+  "title": "Longest Common Subsequence",
+  "difficulty": "Medium",
+  "tags": [
+    "Dynamic Programming",
+    "String"
+  ],
+  "statement_md": "Given two strings `text1` and `text2`, return the length of their longest common subsequence. If there is no common subsequence, return 0.",
+  "constraints": [
+    "1 <= text1.length, text2.length <= 1000"
+  ],
+  "examples": [
+    {
+      "input": {
+        "text1": "abcde",
+        "text2": "ace"
+      },
+      "output": 3
+    },
+    {
+      "input": {
+        "text1": "abc",
+        "text2": "abc"
+      },
+      "output": 3
+    },
+    {
+      "input": {
+        "text1": "abc",
+        "text2": "def"
+      },
+      "output": 0
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def longestCommonSubsequence(self, text1: str, text2: str) -> int:\n        pass\n",
+    "javascript": "function longestCommonSubsequence(text1, text2) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "text1": "abcde",
+        "text2": "ace"
+      },
+      "expected_output": 3,
+      "hidden": false
+    },
+    {
+      "input": {
+        "text1": "abc",
+        "text2": "abc"
+      },
+      "expected_output": 3,
+      "hidden": false
+    },
+    {
+      "input": {
+        "text1": "abc",
+        "text2": "def"
+      },
+      "expected_output": 0,
+      "hidden": false
+    },
+    {
+      "input": {
+        "text1": "ezupkr",
+        "text2": "ubmrapg"
+      },
+      "expected_output": 2,
+      "hidden": true
+    },
+    {
+      "input": {
+        "text1": "bsbininm",
+        "text2": "jmjkbkjkv"
+      },
+      "expected_output": 1,
+      "hidden": true
+    },
+    {
+      "input": {
+        "text1": "a",
+        "text2": "a"
+      },
+      "expected_output": 1,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def longestCommonSubsequence(self, text1: str, text2: str) -> int:\n        dp = [[0] * (len(text2) + 1) for _ in range(len(text1) + 1)]\n        for i in range(len(text1) - 1, -1, -1):\n            for j in range(len(text2) - 1, -1, -1):\n                if text1[i] == text2[j]:\n                    dp[i][j] = 1 + dp[i + 1][j + 1]\n                else:\n                    dp[i][j] = max(dp[i + 1][j], dp[i][j + 1])\n        return dp[0][0]\n",
+    "javascript": "function longestCommonSubsequence(text1, text2) {\n    const m = text1.length, n = text2.length;\n    const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));\n    for (let i = m - 1; i >= 0; i--) {\n        for (let j = n - 1; j >= 0; j--) {\n            if (text1[i] === text2[j]) dp[i][j] = 1 + dp[i + 1][j + 1];\n            else dp[i][j] = Math.max(dp[i + 1][j], dp[i][j + 1]);\n        }\n    }\n    return dp[0][0];\n}\n"
+  },
+  "hints": [
+    "If characters match: `1 + dp[i+1][j+1]`. Else: `max(dp[i+1][j], dp[i][j+1])`."
+  ],
+  "editorial_md": "### Method: 2D Grid DP\n- **Time Complexity**: $\\mathcal{O}(M \\cdot N)$\n- **Space Complexity**: $\\mathcal{O}(M \\cdot N)$"
+}

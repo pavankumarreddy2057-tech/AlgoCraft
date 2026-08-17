@@ -1,0 +1,123 @@
+{
+  "slug": "find-minimum-in-rotated-sorted-array",
+  "title": "Find Minimum in Rotated Sorted Array",
+  "difficulty": "Medium",
+  "tags": [
+    "Arrays",
+    "Binary Search"
+  ],
+  "statement_md": "Suppose an array of length `n` sorted in ascending order is rotated between 1 and n times. Return the minimum element of this array in $\\mathcal{O}(\\log n)$ time.",
+  "constraints": [
+    "1 <= nums.length <= 5000",
+    "-5000 <= nums[i] <= 5000",
+    "All values are unique."
+  ],
+  "examples": [
+    {
+      "input": {
+        "nums": [
+          3,
+          4,
+          5,
+          1,
+          2
+        ]
+      },
+      "output": 1
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def findMin(self, nums: List[int]) -> int:\n        pass\n",
+    "javascript": "function findMin(nums) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "nums": [
+          3,
+          4,
+          5,
+          1,
+          2
+        ]
+      },
+      "expected_output": 1,
+      "hidden": false
+    },
+    {
+      "input": {
+        "nums": [
+          1
+        ]
+      },
+      "expected_output": 1,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          2,
+          1
+        ]
+      },
+      "expected_output": 1,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
+      },
+      "expected_output": 1,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
+      },
+      "expected_output": 1,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          -1,
+          -2,
+          -3,
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "expected_output": -2,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def findMin(self, nums: List[int]) -> int:\n        l, r = 0, len(nums)-1\n        while l < r:\n            mid = (l+r)//2\n            if nums[mid] > nums[r]:\n                l = mid + 1\n            else:\n                r = mid\n        return nums[l]\n",
+    "javascript": "function findMin(nums) {\n    let l = 0, r = nums.length - 1;\n    while (l < r) {\n        const mid = Math.floor((l+r)/2);\n        if (nums[mid] > nums[r]) l = mid + 1;\n        else r = mid;\n    }\n    return nums[l];\n}\n"
+  },
+  "hints": [
+    "If mid > right, min is in right half; otherwise in left half."
+  ],
+  "editorial_md": "### Method: Binary Search\n- **Time Complexity**: $\\mathcal{O}(\\log N)$\n- **Space Complexity**: $\\mathcal{O}(1)$",
+  "time_limit_ms": 2000,
+  "memory_limit_mb": 128
+}

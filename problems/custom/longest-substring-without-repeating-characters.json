@@ -1,0 +1,80 @@
+{
+  "slug": "longest-substring-without-repeating-characters",
+  "title": "Longest Substring Without Repeating Characters",
+  "difficulty": "Medium",
+  "tags": [
+    "Hash Table",
+    "String",
+    "Sliding Window"
+  ],
+  "statement_md": "Find the length of the longest substring without repeating characters.",
+  "constraints": [
+    "0 <= s.length <= 5 * 10^4"
+  ],
+  "examples": [
+    {
+      "input": {
+        "s": "abcabcbb"
+      },
+      "output": 3
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def lengthOfLongestSubstring(self, s: str) -> int:\n        pass\n",
+    "javascript": "function lengthOfLongestSubstring(s) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "s": "abcabcbb"
+      },
+      "expected_output": 3,
+      "hidden": false
+    },
+    {
+      "input": {
+        "s": "a"
+      },
+      "expected_output": 1,
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "ab"
+      },
+      "expected_output": 2,
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "aba"
+      },
+      "expected_output": 2,
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "aaaaa"
+      },
+      "expected_output": 1,
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "abcdefg"
+      },
+      "expected_output": 7,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def lengthOfLongestSubstring(self, s: str) -> int:\n        char_map = {}\n        l = 0\n        max_len = 0\n        for r, c in enumerate(s):\n            if c in char_map and char_map[c] >= l:\n                l = char_map[c] + 1\n            char_map[c] = r\n            max_len = max(max_len, r - l + 1)\n        return max_len\n",
+    "javascript": "function lengthOfLongestSubstring(s) {\n    const map = new Map();\n    let l = 0, maxLen = 0;\n    for (let r = 0; r < s.length; r++) {\n        const c = s[r];\n        if (map.has(c) && map.get(c) >= l) l = map.get(c) + 1;\n        map.set(c, r);\n        maxLen = Math.max(maxLen, r - l + 1);\n    }\n    return maxLen;\n}\n"
+  },
+  "hints": [
+    "Use sliding window with last seen index map."
+  ],
+  "editorial_md": "### Method: Sliding Window\n- **Time Complexity**: $\\mathcal{O}(N)$\n- **Space Complexity**: $\\mathcal{O}(\\min(N, \\Sigma))$",
+  "time_limit_ms": 2000,
+  "memory_limit_mb": 128
+}

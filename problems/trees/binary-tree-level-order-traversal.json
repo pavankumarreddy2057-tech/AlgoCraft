@@ -1,0 +1,182 @@
+{
+  "slug": "binary-tree-level-order-traversal",
+  "title": "Binary Tree Level Order Traversal",
+  "difficulty": "Medium",
+  "tags": [
+    "Tree",
+    "Breadth-First Search",
+    "Binary Tree"
+  ],
+  "statement_md": "Given the `root` of a binary tree, return *the level order traversal of its nodes' values*. (i.e., from left to right, level by level).",
+  "constraints": [
+    "The number of nodes in the tree is in the range [0, 2000].",
+    "-1000 <= Node.val <= 1000"
+  ],
+  "examples": [
+    {
+      "input": {
+        "root": [
+          3,
+          9,
+          20,
+          null,
+          null,
+          15,
+          7
+        ]
+      },
+      "output": [
+        [
+          3
+        ],
+        [
+          9,
+          20
+        ],
+        [
+          15,
+          7
+        ]
+      ]
+    },
+    {
+      "input": {
+        "root": [
+          1
+        ]
+      },
+      "output": [
+        [
+          1
+        ]
+      ]
+    },
+    {
+      "input": {
+        "root": []
+      },
+      "output": []
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def levelOrder(self, root: Optional[TreeNode]) -> List[List[int]]:\n        pass\n",
+    "javascript": "function levelOrder(root) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "root": [
+          3,
+          9,
+          20,
+          null,
+          null,
+          15,
+          7
+        ]
+      },
+      "expected_output": [
+        [
+          3
+        ],
+        [
+          9,
+          20
+        ],
+        [
+          15,
+          7
+        ]
+      ],
+      "hidden": false
+    },
+    {
+      "input": {
+        "root": [
+          1
+        ]
+      },
+      "expected_output": [
+        [
+          1
+        ]
+      ],
+      "hidden": false
+    },
+    {
+      "input": {
+        "root": []
+      },
+      "expected_output": [],
+      "hidden": false
+    },
+    {
+      "input": {
+        "root": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "expected_output": [
+        [
+          1
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          4,
+          5
+        ]
+      ],
+      "hidden": true
+    },
+    {
+      "input": {
+        "root": [
+          1,
+          2
+        ]
+      },
+      "expected_output": [
+        [
+          1
+        ],
+        [
+          2
+        ]
+      ],
+      "hidden": true
+    },
+    {
+      "input": {
+        "root": [
+          1,
+          null,
+          2
+        ]
+      },
+      "expected_output": [
+        [
+          1
+        ],
+        [
+          2
+        ]
+      ],
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def levelOrder(self, root: Optional[TreeNode]) -> List[List[int]]:\n        res = []\n        if not root:\n            return res\n        q = [root]\n        while q:\n            level = []\n            for _ in range(len(q)):\n                node = q.pop(0)\n                level.append(node.val)\n                if node.left:\n                    q.append(node.left)\n                if node.right:\n                    q.append(node.right)\n            res.append(level)\n        return res\n",
+    "javascript": "function levelOrder(root) {\n    const res = [];\n    if (!root) return res;\n    const q = [root];\n    while (q.length > 0) {\n        const level = [];\n        const len = q.length;\n        for (let i = 0; i < len; i++) {\n            const node = q.shift();\n            level.push(node.val);\n            if (node.left) q.push(node.left);\n            if (node.right) q.push(node.right);\n        }\n        res.push(level);\n    }\n    return res;\n}\n"
+  },
+  "hints": [
+    "Use a Queue for standard BFS traversal and iterate level-by-level using queue length."
+  ],
+  "editorial_md": "### Method: Queue-based BFS\n- **Time Complexity**: $\\mathcal{O}(N)$\n- **Space Complexity**: $\\mathcal{O}(N)$"
+}

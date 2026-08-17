@@ -1,0 +1,79 @@
+{
+  "slug": "longest-repeating-character-replacement",
+  "title": "Longest Repeating Character Replacement",
+  "difficulty": "Medium",
+  "tags": [
+    "String",
+    "Sliding Window"
+  ],
+  "statement_md": "Given a string `s` and an integer `k`, you can choose any character and change it to any other uppercase English character. Return the length of the longest substring containing the same letter after performing at most `k` replacements.",
+  "constraints": [
+    "1 <= s.length <= 10^5",
+    "0 <= k <= s.length"
+  ],
+  "examples": [
+    {
+      "input": {
+        "s": "ABAB",
+        "k": 2
+      },
+      "output": 4
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def characterReplacement(self, s: str, k: int) -> int:\n        pass\n",
+    "javascript": "function characterReplacement(s, k) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "s": "ABAB",
+        "k": 2
+      },
+      "expected_output": 4,
+      "hidden": false
+    },
+    {
+      "input": {
+        "s": "ABAB",
+        "k": 2
+      },
+      "expected_output": 4,
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "AABABBA",
+        "k": 1
+      },
+      "expected_output": 4,
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "A",
+        "k": 1
+      },
+      "expected_output": 1,
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "ABBB",
+        "k": 2
+      },
+      "expected_output": 4,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def characterReplacement(self, s: str, k: int) -> int:\n        count = {}\n        max_freq = 0\n        l = 0\n        for r in range(len(s)):\n            count[s[r]] = count.get(s[r], 0) + 1\n            max_freq = max(max_freq, count[s[r]])\n            if (r - l + 1) - max_freq > k:\n                count[s[l]] -= 1\n                l += 1\n        return len(s) - l\n",
+    "javascript": "function characterReplacement(s, k) {\n    const count = {};\n    let maxFreq = 0, l = 0;\n    for (let r = 0; r < s.length; r++) {\n        count[s[r]] = (count[s[r]] || 0) + 1;\n        maxFreq = Math.max(maxFreq, count[s[r]]);\n        if ((r - l + 1) - maxFreq > k) {\n            count[s[l]]--;\n            l++;\n        }\n    }\n    return s.length - l;\n}\n"
+  },
+  "hints": [
+    "Maintain a sliding window where number of replacements = length - max frequency."
+  ],
+  "editorial_md": "### Method: Sliding Window\n- **Time Complexity**: $\\mathcal{O}(N)$\n- **Space Complexity**: $\\mathcal{O}(1)$",
+  "time_limit_ms": 2000,
+  "memory_limit_mb": 128
+}

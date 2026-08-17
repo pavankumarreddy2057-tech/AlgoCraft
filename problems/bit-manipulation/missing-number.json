@@ -1,0 +1,137 @@
+{
+  "slug": "missing-number",
+  "title": "Missing Number",
+  "difficulty": "Easy",
+  "tags": [
+    "Array",
+    "Hash Table",
+    "Math",
+    "Binary Search",
+    "Bit Manipulation",
+    "Sorting"
+  ],
+  "statement_md": "Given an array `nums` containing `n` distinct numbers in the range `[0, n]`, return *the only number in the range that is missing from the array*.",
+  "constraints": [
+    "n == nums.length",
+    "1 <= n <= 10^4",
+    "0 <= nums[i] <= n",
+    "All the numbers of nums are unique."
+  ],
+  "examples": [
+    {
+      "input": {
+        "nums": [
+          3,
+          0,
+          1
+        ]
+      },
+      "output": 2
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          1
+        ]
+      },
+      "output": 2
+    },
+    {
+      "input": {
+        "nums": [
+          9,
+          6,
+          4,
+          2,
+          3,
+          5,
+          7,
+          0,
+          1
+        ]
+      },
+      "output": 8
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def missingNumber(self, nums: List[int]) -> int:\n        pass\n",
+    "javascript": "function missingNumber(nums) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "nums": [
+          3,
+          0,
+          1
+        ]
+      },
+      "expected_output": 2,
+      "hidden": false
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          1
+        ]
+      },
+      "expected_output": 2,
+      "hidden": false
+    },
+    {
+      "input": {
+        "nums": [
+          9,
+          6,
+          4,
+          2,
+          3,
+          5,
+          7,
+          0,
+          1
+        ]
+      },
+      "expected_output": 8,
+      "hidden": false
+    },
+    {
+      "input": {
+        "nums": [
+          0
+        ]
+      },
+      "expected_output": 1,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          1
+        ]
+      },
+      "expected_output": 0,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2
+        ]
+      },
+      "expected_output": 0,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def missingNumber(self, nums: List[int]) -> int:\n        res = len(nums)\n        for i, n in enumerate(nums):\n            res ^= (i ^ n)\n        return res\n",
+    "javascript": "function missingNumber(nums) {\n    let res = nums.length;\n    for (let i = 0; i < nums.length; i++) {\n        res ^= (i ^ nums[i]);\n    }\n    return res;\n}\n"
+  },
+  "hints": [
+    "XOR of a number with itself is 0 (`a ^ a = 0`). XOR all indices with all values."
+  ],
+  "editorial_md": "### Method: Bitwise XOR Arithmetic\n- **Time Complexity**: $\\mathcal{O}(N)$\n- **Space Complexity**: $\\mathcal{O}(1)$"
+}

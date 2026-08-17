@@ -1,0 +1,88 @@
+{
+  "slug": "valid-anagram",
+  "title": "Valid Anagram",
+  "difficulty": "Easy",
+  "tags": [
+    "Strings",
+    "Hash Table",
+    "Sorting"
+  ],
+  "statement_md": "Given two strings `s` and `t`, return `true` if `t` is an **anagram** of `s`, and `false` otherwise.",
+  "constraints": [
+    "1 <= s.length, t.length <= 5 * 10^4",
+    "s and t consist of lowercase English letters."
+  ],
+  "examples": [
+    {
+      "input": {
+        "s": "anagram",
+        "t": "nagaram"
+      },
+      "output": true
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def isAnagram(self, s: str, t: str) -> bool:\n        pass\n",
+    "javascript": "function isAnagram(s, t) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "s": "anagram",
+        "t": "nagaram"
+      },
+      "expected_output": true,
+      "hidden": false
+    },
+    {
+      "input": {
+        "s": "a",
+        "t": "a"
+      },
+      "expected_output": true,
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "ab",
+        "t": "ba"
+      },
+      "expected_output": true,
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "rat",
+        "t": "car"
+      },
+      "expected_output": false,
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "hello",
+        "t": "world"
+      },
+      "expected_output": false,
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "listen",
+        "t": "silent"
+      },
+      "expected_output": true,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def isAnagram(self, s: str, t: str) -> bool:\n        if len(s) != len(t):\n            return False\n        counts = {}\n        for char in s:\n            counts[char] = counts.get(char, 0) + 1\n        for char in t:\n            if char not in counts or counts[char] == 0:\n                return False\n            counts[char] -= 1\n        return True\n",
+    "javascript": "function isAnagram(s, t) {\n    if (s.length !== t.length) return false;\n    const map = {};\n    for (const c of s) map[c] = (map[c] || 0) + 1;\n    for (const c of t) {\n        if (!map[c]) return false;\n        map[c]--;\n    }\n    return true;\n}\n"
+  },
+  "hints": [
+    "Count frequency of each character in both strings."
+  ],
+  "editorial_md": "### Method: Character Frequency Counting\n- **Time Complexity**: $\\mathcal{O}(N)$\n- **Space Complexity**: $\\mathcal{O}(1)$",
+  "time_limit_ms": 2000,
+  "memory_limit_mb": 128
+}

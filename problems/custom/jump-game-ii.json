@@ -1,0 +1,123 @@
+{
+  "slug": "jump-game-ii",
+  "title": "Jump Game II",
+  "difficulty": "Medium",
+  "tags": [
+    "Arrays",
+    "Dynamic Programming",
+    "Greedy"
+  ],
+  "statement_md": "Return the minimum number of jumps to reach the last index. It is guaranteed that you can reach the last index.",
+  "constraints": [
+    "1 <= nums.length <= 10^4",
+    "0 <= nums[i] <= 1000"
+  ],
+  "examples": [
+    {
+      "input": {
+        "nums": [
+          2,
+          3,
+          1,
+          1,
+          4
+        ]
+      },
+      "output": 2
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def jump(self, nums: List[int]) -> int:\n        pass\n",
+    "javascript": "function jump(nums) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "nums": [
+          2,
+          3,
+          1,
+          1,
+          4
+        ]
+      },
+      "expected_output": 2,
+      "hidden": false
+    },
+    {
+      "input": {
+        "nums": [
+          1
+        ]
+      },
+      "expected_output": 0,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          2,
+          1
+        ]
+      },
+      "expected_output": 1,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
+      },
+      "expected_output": 1,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
+      },
+      "expected_output": 4,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          -1,
+          -2,
+          -3,
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "expected_output": 1,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def jump(self, nums: List[int]) -> int:\n        jumps = 0\n        curr_end = 0\n        farthest = 0\n        for i in range(len(nums)-1):\n            farthest = max(farthest, i + nums[i])\n            if i == curr_end:\n                jumps += 1\n                curr_end = farthest\n        return jumps\n",
+    "javascript": "function jump(nums) {\n    let jumps = 0, currEnd = 0, farthest = 0;\n    for (let i = 0; i < nums.length - 1; i++) {\n        farthest = Math.max(farthest, i + nums[i]);\n        if (i === currEnd) {\n            jumps++;\n            currEnd = farthest;\n        }\n    }\n    return jumps;\n}\n"
+  },
+  "hints": [
+    "Greedy: jump when reaching current interval end."
+  ],
+  "editorial_md": "### Method: Greedy\n- **Time Complexity**: $\\mathcal{O}(N)$\n- **Space Complexity**: $\\mathcal{O}(1)$",
+  "time_limit_ms": 2000,
+  "memory_limit_mb": 128
+}

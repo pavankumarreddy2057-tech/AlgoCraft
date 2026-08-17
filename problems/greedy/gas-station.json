@@ -1,0 +1,161 @@
+{
+  "slug": "gas-station",
+  "title": "Gas Station",
+  "difficulty": "Medium",
+  "tags": [
+    "Array",
+    "Greedy"
+  ],
+  "statement_md": "There are `n` gas stations along a circular route, where the amount of gas at the `i-th` station is `gas[i]`.\n\nYou have a car with an unlimited gas tank and it costs `cost[i]` of gas to travel from the `i-th` station to its next `(i + 1)-th` station. You begin the journey with an empty tank at one of the gas stations.\n\nGiven two integer arrays `gas` and `cost`, return *the starting gas station's index if you can travel around the circuit once in the clockwise direction, otherwise return* `-1`.",
+  "constraints": [
+    "n == gas.length == cost.length",
+    "1 <= n <= 10^5",
+    "0 <= gas[i], cost[i] <= 10^4"
+  ],
+  "examples": [
+    {
+      "input": {
+        "gas": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "cost": [
+          3,
+          4,
+          5,
+          1,
+          2
+        ]
+      },
+      "output": 3
+    },
+    {
+      "input": {
+        "gas": [
+          2,
+          3,
+          4
+        ],
+        "cost": [
+          3,
+          4,
+          3
+        ]
+      },
+      "output": -1
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def canCompleteCircuit(self, gas: List[int], cost: List[int]) -> int:\n        pass\n",
+    "javascript": "function canCompleteCircuit(gas, cost) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "gas": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "cost": [
+          3,
+          4,
+          5,
+          1,
+          2
+        ]
+      },
+      "expected_output": 3,
+      "hidden": false
+    },
+    {
+      "input": {
+        "gas": [
+          2,
+          3,
+          4
+        ],
+        "cost": [
+          3,
+          4,
+          3
+        ]
+      },
+      "expected_output": -1,
+      "hidden": false
+    },
+    {
+      "input": {
+        "gas": [
+          5,
+          1,
+          2,
+          3,
+          4
+        ],
+        "cost": [
+          4,
+          4,
+          1,
+          5,
+          1
+        ]
+      },
+      "expected_output": 4,
+      "hidden": true
+    },
+    {
+      "input": {
+        "gas": [
+          2
+        ],
+        "cost": [
+          2
+        ]
+      },
+      "expected_output": 0,
+      "hidden": true
+    },
+    {
+      "input": {
+        "gas": [
+          2
+        ],
+        "cost": [
+          3
+        ]
+      },
+      "expected_output": -1,
+      "hidden": true
+    },
+    {
+      "input": {
+        "gas": [
+          3,
+          1,
+          1
+        ],
+        "cost": [
+          1,
+          2,
+          2
+        ]
+      },
+      "expected_output": 0,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def canCompleteCircuit(self, gas: List[int], cost: List[int]) -> int:\n        if sum(gas) < sum(cost):\n            return -1\n        total = 0\n        res = 0\n        for i in range(len(gas)):\n            total += (gas[i] - cost[i])\n            if total < 0:\n                total = 0\n                res = i + 1\n        return res\n",
+    "javascript": "function canCompleteCircuit(gas, cost) {\n    const totalGas = gas.reduce((a, b) => a + b, 0);\n    const totalCost = cost.reduce((a, b) => a + b, 0);\n    if (totalGas < totalCost) return -1;\n    let total = 0, res = 0;\n    for (let i = 0; i < gas.length; i++) {\n        total += (gas[i] - cost[i]);\n        if (total < 0) {\n            total = 0;\n            res = i + 1;\n        }\n    }\n    return res;\n}\n"
+  },
+  "hints": [
+    "If total gas < total cost, return -1. Otherwise, reset start index whenever tank drops below zero."
+  ],
+  "editorial_md": "### Method: Single-Pass Greedy\n- **Time Complexity**: $\\mathcal{O}(N)$\n- **Space Complexity**: $\\mathcal{O}(1)$"
+}

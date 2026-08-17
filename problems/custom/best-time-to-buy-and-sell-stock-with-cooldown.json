@@ -1,0 +1,122 @@
+{
+  "slug": "best-time-to-buy-and-sell-stock-with-cooldown",
+  "title": "Best Time to Buy and Sell Stock with Cooldown",
+  "difficulty": "Medium",
+  "tags": [
+    "Arrays",
+    "Dynamic Programming"
+  ],
+  "statement_md": "Maximize profit with cooldown: after selling, cannot buy on next day.",
+  "constraints": [
+    "1 <= prices.length <= 5000",
+    "0 <= prices[i] <= 1000"
+  ],
+  "examples": [
+    {
+      "input": {
+        "prices": [
+          1,
+          2,
+          3,
+          0,
+          2
+        ]
+      },
+      "output": 3
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def maxProfit(self, prices: List[int]) -> int:\n        pass\n",
+    "javascript": "function maxProfit(prices) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "prices": [
+          1,
+          2,
+          3,
+          0,
+          2
+        ]
+      },
+      "expected_output": 3,
+      "hidden": false
+    },
+    {
+      "input": {
+        "prices": [
+          7,
+          1,
+          5,
+          3,
+          6,
+          4
+        ]
+      },
+      "expected_output": 5,
+      "hidden": true
+    },
+    {
+      "input": {
+        "prices": [
+          7,
+          6,
+          4,
+          3,
+          1
+        ]
+      },
+      "expected_output": 0,
+      "hidden": true
+    },
+    {
+      "input": {
+        "prices": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "expected_output": 4,
+      "hidden": true
+    },
+    {
+      "input": {
+        "prices": [
+          2,
+          4,
+          1
+        ]
+      },
+      "expected_output": 2,
+      "hidden": true
+    },
+    {
+      "input": {
+        "prices": [
+          3,
+          2,
+          6,
+          5,
+          0,
+          3
+        ]
+      },
+      "expected_output": 7,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def maxProfit(self, prices: List[int]) -> int:\n        sold, held, reset = -float('inf'), -float('inf'), 0\n        for p in prices:\n            prev_sold = sold\n            sold = held + p\n            held = max(held, reset - p)\n            reset = max(reset, prev_sold)\n        return max(sold, reset)\n",
+    "javascript": "function maxProfit(prices) {\n    let sold = -Infinity, held = -Infinity, reset = 0;\n    for (const p of prices) {\n        const prevSold = sold;\n        sold = held + p;\n        held = Math.max(held, reset - p);\n        reset = Math.max(reset, prevSold);\n    }\n    return Math.max(sold, reset);\n}\n"
+  },
+  "hints": [
+    "Use three states: holding, sold, reset."
+  ],
+  "editorial_md": "### Method: State Machine DP\n- **Time Complexity**: $\\mathcal{O}(N)$\n- **Space Complexity**: $\\mathcal{O}(1)$",
+  "time_limit_ms": 2000,
+  "memory_limit_mb": 128
+}

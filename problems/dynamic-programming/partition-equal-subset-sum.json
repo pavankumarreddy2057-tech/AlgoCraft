@@ -1,0 +1,122 @@
+{
+  "slug": "partition-equal-subset-sum",
+  "title": "Partition Equal Subset Sum",
+  "difficulty": "Medium",
+  "tags": [
+    "Array",
+    "Dynamic Programming"
+  ],
+  "statement_md": "Given an integer array `nums`, return `true` *if you can partition the array into two subsets such that the sum of the elements in both subsets is equal or* `false` *otherwise*.",
+  "constraints": [
+    "1 <= nums.length <= 200",
+    "1 <= nums[i] <= 100"
+  ],
+  "examples": [
+    {
+      "input": {
+        "nums": [
+          1,
+          5,
+          11,
+          5
+        ]
+      },
+      "output": true
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          5
+        ]
+      },
+      "output": false
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def canPartition(self, nums: List[int]) -> bool:\n        pass\n",
+    "javascript": "function canPartition(nums) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "nums": [
+          1,
+          5,
+          11,
+          5
+        ]
+      },
+      "expected_output": true,
+      "hidden": false
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          5
+        ]
+      },
+      "expected_output": false,
+      "hidden": false
+    },
+    {
+      "input": {
+        "nums": [
+          1
+        ]
+      },
+      "expected_output": false,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          2,
+          2,
+          2,
+          2
+        ]
+      },
+      "expected_output": true,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          5
+        ]
+      },
+      "expected_output": false,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          14,
+          9,
+          8,
+          4,
+          3,
+          2
+        ]
+      },
+      "expected_output": true,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def canPartition(self, nums: List[int]) -> bool:\n        total = sum(nums)\n        if total % 2 != 0:\n            return False\n        target = total // 2\n        dp = set([0])\n        for n in nums:\n            next_dp = set()\n            for t in dp:\n                if t + n == target:\n                    return True\n                if t + n < target:\n                    next_dp.add(t + n)\n                next_dp.add(t)\n            dp = next_dp\n        return target in dp\n",
+    "javascript": "function canPartition(nums) {\n    const total = nums.reduce((a, b) => a + b, 0);\n    if (total % 2 !== 0) return false;\n    const target = total / 2;\n    let dp = new Set([0]);\n    for (const n of nums) {\n        const nextDp = new Set();\n        for (const t of dp) {\n            if (t + n === target) return true;\n            if (t + n < target) nextDp.add(t + n);\n            nextDp.add(t);\n        }\n        dp = nextDp;\n    }\n    return dp.has(target);\n}\n"
+  },
+  "hints": [
+    "If total sum is odd, partition is impossible. Target is sum(nums) / 2 (0/1 Knapsack)."
+  ],
+  "editorial_md": "### Method: 0/1 Knapsack DP Subset Sum\n- **Time Complexity**: $\\mathcal{O}(N \\cdot \\text{target})$\n- **Space Complexity**: $\\mathcal{O}(\\text{target})$"
+}

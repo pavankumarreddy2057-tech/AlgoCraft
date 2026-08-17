@@ -1,0 +1,111 @@
+{
+  "slug": "merge-sorted-array",
+  "title": "Merge Sorted Array",
+  "difficulty": "Easy",
+  "tags": [
+    "Two Pointers",
+    "Arrays"
+  ],
+  "statement_md": "You are given two integer arrays `nums1` and `nums2`, sorted in non-decreasing order, and two integers `m` and `n`, representing the number of elements in `nums1` and `nums2` respectively. Merge `nums2` into `nums1` in-place.",
+  "constraints": [
+    "nums1.length == m + n",
+    "nums2.length == n",
+    "0 <= m, n <= 200",
+    "-10^9 <= nums1[i], nums2[i] <= 10^9"
+  ],
+  "examples": [
+    {
+      "input": {
+        "nums1": [
+          1,
+          2,
+          3,
+          0,
+          0,
+          0
+        ],
+        "m": 3,
+        "nums2": [
+          2,
+          5,
+          6
+        ],
+        "n": 3
+      },
+      "output": [
+        1,
+        2,
+        2,
+        3,
+        5,
+        6
+      ]
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def merge(self, nums1: List[int], m: int, nums2: List[int], n: int) -> None:\n        pass\n",
+    "javascript": "function merge(nums1, m, nums2, n) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "nums1": [1, 2, 3, 0, 0, 0],
+        "m": 3,
+        "nums2": [2, 5, 6],
+        "n": 3
+      },
+      "expected_output": [1, 2, 2, 3, 5, 6],
+      "hidden": false
+    },
+    {
+      "input": {
+        "nums1": [1],
+        "m": 1,
+        "nums2": [],
+        "n": 0
+      },
+      "expected_output": [1],
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums1": [0],
+        "m": 0,
+        "nums2": [1],
+        "n": 1
+      },
+      "expected_output": [1],
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums1": [2, 0],
+        "m": 1,
+        "nums2": [1],
+        "n": 1
+      },
+      "expected_output": [1, 2],
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums1": [4, 5, 6, 0, 0, 0],
+        "m": 3,
+        "nums2": [1, 2, 3],
+        "n": 3
+      },
+      "expected_output": [1, 2, 3, 4, 5, 6],
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def merge(self, nums1: List[int], m: int, nums2: List[int], n: int) -> None:\n        p1, p2, p = m-1, n-1, m+n-1\n        while p2 >= 0:\n            if p1 >= 0 and nums1[p1] > nums2[p2]:\n                nums1[p] = nums1[p1]\n                p1 -= 1\n            else:\n                nums1[p] = nums2[p2]\n                p2 -= 1\n            p -= 1\n",
+    "javascript": "function merge(nums1, m, nums2, n) {\n    let p1 = m-1, p2 = n-1, p = m+n-1;\n    while (p2 >= 0) {\n        if (p1 >= 0 && nums1[p1] > nums2[p2]) {\n            nums1[p] = nums1[p1];\n            p1--;\n        } else {\n            nums1[p] = nums2[p2];\n            p2--;\n        }\n        p--;\n    }\n}\n"
+  },
+  "hints": [
+    "Merge from the end to avoid overwriting nums1 elements."
+  ],
+  "editorial_md": "### Method: Two Pointers from End\n- **Time Complexity**: $\\mathcal{O}(M+N)$\n- **Space Complexity**: $\\mathcal{O}(1)$",
+  "time_limit_ms": 2000,
+  "memory_limit_mb": 128
+}

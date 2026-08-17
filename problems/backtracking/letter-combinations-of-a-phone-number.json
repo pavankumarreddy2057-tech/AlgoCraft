@@ -1,0 +1,157 @@
+{
+  "slug": "letter-combinations-of-a-phone-number",
+  "title": "Letter Combinations of a Phone Number",
+  "difficulty": "Medium",
+  "tags": [
+    "Hash Table",
+    "String",
+    "Backtracking"
+  ],
+  "statement_md": "Given a string containing digits from `2-9` inclusive, return all possible letter combinations that the number could represent. Return the answer in **any order**.\n\nA mapping of digits to letters (just like on telephone buttons) is given below. Note that 1 does not map to any letters.\n`2: \"abc\"`, `3: \"def\"`, `4: \"ghi\"`, `5: \"jkl\"`, `6: \"mno\"`, `7: \"pqrs\"`, `8: \"tuv\"`, `9: \"wxyz\"`.",
+  "constraints": [
+    "0 <= digits.length <= 4",
+    "digits[i] is a digit in the range ['2', '9']."
+  ],
+  "examples": [
+    {
+      "input": {
+        "digits": "23"
+      },
+      "output": [
+        "ad",
+        "ae",
+        "af",
+        "bd",
+        "be",
+        "bf",
+        "cd",
+        "ce",
+        "cf"
+      ]
+    },
+    {
+      "input": {
+        "digits": ""
+      },
+      "output": []
+    },
+    {
+      "input": {
+        "digits": "2"
+      },
+      "output": [
+        "a",
+        "b",
+        "c"
+      ]
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def letterCombinations(self, digits: str) -> List[str]:\n        pass\n",
+    "javascript": "function letterCombinations(digits) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "digits": "23"
+      },
+      "expected_output": [
+        "ad",
+        "ae",
+        "af",
+        "bd",
+        "be",
+        "bf",
+        "cd",
+        "ce",
+        "cf"
+      ],
+      "hidden": false
+    },
+    {
+      "input": {
+        "digits": ""
+      },
+      "expected_output": [],
+      "hidden": false
+    },
+    {
+      "input": {
+        "digits": "2"
+      },
+      "expected_output": [
+        "a",
+        "b",
+        "c"
+      ],
+      "hidden": false
+    },
+    {
+      "input": {
+        "digits": "7"
+      },
+      "expected_output": [
+        "p",
+        "q",
+        "r",
+        "s"
+      ],
+      "hidden": true
+    },
+    {
+      "input": {
+        "digits": "234"
+      },
+      "expected_output": [
+        "adg",
+        "adh",
+        "adi",
+        "aeg",
+        "aeh",
+        "aei",
+        "afg",
+        "afh",
+        "afi",
+        "bdg",
+        "bdh",
+        "bdi",
+        "beg",
+        "beh",
+        "bei",
+        "bfg",
+        "bfh",
+        "bfi",
+        "cdg",
+        "cdh",
+        "cdi",
+        "ceg",
+        "ceh",
+        "cei",
+        "cfg",
+        "cfh",
+        "cfi"
+      ],
+      "hidden": true
+    },
+    {
+      "input": {
+        "digits": "9"
+      },
+      "expected_output": [
+        "w",
+        "x",
+        "y",
+        "z"
+      ],
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def letterCombinations(self, digits: str) -> List[str]:\n        if not digits:\n            return []\n        phone = {\"2\": \"abc\", \"3\": \"def\", \"4\": \"ghi\", \"5\": \"jkl\", \"6\": \"mno\", \"7\": \"pqrs\", \"8\": \"tuv\", \"9\": \"wxyz\"}\n        res = []\n        def backtrack(i, cur):\n            if i == len(digits):\n                res.append(\"\".join(cur))\n                return\n            for c in phone[digits[i]]:\n                cur.append(c)\n                backtrack(i + 1, cur)\n                cur.pop()\n        backtrack(0, [])\n        return res\n",
+    "javascript": "function letterCombinations(digits) {\n    if (!digits) return [];\n    const phone = { \"2\": \"abc\", \"3\": \"def\", \"4\": \"ghi\", \"5\": \"jkl\", \"6\": \"mno\", \"7\": \"pqrs\", \"8\": \"tuv\", \"9\": \"wxyz\" };\n    const res = [];\n    function backtrack(i, cur) {\n        if (i === digits.length) {\n            res.push(cur.join(\"\"));\n            return;\n        }\n        for (const c of phone[digits[i]]) {\n            cur.push(c);\n            backtrack(i + 1, cur);\n            cur.pop();\n        }\n    }\n    backtrack(0, []);\n    return res;\n}\n"
+  },
+  "hints": [
+    "Map each digit to its corresponding characters and use recursion to build all branches."
+  ],
+  "editorial_md": "### Method: Backtracking Branching\n- **Time Complexity**: $\\mathcal{O}(4^N)$\n- **Space Complexity**: $\\mathcal{O}(N)$"
+}

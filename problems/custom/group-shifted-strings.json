@@ -1,0 +1,179 @@
+{
+  "slug": "group-shifted-strings",
+  "title": "Group Shifted Strings",
+  "difficulty": "Medium",
+  "tags": [
+    "Strings",
+    "Hash Table"
+  ],
+  "statement_md": "We can shift a string by shifting each of its letters to its successive letter. Given an array of strings `strings`, group all strings that belong to the same shifting sequence.",
+  "constraints": [
+    "1 <= strings.length <= 10^4",
+    "0 <= strings[i].length <= 50"
+  ],
+  "examples": [
+    {
+      "input": {
+        "strings": [
+          "abc",
+          "bcd",
+          "acef",
+          "xyz",
+          "az",
+          "ba",
+          "a",
+          "z"
+        ]
+      },
+      "output": [
+        [
+          "abc",
+          "bcd",
+          "xyz"
+        ],
+        [
+          "acef"
+        ],
+        [
+          "az",
+          "ba"
+        ],
+        [
+          "a",
+          "z"
+        ]
+      ]
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def groupStrings(self, strings: List[str]) -> List[List[str]]:\n        pass\n",
+    "javascript": "function groupStrings(strings) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "strings": [
+          "abc",
+          "bcd",
+          "acef",
+          "xyz",
+          "az",
+          "ba",
+          "a",
+          "z"
+        ]
+      },
+      "expected_output": [
+        [
+          "abc",
+          "bcd",
+          "xyz"
+        ],
+        [
+          "acef"
+        ],
+        [
+          "az",
+          "ba"
+        ],
+        [
+          "a",
+          "z"
+        ]
+      ],
+      "hidden": false
+    },
+    {
+      "input": {
+        "strings": [
+          "abc",
+          "bcd",
+          "acef",
+          "xyz",
+          "az",
+          "ba",
+          "a",
+          "z"
+        ]
+      },
+      "expected_output": [
+        [
+          "abc",
+          "bcd",
+          "xyz"
+        ],
+        [
+          "acef"
+        ],
+        [
+          "az",
+          "ba"
+        ],
+        [
+          "a",
+          "z"
+        ]
+      ],
+      "hidden": true
+    },
+    {
+      "input": {
+        "strings": [
+          "a"
+        ]
+      },
+      "expected_output": [
+        [
+          "a"
+        ]
+      ],
+      "hidden": true
+    },
+    {
+      "input": {
+        "strings": [
+          "ab",
+          "ba"
+        ]
+      },
+      "expected_output": [
+        [
+          "ab"
+        ],
+        [
+          "ba"
+        ]
+      ],
+      "hidden": true
+    },
+    {
+      "input": {
+        "strings": [
+          "aa",
+          "bb",
+          "b"
+        ]
+      },
+      "expected_output": [
+        [
+          "aa",
+          "bb"
+        ],
+        [
+          "b"
+        ]
+      ],
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def groupStrings(self, strings: List[str]) -> List[List[str]]:\n        from collections import defaultdict\n        groups = defaultdict(list)\n        for s in strings:\n            if not s:\n                groups[''].append(s)\n                continue\n            key = []\n            for i in range(1, len(s)):\n                diff = (ord(s[i]) - ord(s[i-1])) % 26\n                key.append(str(diff))\n            groups[','.join(key)].append(s)\n        return list(groups.values())\n",
+    "javascript": "function groupStrings(strings) {\n    const groups = new Map();\n    for (const s of strings) {\n        if (s.length === 0) {\n            if (!groups.has('')) groups.set('', []);\n            groups.get('').push(s);\n            continue;\n        }\n        const key = [];\n        for (let i = 1; i < s.length; i++) {\n            const diff = (s.charCodeAt(i) - s.charCodeAt(i-1) + 26) % 26;\n            key.push(diff);\n        }\n        const k = key.join(',');\n        if (!groups.has(k)) groups.set(k, []);\n        groups.get(k).push(s);\n    }\n    return Array.from(groups.values());\n}\n"
+  },
+  "hints": [
+    "Use difference between consecutive characters as key."
+  ],
+  "editorial_md": "### Method: Hash Map with Difference Key\n- **Time Complexity**: $\\mathcal{O}(N \\cdot K)$\n- **Space Complexity**: $\\mathcal{O}(N \\cdot K)$",
+  "time_limit_ms": 2000,
+  "memory_limit_mb": 128
+}

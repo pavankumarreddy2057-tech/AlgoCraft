@@ -1,0 +1,86 @@
+{
+  "slug": "longest-palindromic-substring",
+  "title": "Longest Palindromic Substring",
+  "difficulty": "Medium",
+  "tags": [
+    "Two Pointers",
+    "String",
+    "Dynamic Programming"
+  ],
+  "statement_md": "Given a string `s`, return *the longest palindromic substring* in `s`.",
+  "constraints": [
+    "1 <= s.length <= 1000",
+    "s consist of only digits and English letters."
+  ],
+  "examples": [
+    {
+      "input": {
+        "s": "babad"
+      },
+      "output": "bab",
+      "explanation": "\"aba\" is also a valid answer."
+    },
+    {
+      "input": {
+        "s": "cbbd"
+      },
+      "output": "bb"
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def longestPalindrome(self, s: str) -> str:\n        pass\n",
+    "javascript": "function longestPalindrome(s) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "s": "babad"
+      },
+      "expected_output": "bab",
+      "hidden": false
+    },
+    {
+      "input": {
+        "s": "cbbd"
+      },
+      "expected_output": "bb",
+      "hidden": false
+    },
+    {
+      "input": {
+        "s": "a"
+      },
+      "expected_output": "a",
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "racecar"
+      },
+      "expected_output": "racecar",
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "ab"
+      },
+      "expected_output": "a",
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "aba"
+      },
+      "expected_output": "aba",
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def longestPalindrome(self, s: str) -> str:\n        res = \"\"\n        for i in range(len(s)):\n            # Odd length\n            l, r = i, i\n            while l >= 0 and r < len(s) and s[l] == s[r]:\n                if (r - l + 1) > len(res):\n                    res = s[l:r+1]\n                l -= 1\n                r += 1\n            # Even length\n            l, r = i, i + 1\n            while l >= 0 and r < len(s) and s[l] == s[r]:\n                if (r - l + 1) > len(res):\n                    res = s[l:r+1]\n                l -= 1\n                r += 1\n        return res\n",
+    "javascript": "function longestPalindrome(s) {\n    let res = \"\";\n    for (let i = 0; i < s.length; i++) {\n        // Odd\n        let l = i, r = i;\n        while (l >= 0 && r < s.length && s[l] === s[r]) {\n            if (r - l + 1 > res.length) res = s.slice(l, r + 1);\n            l--; r++;\n        }\n        // Even\n        l = i; r = i + 1;\n        while (l >= 0 && r < s.length && s[l] === s[r]) {\n            if (r - l + 1 > res.length) res = s.slice(l, r + 1);\n            l--; r++;\n        }\n    }\n    return res;\n}\n"
+  },
+  "hints": [
+    "Expand outwards from each center (both 1-character center and 2-character center)."
+  ],
+  "editorial_md": "### Method: Expand Around Center\n- **Time Complexity**: $\\mathcal{O}(N^2)$\n- **Space Complexity**: $\\mathcal{O}(1)$"
+}

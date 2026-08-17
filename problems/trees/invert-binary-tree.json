@@ -1,0 +1,158 @@
+{
+  "slug": "invert-binary-tree",
+  "title": "Invert Binary Tree",
+  "difficulty": "Easy",
+  "tags": [
+    "Tree",
+    "Binary Tree",
+    "DFS"
+  ],
+  "statement_md": "Invert a binary tree and return its root.",
+  "constraints": [
+    "0 <= nodes <= 100"
+  ],
+  "examples": [
+    {
+      "input": {
+        "root": [
+          4,
+          2,
+          7,
+          1,
+          3,
+          6,
+          9
+        ]
+      },
+      "output": [
+        4,
+        7,
+        2,
+        9,
+        6,
+        3,
+        1
+      ]
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def invertTree(self, root: Optional[TreeNode]) -> Optional[TreeNode]:\n        pass\n",
+    "javascript": "function invertTree(root) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "root": [
+          4,
+          2,
+          7,
+          1,
+          3,
+          6,
+          9
+        ]
+      },
+      "expected_output": [
+        4,
+        7,
+        2,
+        9,
+        6,
+        3,
+        1
+      ],
+      "hidden": false
+    },
+    {
+      "input": {
+        "root": [
+          1
+        ]
+      },
+      "expected_output": [
+        1
+      ],
+      "hidden": true
+    },
+    {
+      "input": {
+        "root": [
+          1,
+          2
+        ]
+      },
+      "expected_output": [
+        1,
+        null,
+        2
+      ],
+      "hidden": true
+    },
+    {
+      "input": {
+        "root": [
+          1,
+          null,
+          2
+        ]
+      },
+      "expected_output": [
+        1,
+        2
+      ],
+      "hidden": true
+    },
+    {
+      "input": {
+        "root": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "expected_output": [
+        1,
+        3,
+        2,
+        null,
+        null,
+        5,
+        4
+      ],
+      "hidden": true
+    },
+    {
+      "input": {
+        "root": [
+          10,
+          5,
+          15,
+          3,
+          7,
+          null,
+          18
+        ]
+      },
+      "expected_output": [
+        10,
+        15,
+        5,
+        18,
+        null,
+        7,
+        3
+      ],
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def invertTree(self, root: Optional[TreeNode]) -> Optional[TreeNode]:\n        if not root: return None\n        root.left, root.right = self.invertTree(root.right), self.invertTree(root.left)\n        return root\n",
+    "javascript": "function invertTree(root) {\n    if (!root) return null;\n    const l = invertTree(root.left);\n    const r = invertTree(root.right);\n    root.left = r;\n    root.right = l;\n    return root;\n}\n"
+  },
+  "hints": [
+    "Recursively swap left and right subtrees."
+  ],
+  "editorial_md": "### Method: Recursive DFS\n- **Time Complexity**: $\\mathcal{O}(N)$\n- **Space Complexity**: $\\mathcal{O}(H)$"
+}

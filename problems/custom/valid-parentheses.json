@@ -1,0 +1,79 @@
+{
+  "slug": "valid-parentheses",
+  "title": "Valid Parentheses",
+  "difficulty": "Easy",
+  "tags": [
+    "Stack",
+    "String"
+  ],
+  "statement_md": "Determine if the input string consisting of brackets `()[]{}` is valid.",
+  "constraints": [
+    "1 <= s.length <= 10^4"
+  ],
+  "examples": [
+    {
+      "input": {
+        "s": "()[]{}"
+      },
+      "output": true
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def isValid(self, s: str) -> bool:\n        pass\n",
+    "javascript": "function isValid(s) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "s": "()[]{}"
+      },
+      "expected_output": true,
+      "hidden": false
+    },
+    {
+      "input": {
+        "s": "a"
+      },
+      "expected_output": false,
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "ab"
+      },
+      "expected_output": false,
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "aba"
+      },
+      "expected_output": false,
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "aaaaa"
+      },
+      "expected_output": false,
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "abcdefg"
+      },
+      "expected_output": false,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def isValid(self, s: str) -> bool:\n        stack = []\n        pairs = {\")\": \"(\", \"}\": \"{\", \"]\": \"[\"}\n        for c in s:\n            if c in pairs:\n                if not stack or stack[-1] != pairs[c]:\n                    return False\n                stack.pop()\n            else:\n                stack.append(c)\n        return len(stack) == 0\n",
+    "javascript": "function isValid(s) {\n    const stack = [];\n    const pairs = { \")\": \"(\", \"}\": \"{\", \"]\": \"[\" };\n    for (const c of s) {\n        if (pairs[c]) {\n            if (stack.pop() !== pairs[c]) return false;\n        } else {\n            stack.push(c);\n        }\n    }\n    return stack.length === 0;\n}\n"
+  },
+  "hints": [
+    "Push opening brackets to stack, pop on closing brackets."
+  ],
+  "editorial_md": "### Method: Stack\n- **Time Complexity**: $\\mathcal{O}(N)$\n- **Space Complexity**: $\\mathcal{O}(N)$",
+  "time_limit_ms": 2000,
+  "memory_limit_mb": 128
+}

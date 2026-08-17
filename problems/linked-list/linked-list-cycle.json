@@ -1,0 +1,121 @@
+{
+  "slug": "linked-list-cycle",
+  "title": "Linked List Cycle",
+  "difficulty": "Easy",
+  "tags": [
+    "Linked List",
+    "Two Pointers",
+    "Hash Table"
+  ],
+  "statement_md": "Given `head`, the head of a linked list, determine if the linked list has a cycle in it.\n\nThere is a cycle in a linked list if there is some node in the list that can be reached again by continuously following the `next` pointer.\n\nReturn `true` *if there is a cycle in the linked list. Otherwise, return* `false`.",
+  "constraints": [
+    "The number of the nodes in the list is in the range [0, 10^4].",
+    "-10^5 <= Node.val <= 10^5"
+  ],
+  "examples": [
+    {
+      "input": {
+        "head": [
+          3,
+          2,
+          0,
+          -4
+        ]
+      },
+      "output": false
+    },
+    {
+      "input": {
+        "head": [
+          1,
+          2
+        ]
+      },
+      "output": false
+    },
+    {
+      "input": {
+        "head": [
+          1
+        ]
+      },
+      "output": false
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def hasCycle(self, head: Optional[ListNode]) -> bool:\n        pass\n",
+    "javascript": "function hasCycle(head) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "head": [
+          3,
+          2,
+          0,
+          -4
+        ]
+      },
+      "expected_output": false,
+      "hidden": false
+    },
+    {
+      "input": {
+        "head": [
+          1,
+          2
+        ]
+      },
+      "expected_output": false,
+      "hidden": false
+    },
+    {
+      "input": {
+        "head": [
+          1
+        ]
+      },
+      "expected_output": false,
+      "hidden": false
+    },
+    {
+      "input": {
+        "head": []
+      },
+      "expected_output": false,
+      "hidden": true
+    },
+    {
+      "input": {
+        "head": [
+          1,
+          2,
+          3
+        ]
+      },
+      "expected_output": false,
+      "hidden": true
+    },
+    {
+      "input": {
+        "head": [
+          10,
+          20,
+          30,
+          40,
+          50
+        ]
+      },
+      "expected_output": false,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def hasCycle(self, head: Optional[ListNode]) -> bool:\n        slow, fast = head, head\n        while fast and fast.next:\n            slow = slow.next\n            fast = fast.next.next\n            if slow == fast:\n                return True\n        return False\n",
+    "javascript": "function hasCycle(head) {\n    let slow = head, fast = head;\n    while (fast && fast.next) {\n        slow = slow.next;\n        fast = fast.next.next;\n        if (slow === fast) return true;\n    }\n    return false;\n}\n"
+  },
+  "hints": [
+    "Use Floyd's Tortoise and Hare algorithm (fast moves 2 steps, slow moves 1 step)."
+  ],
+  "editorial_md": "### Method: Floyd's Cycle Finding Algorithm\n- **Time Complexity**: $\\mathcal{O}(N)$\n- **Space Complexity**: $\\mathcal{O}(1)$"
+}

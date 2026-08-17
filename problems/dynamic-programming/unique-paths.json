@@ -1,0 +1,92 @@
+{
+  "slug": "unique-paths",
+  "title": "Unique Paths",
+  "difficulty": "Medium",
+  "tags": [
+    "Math",
+    "Dynamic Programming",
+    "Combinatorics"
+  ],
+  "statement_md": "There is a robot on an `m x n` grid. The robot is initially located at top-left corner `(0, 0)` and tries to move to bottom-right corner `(m - 1, n - 1)`. The robot can only move either down or right at any point.\n\nGiven integers `m` and `n`, return the number of possible unique paths.",
+  "constraints": [
+    "1 <= m, n <= 100"
+  ],
+  "examples": [
+    {
+      "input": {
+        "m": 3,
+        "n": 7
+      },
+      "output": 28
+    },
+    {
+      "input": {
+        "m": 3,
+        "n": 2
+      },
+      "output": 3
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def uniquePaths(self, m: int, n: int) -> int:\n        pass\n",
+    "javascript": "function uniquePaths(m, n) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "m": 3,
+        "n": 7
+      },
+      "expected_output": 28,
+      "hidden": false
+    },
+    {
+      "input": {
+        "m": 3,
+        "n": 2
+      },
+      "expected_output": 3,
+      "hidden": false
+    },
+    {
+      "input": {
+        "m": 1,
+        "n": 1
+      },
+      "expected_output": 1,
+      "hidden": true
+    },
+    {
+      "input": {
+        "m": 2,
+        "n": 2
+      },
+      "expected_output": 2,
+      "hidden": true
+    },
+    {
+      "input": {
+        "m": 3,
+        "n": 3
+      },
+      "expected_output": 6,
+      "hidden": true
+    },
+    {
+      "input": {
+        "m": 7,
+        "n": 3
+      },
+      "expected_output": 28,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def uniquePaths(self, m: int, n: int) -> int:\n        row = [1] * n\n        for _ in range(m - 1):\n            new_row = [1] * n\n            for j in range(n - 2, -1, -1):\n                new_row[j] = new_row[j + 1] + row[j]\n            row = new_row\n        return row[0]\n",
+    "javascript": "function uniquePaths(m, n) {\n    let row = new Array(n).fill(1);\n    for (let i = 0; i < m - 1; i++) {\n        const newRow = new Array(n).fill(1);\n        for (let j = n - 2; j >= 0; j--) {\n            newRow[j] = newRow[j + 1] + row[j];\n        }\n        row = newRow;\n    }\n    return row[0];\n}\n"
+  },
+  "hints": [
+    "dp[r][c] = dp[r+1][c] + dp[r][c+1]"
+  ],
+  "editorial_md": "### Method: 2D Dynamic Programming (Space Optimized)\n- **Time Complexity**: $\\mathcal{O}(M \\cdot N)$\n- **Space Complexity**: $\\mathcal{O}(N)$"
+}

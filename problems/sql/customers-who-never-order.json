@@ -1,0 +1,101 @@
+{
+  "slug": "customers-who-never-order",
+  "title": "Customers Who Never Order",
+  "difficulty": "Easy",
+  "tags": [
+    "Database",
+    "SQL"
+  ],
+  "statement_md": "Write a solution to find all customers who never order anything.",
+  "constraints": [
+    "id is the primary key column for Customers table."
+  ],
+  "examples": [
+    {
+      "input": "Table Customers:\n+----+-------+\n| id | name  |\n+----+-------+\n| 1  | Joe   |\n| 2  | Henry |\n| 3  | Sam   |\n| 4  | Max   |\n+----+-------+\nTable Orders:\n+----+------------+\n| id | customerId |\n+----+------------+\n| 1  | 3          |\n| 2  | 1          |\n+----+------------+",
+      "output": "+-----------+\n| Customers |\n+-----------+\n| Henry     |\n| Max       |\n+-----------+"
+    }
+  ],
+  "starter_code": {
+    "sql": "-- Write your SQL query statement below\nSELECT \n"
+  },
+  "test_cases": [
+    {
+      "schema_ddl": "\n          CREATE TABLE Customers (id INT, name VARCHAR(255));\n          CREATE TABLE Orders (id INT, customerId INT);\n          INSERT INTO Customers VALUES (1, 'Joe'), (2, 'Henry'), (3, 'Sam'), (4, 'Max');\n          INSERT INTO Orders VALUES (1, 3), (2, 1);\n        ",
+      "expected_output": {
+        "columns": [
+          "Customers"
+        ],
+        "values": [
+          [
+            "Henry"
+          ],
+          [
+            "Max"
+          ]
+        ]
+      },
+      "hidden": false
+    },
+    {
+      "schema_ddl": "\n      CREATE TABLE Customers (id INT, name VARCHAR(255));\n      CREATE TABLE Orders (id INT, customerId INT);\n      INSERT INTO Customers VALUES (1, 'Alice'), (2, 'Bob'), (3, 'Charlie');\n      INSERT INTO Orders VALUES (1, 1), (2, 2), (3, 3);\n    ",
+      "expected_output": {
+        "columns": [],
+        "values": []
+      },
+      "hidden": true
+    },
+    {
+      "schema_ddl": "\n      CREATE TABLE Customers (id INT, name VARCHAR(255));\n      CREATE TABLE Orders (id INT, customerId INT);\n      INSERT INTO Customers VALUES (1, 'Solo');\n    ",
+      "expected_output": {
+        "columns": [
+          "Customers"
+        ],
+        "values": [
+          [
+            "Solo"
+          ]
+        ]
+      },
+      "hidden": true
+    },
+    {
+      "schema_ddl": "\n      CREATE TABLE Customers (id INT, name VARCHAR(255));\n      CREATE TABLE Orders (id INT, customerId INT);\n      INSERT INTO Customers VALUES (1, 'Dan'), (2, 'Eva');\n      INSERT INTO Orders VALUES (1, 1);\n    ",
+      "expected_output": {
+        "columns": [
+          "Customers"
+        ],
+        "values": [
+          [
+            "Eva"
+          ]
+        ]
+      },
+      "hidden": true
+    },
+    {
+      "schema_ddl": "\n      CREATE TABLE Customers (id INT, name VARCHAR(255));\n      CREATE TABLE Orders (id INT, customerId INT);\n      INSERT INTO Customers VALUES (10, 'A'), (20, 'B'), (30, 'C'), (40, 'D');\n      INSERT INTO Orders VALUES (1, 20), (2, 40);\n    ",
+      "expected_output": {
+        "columns": [
+          "Customers"
+        ],
+        "values": [
+          [
+            "A"
+          ],
+          [
+            "C"
+          ]
+        ]
+      },
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "sql": "SELECT name AS Customers\nFROM Customers\nWHERE id NOT IN (SELECT customerId FROM Orders WHERE customerId IS NOT NULL);"
+  },
+  "hints": [
+    "Use `NOT IN (SELECT customerId FROM Orders)` or `LEFT JOIN ... WHERE Orders.id IS NULL`."
+  ],
+  "editorial_md": "### Method: NOT IN Subquery\n\n```sql\nSELECT name AS Customers\nFROM Customers\nWHERE id NOT IN (SELECT customerId FROM Orders WHERE customerId IS NOT NULL);\n```"
+}

@@ -1,0 +1,210 @@
+{
+  "slug": "non-overlapping-intervals",
+  "title": "Non-overlapping Intervals",
+  "difficulty": "Medium",
+  "tags": [
+    "Array",
+    "Dynamic Programming",
+    "Greedy",
+    "Sorting"
+  ],
+  "statement_md": "Given an array of intervals `intervals` where `intervals[i] = [start_i, end_i]`, return *the minimum number of intervals you need to remove to make the rest of the intervals non-overlapping*.",
+  "constraints": [
+    "1 <= intervals.length <= 10^5",
+    "intervals[i].length == 2",
+    "-5 * 10^4 <= start_i < end_i <= 5 * 10^4"
+  ],
+  "examples": [
+    {
+      "input": {
+        "intervals": [
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            4
+          ],
+          [
+            1,
+            3
+          ]
+        ]
+      },
+      "output": 1
+    },
+    {
+      "input": {
+        "intervals": [
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            2
+          ]
+        ]
+      },
+      "output": 2
+    },
+    {
+      "input": {
+        "intervals": [
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            3
+          ]
+        ]
+      },
+      "output": 0
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def eraseOverlapIntervals(self, intervals: List[List[int]]) -> int:\n        pass\n",
+    "javascript": "function eraseOverlapIntervals(intervals) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "intervals": [
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            4
+          ],
+          [
+            1,
+            3
+          ]
+        ]
+      },
+      "expected_output": 1,
+      "hidden": false
+    },
+    {
+      "input": {
+        "intervals": [
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            2
+          ]
+        ]
+      },
+      "expected_output": 2,
+      "hidden": false
+    },
+    {
+      "input": {
+        "intervals": [
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            3
+          ]
+        ]
+      },
+      "expected_output": 0,
+      "hidden": false
+    },
+    {
+      "input": {
+        "intervals": [
+          [
+            1,
+            100
+          ],
+          [
+            11,
+            22
+          ],
+          [
+            1,
+            11
+          ],
+          [
+            2,
+            12
+          ]
+        ]
+      },
+      "expected_output": 2,
+      "hidden": true
+    },
+    {
+      "input": {
+        "intervals": [
+          [
+            1,
+            2
+          ]
+        ]
+      },
+      "expected_output": 0,
+      "hidden": true
+    },
+    {
+      "input": {
+        "intervals": [
+          [
+            1,
+            4
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            5
+          ],
+          [
+            4,
+            6
+          ]
+        ]
+      },
+      "expected_output": 2,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def eraseOverlapIntervals(self, intervals: List[List[int]]) -> int:\n        intervals.sort(key=lambda x: x[1])\n        count = 0\n        prev_end = float(\"-inf\")\n        for start, end in intervals:\n            if start >= prev_end:\n                prev_end = end\n            else:\n                count += 1\n        return count\n",
+    "javascript": "function eraseOverlapIntervals(intervals) {\n    intervals.sort((a, b) => a[1] - b[1]);\n    let count = 0;\n    let prevEnd = -Infinity;\n    for (const [start, end] of intervals) {\n        if (start >= prevEnd) {\n            prevEnd = end;\n        } else {\n            count++;\n        }\n    }\n    return count;\n}\n"
+  },
+  "hints": [
+    "Greedily sort by interval end times to maximize remaining compatible intervals."
+  ],
+  "editorial_md": "### Method: Greedy Interval Scheduling\n- **Time Complexity**: $\\mathcal{O}(N \\log N)$\n- **Space Complexity**: $\\mathcal{O}(1)$"
+}

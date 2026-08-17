@@ -1,0 +1,121 @@
+{
+  "slug": "maximum-points-you-can-obtain-from-cards",
+  "title": "Maximum Points You Can Obtain from Cards",
+  "difficulty": "Medium",
+  "tags": [
+    "Arrays",
+    "Sliding Window",
+    "Prefix Sum"
+  ],
+  "statement_md": "There are several cards arranged in a row, and each card has an associated number of points. You can take exactly `k` cards from either the beginning or the end. Return the maximum points you can obtain.",
+  "constraints": [
+    "1 <= cardPoints.length <= 10^5",
+    "1 <= cardPoints[i] <= 10^4",
+    "1 <= k <= cardPoints.length"
+  ],
+  "examples": [
+    {
+      "input": {
+        "cardPoints": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          1
+        ],
+        "k": 3
+      },
+      "output": 12
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def maxScore(self, cardPoints: List[int], k: int) -> int:\n        pass\n",
+    "javascript": "function maxScore(cardPoints, k) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "cardPoints": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          1
+        ],
+        "k": 3
+      },
+      "expected_output": 12,
+      "hidden": false
+    },
+    {
+      "input": {
+        "cardPoints": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          1
+        ],
+        "k": 3
+      },
+      "expected_output": 12,
+      "hidden": true
+    },
+    {
+      "input": {
+        "cardPoints": [
+          2,
+          2,
+          2
+        ],
+        "k": 2
+      },
+      "expected_output": 4,
+      "hidden": true
+    },
+    {
+      "input": {
+        "cardPoints": [
+          9,
+          7,
+          7,
+          9,
+          7,
+          7,
+          9
+        ],
+        "k": 7
+      },
+      "expected_output": 55,
+      "hidden": true
+    },
+    {
+      "input": {
+        "cardPoints": [
+          1,
+          1000,
+          1
+        ],
+        "k": 1
+      },
+      "expected_output": 1,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def maxScore(self, cardPoints: List[int], k: int) -> int:\n        total = sum(cardPoints)\n        window = len(cardPoints) - k\n        curr_sum = sum(cardPoints[:window])\n        min_sum = curr_sum\n        for i in range(window, len(cardPoints)):\n            curr_sum += cardPoints[i] - cardPoints[i - window]\n            min_sum = min(min_sum, curr_sum)\n        return total - min_sum\n",
+    "javascript": "function maxScore(cardPoints, k) {\n    const total = cardPoints.reduce((a,b) => a+b, 0);\n    const window = cardPoints.length - k;\n    let currSum = cardPoints.slice(0, window).reduce((a,b) => a+b, 0);\n    let minSum = currSum;\n    for (let i = window; i < cardPoints.length; i++) {\n        currSum += cardPoints[i] - cardPoints[i - window];\n        minSum = Math.min(minSum, currSum);\n    }\n    return total - minSum;\n}\n"
+  },
+  "hints": [
+    "Find minimum sum of a subarray of length n-k."
+  ],
+  "editorial_md": "### Method: Sliding Window\n- **Time Complexity**: $\\mathcal{O}(N)$\n- **Space Complexity**: $\\mathcal{O}(1)$",
+  "time_limit_ms": 2000,
+  "memory_limit_mb": 128
+}

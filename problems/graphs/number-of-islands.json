@@ -1,0 +1,179 @@
+{
+  "slug": "number-of-islands",
+  "title": "Number of Islands",
+  "difficulty": "Medium",
+  "tags": [
+    "Graphs",
+    "DFS",
+    "BFS",
+    "Matrix"
+  ],
+  "statement_md": "Return number of islands formed by connected 1s in binary grid.",
+  "constraints": [
+    "1 <= m, n <= 300"
+  ],
+  "examples": [
+    {
+      "input": {
+        "grid": [
+          [
+            "1",
+            "1",
+            "0",
+            "0",
+            "0"
+          ],
+          [
+            "1",
+            "1",
+            "0",
+            "0",
+            "0"
+          ],
+          [
+            "0",
+            "0",
+            "1",
+            "0",
+            "0"
+          ],
+          [
+            "0",
+            "0",
+            "0",
+            "1",
+            "1"
+          ]
+        ]
+      },
+      "output": 3
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def numIslands(self, grid: List[List[str]]) -> int:\n        pass\n",
+    "javascript": "function numIslands(grid) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "grid": [
+          [
+            "1",
+            "1",
+            "0",
+            "0",
+            "0"
+          ],
+          [
+            "1",
+            "1",
+            "0",
+            "0",
+            "0"
+          ],
+          [
+            "0",
+            "0",
+            "1",
+            "0",
+            "0"
+          ],
+          [
+            "0",
+            "0",
+            "0",
+            "1",
+            "1"
+          ]
+        ]
+      },
+      "expected_output": 3,
+      "hidden": false
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            "1"
+          ]
+        ]
+      },
+      "expected_output": 1,
+      "hidden": true
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            "0"
+          ]
+        ]
+      },
+      "expected_output": 0,
+      "hidden": true
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            "1",
+            "0"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ]
+      },
+      "expected_output": 2,
+      "hidden": true
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "1",
+            "1"
+          ]
+        ]
+      },
+      "expected_output": 1,
+      "hidden": true
+    },
+    {
+      "input": {
+        "grid": [
+          [
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0"
+          ],
+          [
+            "1",
+            "0",
+            "1"
+          ]
+        ]
+      },
+      "expected_output": 5,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def numIslands(self, grid: List[List[str]]) -> int:\n        if not grid: return 0\n        rows, cols = len(grid), len(grid[0])\n        count = 0\n        def dfs(r, c):\n            if r < 0 or r >= rows or c < 0 or c >= cols or grid[r][c] != \"1\": return\n            grid[r][c] = \"0\"\n            dfs(r + 1, c); dfs(r - 1, c); dfs(r, c + 1); dfs(r, c - 1)\n        for r in range(rows):\n            for c in range(cols):\n                if grid[r][c] == \"1\":\n                    count += 1\n                    dfs(r, c)\n        return count\n",
+    "javascript": "function numIslands(grid) {\n    if (!grid || grid.length === 0) return 0;\n    const rows = grid.length, cols = grid[0].length;\n    let count = 0;\n    function dfs(r, c) {\n        if (r < 0 || r >= rows || c < 0 || c >= cols || grid[r][c] !== \"1\") return;\n        grid[r][c] = \"0\";\n        dfs(r + 1, c); dfs(r - 1, c); dfs(r, c + 1); dfs(r, c - 1);\n    }\n    for (let r = 0; r < rows; r++) {\n        for (let c = 0; c < cols; c++) {\n            if (grid[r][c] === \"1\") {\n                count++;\n                dfs(r, c);\n            }\n        }\n    }\n    return count;\n}\n"
+  },
+  "hints": [
+    "DFS flood fill connected 1s to 0s."
+  ],
+  "editorial_md": "### Method: DFS Flood Fill\n- **Time Complexity**: $\\mathcal{O}(M \\cdot N)$\n- **Space Complexity**: $\\mathcal{O}(M \\cdot N)$"
+}

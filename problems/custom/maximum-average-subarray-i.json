@@ -1,0 +1,126 @@
+{
+  "slug": "maximum-average-subarray-i",
+  "title": "Maximum Average Subarray I",
+  "difficulty": "Easy",
+  "tags": [
+    "Arrays",
+    "Sliding Window"
+  ],
+  "statement_md": "Given an array of integers `nums` and an integer `k`, find the contiguous subarray of length `k` that has the maximum average value and return this value.",
+  "constraints": [
+    "1 <= k <= nums.length <= 10^5",
+    "-10^4 <= nums[i] <= 10^4"
+  ],
+  "examples": [
+    {
+      "input": {
+        "nums": [
+          1,
+          12,
+          -5,
+          -6,
+          50,
+          3
+        ],
+        "k": 4
+      },
+      "output": 12.75
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def findMaxAverage(self, nums: List[int], k: int) -> float:\n        pass\n",
+    "javascript": "function findMaxAverage(nums, k) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "nums": [
+          1,
+          12,
+          -5,
+          -6,
+          50,
+          3
+        ],
+        "k": 4
+      },
+      "expected_output": 12.75,
+      "hidden": false
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          1,
+          1,
+          2,
+          2,
+          3
+        ],
+        "k": 2
+      },
+      "expected_output": 2.5,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          1
+        ],
+        "k": 1
+      },
+      "expected_output": 1,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          4,
+          1,
+          -1,
+          2,
+          -1,
+          2,
+          3
+        ],
+        "k": 2
+      },
+      "expected_output": 2.5,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2
+        ],
+        "k": 2
+      },
+      "expected_output": 1.5,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          3,
+          0,
+          1,
+          0
+        ],
+        "k": 1
+      },
+      "expected_output": 3,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def findMaxAverage(self, nums: List[int], k: int) -> float:\n        curr_sum = sum(nums[:k])\n        max_sum = curr_sum\n        for i in range(k, len(nums)):\n            curr_sum += nums[i] - nums[i-k]\n            max_sum = max(max_sum, curr_sum)\n        return max_sum / k\n",
+    "javascript": "function findMaxAverage(nums, k) {\n    let currSum = nums.slice(0,k).reduce((a,b) => a+b, 0);\n    let maxSum = currSum;\n    for (let i = k; i < nums.length; i++) {\n        currSum += nums[i] - nums[i-k];\n        maxSum = Math.max(maxSum, currSum);\n    }\n    return maxSum / k;\n}\n"
+  },
+  "hints": [
+    "Use sliding window to maintain sum of current k elements."
+  ],
+  "editorial_md": "### Method: Sliding Window\n- **Time Complexity**: $\\mathcal{O}(N)$\n- **Space Complexity**: $\\mathcal{O}(1)$",
+  "time_limit_ms": 2000,
+  "memory_limit_mb": 128
+}

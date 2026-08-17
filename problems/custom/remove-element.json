@@ -1,0 +1,108 @@
+{
+  "slug": "remove-element",
+  "title": "Remove Element",
+  "difficulty": "Easy",
+  "tags": [
+    "Two Pointers",
+    "Arrays"
+  ],
+  "statement_md": "Given an integer array `nums` and an integer `val`, remove all occurrences of `val` **in-place** and return the number of elements which are not equal to `val`.",
+  "constraints": [
+    "0 <= nums.length <= 100",
+    "0 <= nums[i] <= 50",
+    "0 <= val <= 100"
+  ],
+  "examples": [
+    {
+      "input": {
+        "nums": [
+          3,
+          2,
+          2,
+          3
+        ],
+        "val": 3
+      },
+      "output": 2
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def removeElement(self, nums: List[int], val: int) -> int:\n        pass\n",
+    "javascript": "function removeElement(nums, val) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "nums": [
+          3,
+          2,
+          2,
+          3
+        ],
+        "val": 3
+      },
+      "expected_output": 2,
+      "hidden": false
+    },
+    {
+      "input": {
+        "nums": [
+          3,
+          2,
+          2,
+          3
+        ],
+        "val": 3
+      },
+      "expected_output": 2,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          1,
+          2,
+          2,
+          3,
+          0,
+          4,
+          2
+        ],
+        "val": 2
+      },
+      "expected_output": 5,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          1
+        ],
+        "val": 1
+      },
+      "expected_output": 0,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          1
+        ],
+        "val": 2
+      },
+      "expected_output": 1,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def removeElement(self, nums: List[int], val: int) -> int:\n        i = 0\n        for x in nums:\n            if x != val:\n                nums[i] = x\n                i += 1\n        return i\n",
+    "javascript": "function removeElement(nums, val) {\n    let i = 0;\n    for (const x of nums) {\n        if (x !== val) {\n            nums[i] = x;\n            i++;\n        }\n    }\n    return i;\n}\n"
+  },
+  "hints": [
+    "Keep a pointer for position to place non-val elements."
+  ],
+  "editorial_md": "### Method: Two Pointers\n- **Time Complexity**: $\\mathcal{O}(N)$\n- **Space Complexity**: $\\mathcal{O}(1)$",
+  "time_limit_ms": 2000,
+  "memory_limit_mb": 128
+}

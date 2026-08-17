@@ -1,0 +1,122 @@
+{
+  "slug": "two-sum-ii-input-array-is-sorted",
+  "title": "Two Sum II - Input Array Is Sorted",
+  "difficulty": "Medium",
+  "tags": [
+    "Two Pointers",
+    "Arrays",
+    "Binary Search"
+  ],
+  "statement_md": "Given a **1-indexed** array of integers `numbers` sorted in non-decreasing order, find two numbers that add up to `target`. Return `[index1, index2]`.",
+  "constraints": [
+    "2 <= numbers.length <= 3 * 10^4",
+    "Exactly one solution exists."
+  ],
+  "examples": [
+    {
+      "input": {
+        "numbers": [
+          2,
+          7,
+          11,
+          15
+        ],
+        "target": 9
+      },
+      "output": [
+        1,
+        2
+      ]
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def twoSum(self, numbers: List[int], target: int) -> List[int]:\n        pass\n",
+    "javascript": "function twoSum(numbers, target) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "numbers": [
+          2,
+          7,
+          11,
+          15
+        ],
+        "target": 9
+      },
+      "expected_output": [
+        1,
+        2
+      ],
+      "hidden": false
+    },
+    {
+      "input": {
+        "numbers": [
+          2,
+          3,
+          4
+        ],
+        "target": 6
+      },
+      "expected_output": [
+        1,
+        3
+      ],
+      "hidden": false
+    },
+    {
+      "input": {
+        "numbers": [
+          2,
+          7,
+          11,
+          15
+        ],
+        "target": 9
+      },
+      "expected_output": [
+        1,
+        2
+      ],
+      "hidden": true
+    },
+    {
+      "input": {
+        "numbers": [
+          2,
+          3,
+          4
+        ],
+        "target": 6
+      },
+      "expected_output": [
+        1,
+        3
+      ],
+      "hidden": true
+    },
+    {
+      "input": {
+        "numbers": [
+          -1,
+          0
+        ],
+        "target": -1
+      },
+      "expected_output": [
+        1,
+        2
+      ],
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def twoSum(self, numbers: List[int], target: int) -> List[int]:\n        l, r = 0, len(numbers) - 1\n        while l < r:\n            s = numbers[l] + numbers[r]\n            if s == target:\n                return [l + 1, r + 1]\n            elif s < target:\n                l += 1\n            else:\n                r -= 1\n        return []\n",
+    "javascript": "function twoSum(numbers, target) {\n    let l = 0, r = numbers.length - 1;\n    while (l < r) {\n        const s = numbers[l] + numbers[r];\n        if (s === target) return [l + 1, r + 1];\n        if (s < target) l++;\n        else r--;\n    }\n    return [];\n}\n"
+  },
+  "hints": [
+    "Pointers at ends; move left rightward if sum too small, right leftward if too big."
+  ],
+  "editorial_md": "### Method: Two Pointers\n- **Time Complexity**: $\\mathcal{O}(N)$\n- **Space Complexity**: $\\mathcal{O}(1)$"
+}

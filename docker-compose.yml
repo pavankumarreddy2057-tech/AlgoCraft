@@ -1,0 +1,22 @@
+services:
+  algocraft-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: algocraft-platform
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=production
+      - PORT=4000
+      - OLLAMA_URL=http://host.docker.internal:11434
+    volumes:
+      - algocraft_db:/app/server/data
+      - ./problems:/app/problems
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  algocraft_db:
+    name: algocraft_db_data

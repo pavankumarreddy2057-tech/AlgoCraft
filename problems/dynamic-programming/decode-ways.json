@@ -1,0 +1,90 @@
+{
+  "slug": "decode-ways",
+  "title": "Decode Ways",
+  "difficulty": "Medium",
+  "tags": [
+    "String",
+    "Dynamic Programming"
+  ],
+  "statement_md": "A message containing letters from `A-Z` can be encoded into numbers using the mapping `'A' -> \"1\"`, `'B' -> \"2\"`, ..., `'Z' -> \"26\"`.\n\nGiven a string `s` containing only digits, return *the **number** of ways to **decode** it*.",
+  "constraints": [
+    "1 <= s.length <= 100",
+    "s contains only digits and may contain leading zero(s)."
+  ],
+  "examples": [
+    {
+      "input": {
+        "s": "12"
+      },
+      "output": 2
+    },
+    {
+      "input": {
+        "s": "226"
+      },
+      "output": 3
+    },
+    {
+      "input": {
+        "s": "06"
+      },
+      "output": 0
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def numDecodings(self, s: str) -> int:\n        pass\n",
+    "javascript": "function numDecodings(s) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "s": "12"
+      },
+      "expected_output": 2,
+      "hidden": false
+    },
+    {
+      "input": {
+        "s": "226"
+      },
+      "expected_output": 3,
+      "hidden": false
+    },
+    {
+      "input": {
+        "s": "06"
+      },
+      "expected_output": 0,
+      "hidden": false
+    },
+    {
+      "input": {
+        "s": "10"
+      },
+      "expected_output": 1,
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "27"
+      },
+      "expected_output": 1,
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "11106"
+      },
+      "expected_output": 2,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def numDecodings(self, s: str) -> int:\n        if not s or s[0] == \"0\":\n            return 0\n        dp = {len(s): 1}\n        for i in range(len(s) - 1, -1, -1):\n            if s[i] == \"0\":\n                dp[i] = 0\n            else:\n                dp[i] = dp.get(i + 1, 0)\n                if i + 1 < len(s) and (s[i] == \"1\" or (s[i] == \"2\" and s[i + 1] in \"0123456\")):\n                    dp[i] += dp.get(i + 2, 0)\n        return dp[0]\n",
+    "javascript": "function numDecodings(s) {\n    if (!s || s[0] === \"0\") return 0;\n    const dp = new Array(s.length + 1).fill(0);\n    dp[s.length] = 1;\n    for (let i = s.length - 1; i >= 0; i--) {\n        if (s[i] === \"0\") {\n            dp[i] = 0;\n        } else {\n            dp[i] = dp[i + 1];\n            if (i + 1 < s.length && (s[i] === \"1\" || (s[i] === \"2\" && \"0123456\".includes(s[i + 1])))) {\n                dp[i] += dp[i + 2];\n            }\n        }\n    }\n    return dp[0];\n}\n"
+  },
+  "hints": [
+    "Check single digit `1-9` and double digits `10-26`."
+  ],
+  "editorial_md": "### Method: 1D Dynamic Programming\n- **Time Complexity**: $\\mathcal{O}(N)$\n- **Space Complexity**: $\\mathcal{O}(N)$"
+}

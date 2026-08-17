@@ -1,0 +1,134 @@
+{
+  "slug": "diameter-of-binary-tree",
+  "title": "Diameter of Binary Tree",
+  "difficulty": "Easy",
+  "tags": [
+    "Tree",
+    "Depth-First Search",
+    "Binary Tree"
+  ],
+  "statement_md": "Given the `root` of a binary tree, return *the length of the **diameter** of the tree*.\n\nThe **diameter** of a binary tree is the **length** of the longest path between any two nodes in a tree. This path may or may not pass through the `root`.",
+  "constraints": [
+    "The number of nodes in the tree is in the range [1, 10^4].",
+    "-100 <= Node.val <= 100"
+  ],
+  "examples": [
+    {
+      "input": {
+        "root": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "output": 3
+    },
+    {
+      "input": {
+        "root": [
+          1,
+          2
+        ]
+      },
+      "output": 1
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def diameterOfBinaryTree(self, root: Optional[TreeNode]) -> int:\n        pass\n",
+    "javascript": "function diameterOfBinaryTree(root) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "root": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "expected_output": 3,
+      "hidden": false
+    },
+    {
+      "input": {
+        "root": [
+          1,
+          2
+        ]
+      },
+      "expected_output": 1,
+      "hidden": false
+    },
+    {
+      "input": {
+        "root": [
+          1
+        ]
+      },
+      "expected_output": 0,
+      "hidden": true
+    },
+    {
+      "input": {
+        "root": [
+          4,
+          -7,
+          -3,
+          null,
+          null,
+          -9,
+          -3,
+          9,
+          -7,
+          -4,
+          null,
+          6,
+          null,
+          -6,
+          -6,
+          null,
+          null,
+          0,
+          6,
+          5,
+          null,
+          9,
+          null,
+          null,
+          -1,
+          -4,
+          null,
+          null,
+          null,
+          -2
+        ]
+      },
+      "expected_output": 8,
+      "hidden": true
+    },
+    {
+      "input": {
+        "root": [
+          2,
+          3,
+          null,
+          1
+        ]
+      },
+      "expected_output": 2,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def diameterOfBinaryTree(self, root: Optional[TreeNode]) -> int:\n        res = [0]\n        def dfs(curr):\n            if not curr:\n                return -1\n            left = dfs(curr.left)\n            right = dfs(curr.right)\n            res[0] = max(res[0], 2 + left + right)\n            return 1 + max(left, right)\n        dfs(root)\n        return res[0]\n",
+    "javascript": "function diameterOfBinaryTree(root) {\n    let res = 0;\n    function dfs(curr) {\n        if (!curr) return -1;\n        const left = dfs(curr.left);\n        const right = dfs(curr.right);\n        res = Math.max(res, 2 + left + right);\n        return 1 + Math.max(left, right);\n    }\n    dfs(root);\n    return res;\n}\n"
+  },
+  "hints": [
+    "The longest path through a node is `height(left) + height(right) + 2`."
+  ],
+  "editorial_md": "### Method: Post-Order DFS with Global Max\n- **Time Complexity**: $\\mathcal{O}(N)$\n- **Space Complexity**: $\\mathcal{O}(H)$"
+}

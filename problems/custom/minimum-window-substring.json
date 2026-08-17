@@ -1,0 +1,88 @@
+{
+  "slug": "minimum-window-substring",
+  "title": "Minimum Window Substring",
+  "difficulty": "Hard",
+  "tags": [
+    "String",
+    "Sliding Window",
+    "Hash Table"
+  ],
+  "statement_md": "Given two strings `s` and `t`, return the minimum window substring of `s` such that every character in `t` (including duplicates) is included in the window. If no such substring exists, return an empty string.",
+  "constraints": [
+    "1 <= s.length, t.length <= 10^5",
+    "s and t consist of uppercase and lowercase English letters."
+  ],
+  "examples": [
+    {
+      "input": {
+        "s": "ADOBECODEBANC",
+        "t": "ABC"
+      },
+      "output": "BANC"
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def minWindow(self, s: str, t: str) -> str:\n        pass\n",
+    "javascript": "function minWindow(s, t) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "s": "ADOBECODEBANC",
+        "t": "ABC"
+      },
+      "expected_output": "BANC",
+      "hidden": false
+    },
+    {
+      "input": {
+        "s": "a",
+        "t": "a"
+      },
+      "expected_output": "a",
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "ab",
+        "t": "ba"
+      },
+      "expected_output": "ab",
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "rat",
+        "t": "car"
+      },
+      "expected_output": "",
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "hello",
+        "t": "world"
+      },
+      "expected_output": "",
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "listen",
+        "t": "silent"
+      },
+      "expected_output": "listen",
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def minWindow(self, s: str, t: str) -> str:\n        need = {}\n        for c in t:\n            need[c] = need.get(c, 0) + 1\n        have = {}\n        l = 0\n        min_len = float('inf')\n        min_start = 0\n        required = len(need)\n        formed = 0\n        for r, c in enumerate(s):\n            have[c] = have.get(c, 0) + 1\n            if c in need and have[c] == need[c]:\n                formed += 1\n            while formed == required:\n                if r - l + 1 < min_len:\n                    min_len = r - l + 1\n                    min_start = l\n                have[s[l]] -= 1\n                if s[l] in need and have[s[l]] < need[s[l]]:\n                    formed -= 1\n                l += 1\n        return \"\" if min_len == float('inf') else s[min_start:min_start+min_len]\n",
+    "javascript": "function minWindow(s, t) {\n    const need = {};\n    for (const c of t) need[c] = (need[c] || 0) + 1;\n    const have = {};\n    let l = 0, minLen = Infinity, minStart = 0;\n    const required = Object.keys(need).length;\n    let formed = 0;\n    for (let r = 0; r < s.length; r++) {\n        const c = s[r];\n        have[c] = (have[c] || 0) + 1;\n        if (need[c] && have[c] === need[c]) formed++;\n        while (formed === required) {\n            if (r - l + 1 < minLen) {\n                minLen = r - l + 1;\n                minStart = l;\n            }\n            have[s[l]]--;\n            if (need[s[l]] && have[s[l]] < need[s[l]]) formed--;\n            l++;\n        }\n    }\n    return minLen === Infinity ? \"\" : s.slice(minStart, minStart + minLen);\n}\n"
+  },
+  "hints": [
+    "Use sliding window with character counts."
+  ],
+  "editorial_md": "### Method: Sliding Window\n- **Time Complexity**: $\\mathcal{O}(|S| + |T|)$\n- **Space Complexity**: $\\mathcal{O}(|S| + |T|)$",
+  "time_limit_ms": 2000,
+  "memory_limit_mb": 128
+}

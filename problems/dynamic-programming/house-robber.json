@@ -1,0 +1,127 @@
+{
+  "slug": "house-robber",
+  "title": "House Robber",
+  "difficulty": "Medium",
+  "tags": [
+    "Dynamic Programming",
+    "Arrays"
+  ],
+  "statement_md": "Determine maximum money you can rob from houses without robbing adjacent houses.",
+  "constraints": [
+    "1 <= nums.length <= 100"
+  ],
+  "examples": [
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          1
+        ]
+      },
+      "output": 4
+    },
+    {
+      "input": {
+        "nums": [
+          2,
+          7,
+          9,
+          3,
+          1
+        ]
+      },
+      "output": 12
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def rob(self, nums: List[int]) -> int:\n        pass\n",
+    "javascript": "function rob(nums) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          1
+        ]
+      },
+      "expected_output": 4,
+      "hidden": false
+    },
+    {
+      "input": {
+        "nums": [
+          2,
+          7,
+          9,
+          3,
+          1
+        ]
+      },
+      "expected_output": 12,
+      "hidden": false
+    },
+    {
+      "input": {
+        "nums": [
+          1
+        ]
+      },
+      "expected_output": 1,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          2,
+          1
+        ]
+      },
+      "expected_output": 2,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
+      },
+      "expected_output": 9,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
+      },
+      "expected_output": 30,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def rob(self, nums: List[int]) -> int:\n        r1, r2 = 0, 0\n        for n in nums:\n            r1, r2 = r2, max(n + r1, r2)\n        return r2\n",
+    "javascript": "function rob(nums) {\n    let r1 = 0, r2 = 0;\n    for (const n of nums) {\n        const t = Math.max(n + r1, r2);\n        r1 = r2;\n        r2 = t;\n    }\n    return r2;\n}\n"
+  },
+  "hints": [
+    "dp[i] = max(nums[i] + dp[i-2], dp[i-1])"
+  ],
+  "editorial_md": "### Method: Dynamic Programming\n- **Time Complexity**: $\\mathcal{O}(N)$\n- **Space Complexity**: $\\mathcal{O}(1)$"
+}

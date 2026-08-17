@@ -1,0 +1,172 @@
+{
+  "slug": "product-of-array-except-self",
+  "title": "Product of Array Except Self",
+  "difficulty": "Medium",
+  "tags": [
+    "Arrays",
+    "Prefix Sum"
+  ],
+  "statement_md": "Given an integer array `nums`, return an array `answer` such that `answer[i]` is equal to the product of all the elements of `nums` except `nums[i]` without using division.",
+  "constraints": [
+    "2 <= nums.length <= 10^5",
+    "-30 <= nums[i] <= 30"
+  ],
+  "examples": [
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "output": [
+        24,
+        12,
+        8,
+        6
+      ]
+    },
+    {
+      "input": {
+        "nums": [
+          -1,
+          1,
+          0,
+          -3,
+          3
+        ]
+      },
+      "output": [
+        0,
+        0,
+        9,
+        0,
+        0
+      ]
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def productExceptSelf(self, nums: List[int]) -> List[int]:\n        pass\n",
+    "javascript": "function productExceptSelf(nums) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "expected_output": [
+        24,
+        12,
+        8,
+        6
+      ],
+      "hidden": false
+    },
+    {
+      "input": {
+        "nums": [
+          -1,
+          1,
+          0,
+          -3,
+          3
+        ]
+      },
+      "expected_output": [
+        0,
+        0,
+        9,
+        0,
+        0
+      ],
+      "hidden": false
+    },
+    {
+      "input": {
+        "nums": [
+          1
+        ]
+      },
+      "expected_output": [
+        1
+      ],
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          2,
+          1
+        ]
+      },
+      "expected_output": [
+        1,
+        2
+      ],
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
+      },
+      "expected_output": [
+        24,
+        30,
+        40,
+        60,
+        120
+      ],
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
+      },
+      "expected_output": [
+        3628800,
+        1814400,
+        1209600,
+        907200,
+        725760,
+        604800,
+        518400,
+        453600,
+        403200,
+        362880
+      ],
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def productExceptSelf(self, nums: List[int]) -> List[int]:\n        n = len(nums)\n        res = [1] * n\n        p = 1\n        for i in range(n):\n            res[i] = p\n            p *= nums[i]\n        s = 1\n        for i in range(n - 1, -1, -1):\n            res[i] *= s\n            s *= nums[i]\n        return res\n",
+    "javascript": "function productExceptSelf(nums) {\n    const n = nums.length;\n    const res = new Array(n).fill(1);\n    let p = 1;\n    for (let i = 0; i < n; i++) {\n        res[i] = p;\n        p *= nums[i];\n    }\n    let s = 1;\n    for (let i = n - 1; i >= 0; i--) {\n        res[i] *= s;\n        s *= nums[i];\n    }\n    return res;\n}\n"
+  },
+  "hints": [
+    "Prefix product pass forwards, suffix product pass backwards."
+  ],
+  "editorial_md": "### Method: Prefix & Suffix Products\n- **Time Complexity**: $\\mathcal{O}(N)$\n- **Space Complexity**: $\\mathcal{O}(1)$"
+}

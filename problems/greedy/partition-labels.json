@@ -1,0 +1,112 @@
+{
+  "slug": "partition-labels",
+  "title": "Partition Labels",
+  "difficulty": "Medium",
+  "tags": [
+    "Hash Table",
+    "Two Pointers",
+    "String",
+    "Greedy"
+  ],
+  "statement_md": "You are given a string `s`. We want to partition the string into as many parts as possible so that each letter appears in at most one part.\n\nReturn *a list of integers representing the size of these parts*.",
+  "constraints": [
+    "1 <= s.length <= 500",
+    "s consists of lowercase English letters."
+  ],
+  "examples": [
+    {
+      "input": {
+        "s": "ababcbacadefegdehijhklij"
+      },
+      "output": [
+        9,
+        7,
+        8
+      ]
+    },
+    {
+      "input": {
+        "s": "eccbbbbdec"
+      },
+      "output": [
+        10
+      ]
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def partitionLabels(self, s: str) -> List[int]:\n        pass\n",
+    "javascript": "function partitionLabels(s) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "s": "ababcbacadefegdehijhklij"
+      },
+      "expected_output": [
+        9,
+        7,
+        8
+      ],
+      "hidden": false
+    },
+    {
+      "input": {
+        "s": "eccbbbbdec"
+      },
+      "expected_output": [
+        10
+      ],
+      "hidden": false
+    },
+    {
+      "input": {
+        "s": "a"
+      },
+      "expected_output": [
+        1
+      ],
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "abcdef"
+      },
+      "expected_output": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "caedbdedda"
+      },
+      "expected_output": [
+        1,
+        9
+      ],
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "qiejxqfnqceoxmmyswx"
+      },
+      "expected_output": [
+        19
+      ],
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def partitionLabels(self, s: str) -> List[int]:\n        last_idx = {c: i for i, c in enumerate(s)}\n        res = []\n        size, end = 0, 0\n        for i, c in enumerate(s):\n            size += 1\n            end = max(end, last_idx[c])\n            if i == end:\n                res.append(size)\n                size = 0\n        return res\n",
+    "javascript": "function partitionLabels(s) {\n    const lastIdx = {};\n    for (let i = 0; i < s.length; i++) lastIdx[s[i]] = i;\n    const res = [];\n    let size = 0, end = 0;\n    for (let i = 0; i < s.length; i++) {\n        size++;\n        end = Math.max(end, lastIdx[s[i]]);\n        if (i === end) {\n            res.push(size);\n            size = 0;\n        }\n    }\n    return res;\n}\n"
+  },
+  "hints": [
+    "Record the last index of every character first. Then expand the boundary until the current index reaches the furthest needed index."
+  ],
+  "editorial_md": "### Method: Greedy Last-Index Intervals\n- **Time Complexity**: $\\mathcal{O}(N)$\n- **Space Complexity**: $\\mathcal{O}(1)$ (26 characters)"
+}

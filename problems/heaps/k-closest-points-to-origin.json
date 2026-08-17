@@ -1,0 +1,215 @@
+{
+  "slug": "k-closest-points-to-origin",
+  "title": "K Closest Points to Origin",
+  "difficulty": "Medium",
+  "tags": [
+    "Array",
+    "Math",
+    "Divide and Conquer",
+    "Geometry",
+    "Sorting",
+    "Heap (Priority Queue)",
+    "Quickselect"
+  ],
+  "statement_md": "Given an array of `points` where `points[i] = [xi, yi]` represents a point on the X-Y plane and an integer `k`, return the `k` closest points to the origin `(0, 0)`.\n\nThe distance between two points on the X-Y plane is the Euclidean distance (i.e., $\\sqrt{(x_1 - x_2)^2 + (y_1 - y_2)^2}$).\n\nYou may return the answer in **any order**.",
+  "constraints": [
+    "1 <= k <= points.length <= 10^4",
+    "-10^4 <= xi, yi <= 10^4"
+  ],
+  "examples": [
+    {
+      "input": {
+        "points": [
+          [
+            1,
+            3
+          ],
+          [
+            -2,
+            2
+          ]
+        ],
+        "k": 1
+      },
+      "output": [
+        [
+          -2,
+          2
+        ]
+      ]
+    },
+    {
+      "input": {
+        "points": [
+          [
+            3,
+            3
+          ],
+          [
+            5,
+            -1
+          ],
+          [
+            -2,
+            4
+          ]
+        ],
+        "k": 2
+      },
+      "output": [
+        [
+          3,
+          3
+        ],
+        [
+          -2,
+          4
+        ]
+      ]
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def kClosest(self, points: List[List[int]], k: int) -> List[List[int]]:\n        pass\n",
+    "javascript": "function kClosest(points, k) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "points": [
+          [
+            1,
+            3
+          ],
+          [
+            -2,
+            2
+          ]
+        ],
+        "k": 1
+      },
+      "expected_output": [
+        [
+          -2,
+          2
+        ]
+      ],
+      "hidden": false
+    },
+    {
+      "input": {
+        "points": [
+          [
+            3,
+            3
+          ],
+          [
+            5,
+            -1
+          ],
+          [
+            -2,
+            4
+          ]
+        ],
+        "k": 2
+      },
+      "expected_output": [
+        [
+          3,
+          3
+        ],
+        [
+          -2,
+          4
+        ]
+      ],
+      "hidden": false
+    },
+    {
+      "input": {
+        "points": [
+          [
+            0,
+            1
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        "k": 2
+      },
+      "expected_output": [
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          0
+        ]
+      ],
+      "hidden": true
+    },
+    {
+      "input": {
+        "points": [
+          [
+            1,
+            3
+          ],
+          [
+            -2,
+            2
+          ]
+        ],
+        "k": 1
+      },
+      "expected_output": [
+        [
+          -2,
+          2
+        ]
+      ],
+      "hidden": true
+    },
+    {
+      "input": {
+        "points": [
+          [
+            3,
+            3
+          ],
+          [
+            5,
+            -1
+          ],
+          [
+            -2,
+            4
+          ]
+        ],
+        "k": 2
+      },
+      "expected_output": [
+        [
+          3,
+          3
+        ],
+        [
+          -2,
+          4
+        ]
+      ],
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def kClosest(self, points: List[List[int]], k: int) -> List[List[int]]:\n        points.sort(key=lambda p: p[0]**2 + p[1]**2)\n        return points[:k]\n",
+    "javascript": "function kClosest(points, k) {\n    points.sort((a, b) => (a[0]**2 + a[1]**2) - (b[0]**2 + b[1]**2));\n    return points.slice(0, k);\n}\n"
+  },
+  "hints": [
+    "Sort points by their squared distance $x^2 + y^2$ or maintain a max heap of size $k$."
+  ],
+  "editorial_md": "### Method: Max Heap / Sorting\n- **Time Complexity**: $\\mathcal{O}(N \\log k)$\n- **Space Complexity**: $\\mathcal{O}(k)$"
+}

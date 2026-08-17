@@ -1,0 +1,143 @@
+{
+  "slug": "reverse-linked-list",
+  "title": "Reverse Linked List",
+  "difficulty": "Easy",
+  "tags": [
+    "Linked List",
+    "Recursion"
+  ],
+  "statement_md": "Reverse a singly linked list.",
+  "constraints": [
+    "0 <= nodes <= 5000"
+  ],
+  "examples": [
+    {
+      "input": {
+        "head": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "output": [
+        5,
+        4,
+        3,
+        2,
+        1
+      ]
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def reverseList(self, head: Optional[ListNode]) -> Optional[ListNode]:\n        pass\n",
+    "javascript": "function reverseList(head) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "head": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "expected_output": [
+        5,
+        4,
+        3,
+        2,
+        1
+      ],
+      "hidden": false
+    },
+    {
+      "input": {
+        "head": [
+          1
+        ]
+      },
+      "expected_output": [
+        1
+      ],
+      "hidden": true
+    },
+    {
+      "input": {
+        "head": [
+          1,
+          2
+        ]
+      },
+      "expected_output": [
+        2,
+        1
+      ],
+      "hidden": true
+    },
+    {
+      "input": {
+        "head": [
+          1,
+          2,
+          3
+        ]
+      },
+      "expected_output": [
+        3,
+        2,
+        1
+      ],
+      "hidden": true
+    },
+    {
+      "input": {
+        "head": [
+          10,
+          20,
+          30,
+          40,
+          50
+        ]
+      },
+      "expected_output": [
+        50,
+        40,
+        30,
+        20,
+        10
+      ],
+      "hidden": true
+    },
+    {
+      "input": {
+        "head": [
+          -5,
+          -4,
+          -3,
+          -2,
+          -1
+        ]
+      },
+      "expected_output": [
+        -1,
+        -2,
+        -3,
+        -4,
+        -5
+      ],
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def reverseList(self, head: Optional[ListNode]) -> Optional[ListNode]:\n        prev, curr = None, head\n        while curr:\n            nxt = curr.next\n            curr.next = prev\n            prev = curr\n            curr = nxt\n        return prev\n",
+    "javascript": "function reverseList(head) {\n    let prev = null, curr = head;\n    while (curr) {\n        const nxt = curr.next;\n        curr.next = prev;\n        prev = curr;\n        curr = nxt;\n    }\n    return prev;\n}\n"
+  },
+  "hints": [
+    "Iteratively redirect curr.next to prev."
+  ],
+  "editorial_md": "### Method: Iterative 3 Pointers\n- **Time Complexity**: $\\mathcal{O}(N)$\n- **Space Complexity**: $\\mathcal{O}(1)$"
+}

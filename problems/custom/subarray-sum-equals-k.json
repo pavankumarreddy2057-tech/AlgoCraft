@@ -1,0 +1,122 @@
+{
+  "slug": "subarray-sum-equals-k",
+  "title": "Subarray Sum Equals K",
+  "difficulty": "Medium",
+  "tags": [
+    "Arrays",
+    "Hash Table",
+    "Prefix Sum"
+  ],
+  "statement_md": "Given an array of integers `nums` and an integer `k`, return the total number of continuous subarrays whose sum equals `k`.",
+  "constraints": [
+    "1 <= nums.length <= 2 * 10^4",
+    "-1000 <= nums[i] <= 1000",
+    "-10^7 <= k <= 10^7"
+  ],
+  "examples": [
+    {
+      "input": {
+        "nums": [
+          1,
+          1,
+          1
+        ],
+        "k": 2
+      },
+      "output": 2
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def subarraySum(self, nums: List[int], k: int) -> int:\n        pass\n",
+    "javascript": "function subarraySum(nums, k) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "nums": [
+          1,
+          1,
+          1
+        ],
+        "k": 2
+      },
+      "expected_output": 2,
+      "hidden": false
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          1,
+          1,
+          2,
+          2,
+          3
+        ],
+        "k": 2
+      },
+      "expected_output": 4,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          1
+        ],
+        "k": 1
+      },
+      "expected_output": 1,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          4,
+          1,
+          -1,
+          2,
+          -1,
+          2,
+          3
+        ],
+        "k": 2
+      },
+      "expected_output": 4,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2
+        ],
+        "k": 2
+      },
+      "expected_output": 1,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          3,
+          0,
+          1,
+          0
+        ],
+        "k": 1
+      },
+      "expected_output": 4,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def subarraySum(self, nums: List[int], k: int) -> int:\n        prefix_sum = {0: 1}\n        curr_sum = 0\n        count = 0\n        for n in nums:\n            curr_sum += n\n            count += prefix_sum.get(curr_sum - k, 0)\n            prefix_sum[curr_sum] = prefix_sum.get(curr_sum, 0) + 1\n        return count\n",
+    "javascript": "function subarraySum(nums, k) {\n    const prefixSum = new Map();\n    prefixSum.set(0, 1);\n    let currSum = 0, count = 0;\n    for (const n of nums) {\n        currSum += n;\n        count += prefixSum.get(currSum - k) || 0;\n        prefixSum.set(currSum, (prefixSum.get(currSum) || 0) + 1);\n    }\n    return count;\n}\n"
+  },
+  "hints": [
+    "Use prefix sum and hashmap to store frequencies."
+  ],
+  "editorial_md": "### Method: Prefix Sum with Hash Map\n- **Time Complexity**: $\\mathcal{O}(N)$\n- **Space Complexity**: $\\mathcal{O}(N)$",
+  "time_limit_ms": 2000,
+  "memory_limit_mb": 128
+}

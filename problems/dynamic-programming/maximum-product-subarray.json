@@ -1,0 +1,117 @@
+{
+  "slug": "maximum-product-subarray",
+  "title": "Maximum Product Subarray",
+  "difficulty": "Medium",
+  "tags": [
+    "Array",
+    "Dynamic Programming"
+  ],
+  "statement_md": "Given an integer array `nums`, find a subarray that has the largest product, and return *the product*.",
+  "constraints": [
+    "1 <= nums.length <= 2 * 10^4",
+    "-10 <= nums[i] <= 10"
+  ],
+  "examples": [
+    {
+      "input": {
+        "nums": [
+          2,
+          3,
+          -2,
+          4
+        ]
+      },
+      "output": 6
+    },
+    {
+      "input": {
+        "nums": [
+          -2,
+          0,
+          -1
+        ]
+      },
+      "output": 0
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def maxProduct(self, nums: List[int]) -> int:\n        pass\n",
+    "javascript": "function maxProduct(nums) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "nums": [
+          2,
+          3,
+          -2,
+          4
+        ]
+      },
+      "expected_output": 6,
+      "hidden": false
+    },
+    {
+      "input": {
+        "nums": [
+          -2,
+          0,
+          -1
+        ]
+      },
+      "expected_output": 0,
+      "hidden": false
+    },
+    {
+      "input": {
+        "nums": [
+          -2
+        ]
+      },
+      "expected_output": -2,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          -2,
+          3,
+          -4
+        ]
+      },
+      "expected_output": 24,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          2
+        ]
+      },
+      "expected_output": 2,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          2,
+          -5,
+          -2,
+          -4,
+          3
+        ]
+      },
+      "expected_output": 24,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def maxProduct(self, nums: List[int]) -> int:\n        res = max(nums)\n        cur_min, cur_max = 1, 1\n        for n in nums:\n            if n == 0:\n                cur_min, cur_max = 1, 1\n                continue\n            tmp = cur_max * n\n            cur_max = max(n * cur_max, n * cur_min, n)\n            cur_min = min(tmp, n * cur_min, n)\n            res = max(res, cur_max)\n        return res\n",
+    "javascript": "function maxProduct(nums) {\n    let res = Math.max(...nums);\n    let curMin = 1, curMax = 1;\n    for (const n of nums) {\n        if (n === 0) {\n            curMin = 1;\n            curMax = 1;\n            continue;\n        }\n        const tmp = curMax * n;\n        curMax = Math.max(n * curMax, n * curMin, n);\n        curMin = Math.min(tmp, n * curMin, n);\n        res = Math.max(res, curMax);\n    }\n    return res;\n}\n"
+  },
+  "hints": [
+    "Track both the running minimum and running maximum because multiplying two negatives yields a positive."
+  ],
+  "editorial_md": "### Method: Dual State DP (Min & Max Product)\n- **Time Complexity**: $\\mathcal{O}(N)$\n- **Space Complexity**: $\\mathcal{O}(1)$"
+}

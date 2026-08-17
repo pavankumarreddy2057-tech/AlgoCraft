@@ -1,0 +1,125 @@
+{
+  "slug": "single-number",
+  "title": "Single Number",
+  "difficulty": "Easy",
+  "tags": [
+    "Bit Manipulation",
+    "Arrays"
+  ],
+  "statement_md": "Find the single non-repeated integer where every other integer appears twice.",
+  "constraints": [
+    "1 <= nums.length <= 3 * 10^4"
+  ],
+  "examples": [
+    {
+      "input": {
+        "nums": [
+          2,
+          2,
+          1
+        ]
+      },
+      "output": 1
+    },
+    {
+      "input": {
+        "nums": [
+          4,
+          1,
+          2,
+          1,
+          2
+        ]
+      },
+      "output": 4
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def singleNumber(self, nums: List[int]) -> int:\n        pass\n",
+    "javascript": "function singleNumber(nums) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "nums": [
+          2,
+          2,
+          1
+        ]
+      },
+      "expected_output": 1,
+      "hidden": false
+    },
+    {
+      "input": {
+        "nums": [
+          4,
+          1,
+          2,
+          1,
+          2
+        ]
+      },
+      "expected_output": 4,
+      "hidden": false
+    },
+    {
+      "input": {
+        "nums": [
+          1
+        ]
+      },
+      "expected_output": 1,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          2,
+          1
+        ]
+      },
+      "expected_output": 3,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
+      },
+      "expected_output": 1,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
+      },
+      "expected_output": 11,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def singleNumber(self, nums: List[int]) -> int:\n        res = 0\n        for n in nums: res ^= n\n        return res\n",
+    "javascript": "function singleNumber(nums) {\n    let res = 0;\n    for (const n of nums) res ^= n;\n    return res;\n}\n"
+  },
+  "hints": [
+    "XOR cancels duplicate pairs: `x ^ x = 0`."
+  ],
+  "editorial_md": "### Method: Bitwise XOR\n- **Time Complexity**: $\\mathcal{O}(N)$\n- **Space Complexity**: $\\mathcal{O}(1)$"
+}

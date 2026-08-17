@@ -1,0 +1,115 @@
+{
+  "slug": "contains-duplicate",
+  "title": "Contains Duplicate",
+  "difficulty": "Easy",
+  "tags": [
+    "Arrays",
+    "Hash Table",
+    "Sorting"
+  ],
+  "statement_md": "Given an integer array `nums`, return `true` if any value appears **at least twice** in the array, and return `false` if every element is distinct.",
+  "constraints": [
+    "1 <= nums.length <= 10^5",
+    "-10^9 <= nums[i] <= 10^9"
+  ],
+  "examples": [
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          1
+        ]
+      },
+      "output": true
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "output": false
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def containsDuplicate(self, nums: List[int]) -> bool:\n        pass\n",
+    "javascript": "function containsDuplicate(nums) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          1
+        ]
+      },
+      "expected_output": true,
+      "hidden": false
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "expected_output": false,
+      "hidden": false
+    },
+    {
+      "input": {
+        "nums": [
+          99
+        ]
+      },
+      "expected_output": false,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          0,
+          0
+        ]
+      },
+      "expected_output": true,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          1
+        ]
+      },
+      "expected_output": false,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          2,
+          1
+        ]
+      },
+      "expected_output": false,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def containsDuplicate(self, nums: List[int]) -> bool:\n        return len(nums) != len(set(nums))\n",
+    "javascript": "function containsDuplicate(nums) {\n    return new Set(nums).size !== nums.length;\n}\n"
+  },
+  "hints": [
+    "Check if size of set differs from length of array."
+  ],
+  "editorial_md": "### Method: Hash Set\n- **Time Complexity**: $\\mathcal{O}(N)$\n- **Space Complexity**: $\\mathcal{O}(N)$"
+}

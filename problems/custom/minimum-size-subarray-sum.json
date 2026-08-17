@@ -1,0 +1,127 @@
+{
+  "slug": "minimum-size-subarray-sum",
+  "title": "Minimum Size Subarray Sum",
+  "difficulty": "Medium",
+  "tags": [
+    "Arrays",
+    "Sliding Window",
+    "Binary Search"
+  ],
+  "statement_md": "Given an array of positive integers `nums` and a positive integer `target`, return the minimal length of a contiguous subarray whose sum is greater than or equal to `target`. If no such subarray exists, return 0.",
+  "constraints": [
+    "1 <= target <= 10^9",
+    "1 <= nums.length <= 10^5",
+    "1 <= nums[i] <= 10^4"
+  ],
+  "examples": [
+    {
+      "input": {
+        "target": 7,
+        "nums": [
+          2,
+          3,
+          1,
+          2,
+          4,
+          3
+        ]
+      },
+      "output": 2
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def minSubArrayLen(self, target: int, nums: List[int]) -> int:\n        pass\n",
+    "javascript": "function minSubArrayLen(target, nums) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "target": 7,
+        "nums": [
+          2,
+          3,
+          1,
+          2,
+          4,
+          3
+        ]
+      },
+      "expected_output": 2,
+      "hidden": false
+    },
+    {
+      "input": {
+        "nums": [
+          3,
+          3
+        ],
+        "target": 6
+      },
+      "expected_output": 2,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "target": 7
+      },
+      "expected_output": 2,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          5,
+          8,
+          11,
+          15
+        ],
+        "target": 19
+      },
+      "expected_output": 2,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          100,
+          200,
+          300
+        ],
+        "target": 500
+      },
+      "expected_output": 2,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          2,
+          7,
+          11,
+          15
+        ],
+        "target": 9
+      },
+      "expected_output": 1,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def minSubArrayLen(self, target: int, nums: List[int]) -> int:\n        l = 0\n        curr_sum = 0\n        min_len = float('inf')\n        for r, n in enumerate(nums):\n            curr_sum += n\n            while curr_sum >= target:\n                min_len = min(min_len, r - l + 1)\n                curr_sum -= nums[l]\n                l += 1\n        return min_len if min_len != float('inf') else 0\n",
+    "javascript": "function minSubArrayLen(target, nums) {\n    let l = 0, currSum = 0, minLen = Infinity;\n    for (let r = 0; r < nums.length; r++) {\n        currSum += nums[r];\n        while (currSum >= target) {\n            minLen = Math.min(minLen, r - l + 1);\n            currSum -= nums[l];\n            l++;\n        }\n    }\n    return minLen === Infinity ? 0 : minLen;\n}\n"
+  },
+  "hints": [
+    "Use sliding window with two pointers."
+  ],
+  "editorial_md": "### Method: Sliding Window\n- **Time Complexity**: $\\mathcal{O}(N)$\n- **Space Complexity**: $\\mathcal{O}(1)$",
+  "time_limit_ms": 2000,
+  "memory_limit_mb": 128
+}

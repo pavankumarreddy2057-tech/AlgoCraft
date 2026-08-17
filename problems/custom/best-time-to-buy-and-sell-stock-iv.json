@@ -1,0 +1,108 @@
+{
+  "slug": "best-time-to-buy-and-sell-stock-iv",
+  "title": "Best Time to Buy and Sell Stock IV",
+  "difficulty": "Hard",
+  "tags": [
+    "Arrays",
+    "Dynamic Programming"
+  ],
+  "statement_md": "Maximize profit by completing at most `k` transactions.",
+  "constraints": [
+    "0 <= k <= 100",
+    "1 <= prices.length <= 1000",
+    "0 <= prices[i] <= 1000"
+  ],
+  "examples": [
+    {
+      "input": {
+        "k": 2,
+        "prices": [
+          2,
+          4,
+          1
+        ]
+      },
+      "output": 2
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def maxProfit(self, k: int, prices: List[int]) -> int:\n        pass\n",
+    "javascript": "function maxProfit(k, prices) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "k": 2,
+        "prices": [
+          2,
+          4,
+          1
+        ]
+      },
+      "expected_output": 2,
+      "hidden": false
+    },
+    {
+      "input": {
+        "k": 2,
+        "prices": [
+          2,
+          4,
+          1
+        ]
+      },
+      "expected_output": 2,
+      "hidden": true
+    },
+    {
+      "input": {
+        "k": 2,
+        "prices": [
+          3,
+          2,
+          6,
+          5,
+          0,
+          3
+        ]
+      },
+      "expected_output": 7,
+      "hidden": true
+    },
+    {
+      "input": {
+        "k": 1,
+        "prices": [
+          1,
+          2
+        ]
+      },
+      "expected_output": 1,
+      "hidden": true
+    },
+    {
+      "input": {
+        "k": 2,
+        "prices": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "expected_output": 4,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def maxProfit(self, k: int, prices: List[int]) -> int:\n        if not prices: return 0\n        if k >= len(prices) // 2:\n            return sum(max(0, prices[i] - prices[i-1]) for i in range(1, len(prices)))\n        dp = [[0]*(k+1) for _ in range(len(prices))]\n        for j in range(1, k+1):\n            max_diff = -prices[0]\n            for i in range(1, len(prices)):\n                dp[i][j] = max(dp[i-1][j], prices[i] + max_diff)\n                max_diff = max(max_diff, dp[i-1][j-1] - prices[i])\n        return dp[-1][-1]\n",
+    "javascript": "function maxProfit(k, prices) {\n    if (!prices || prices.length === 0) return 0;\n    if (k >= Math.floor(prices.length / 2)) {\n        let profit = 0;\n        for (let i = 1; i < prices.length; i++) {\n            if (prices[i] > prices[i-1]) profit += prices[i] - prices[i-1];\n        }\n        return profit;\n    }\n    const dp = Array.from({length: prices.length}, () => new Array(k+1).fill(0));\n    for (let j = 1; j <= k; j++) {\n        let maxDiff = -prices[0];\n        for (let i = 1; i < prices.length; i++) {\n            dp[i][j] = Math.max(dp[i-1][j], prices[i] + maxDiff);\n            maxDiff = Math.max(maxDiff, dp[i-1][j-1] - prices[i]);\n        }\n    }\n    return dp[prices.length-1][k];\n}\n"
+  },
+  "hints": [
+    "Use DP with state for transactions and days."
+  ],
+  "editorial_md": "### Method: Dynamic Programming\n- **Time Complexity**: $\\mathcal{O}(N \\cdot K)$\n- **Space Complexity**: $\\mathcal{O}(N \\cdot K)$",
+  "time_limit_ms": 2000,
+  "memory_limit_mb": 128
+}

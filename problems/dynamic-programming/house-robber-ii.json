@@ -1,0 +1,117 @@
+{
+  "slug": "house-robber-ii",
+  "title": "House Robber II",
+  "difficulty": "Medium",
+  "tags": [
+    "Array",
+    "Dynamic Programming"
+  ],
+  "statement_md": "You are a professional robber planning to rob houses along a street. Each house has a certain amount of money stashed. All houses at this place are **arranged in a circle**.\n\nReturn the maximum amount of money you can rob tonight without alerting the police.",
+  "constraints": [
+    "1 <= nums.length <= 100",
+    "0 <= nums[i] <= 1000"
+  ],
+  "examples": [
+    {
+      "input": {
+        "nums": [
+          2,
+          3,
+          2
+        ]
+      },
+      "output": 3
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          1
+        ]
+      },
+      "output": 4
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3
+        ]
+      },
+      "output": 3
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def rob(self, nums: List[int]) -> int:\n        pass\n",
+    "javascript": "function rob(nums) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "nums": [
+          2,
+          3,
+          2
+        ]
+      },
+      "expected_output": 3,
+      "hidden": false
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          1
+        ]
+      },
+      "expected_output": 4,
+      "hidden": false
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3
+        ]
+      },
+      "expected_output": 3,
+      "hidden": false
+    },
+    {
+      "input": {
+        "nums": [
+          1
+        ]
+      },
+      "expected_output": 1,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          200,
+          3,
+          140,
+          20,
+          10
+        ]
+      },
+      "expected_output": 340,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def rob(self, nums: List[int]) -> int:\n        if len(nums) == 1:\n            return nums[0]\n        def rob_helper(sub):\n            rob1, rob2 = 0, 0\n            for n in sub:\n                new_rob = max(rob1 + n, rob2)\n                rob1 = rob2\n                rob2 = new_rob\n            return rob2\n        return max(rob_helper(nums[:-1]), rob_helper(nums[1:]))\n",
+    "javascript": "function rob(nums) {\n    if (nums.length === 1) return nums[0];\n    function robHelper(sub) {\n        let rob1 = 0, rob2 = 0;\n        for (const n of sub) {\n            const newRob = Math.max(rob1 + n, rob2);\n            rob1 = rob2;\n            rob2 = newRob;\n        }\n        return rob2;\n    }\n    return Math.max(robHelper(nums.slice(0, -1)), robHelper(nums.slice(1)));\n}\n"
+  },
+  "hints": [
+    "Split into two standard House Robber cases: skip the first house OR skip the last house."
+  ],
+  "editorial_md": "### Method: 1D DP on Split Subarrays\n- **Time Complexity**: $\\mathcal{O}(N)$\n- **Space Complexity**: $\\mathcal{O}(1)$"
+}

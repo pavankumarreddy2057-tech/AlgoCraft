@@ -1,0 +1,92 @@
+{
+  "slug": "duplicate-emails",
+  "title": "Duplicate Emails",
+  "difficulty": "Easy",
+  "tags": [
+    "Database",
+    "SQL"
+  ],
+  "statement_md": "Write a solution to report all the duplicate emails. Note that it's guaranteed email field is not NULL.",
+  "constraints": [
+    "id is the primary key column for this table."
+  ],
+  "examples": [
+    {
+      "input": "Table Person:\n+----+---------+\n| id | email   |\n+----+---------+\n| 1  | a@b.com |\n| 2  | c@d.com |\n| 3  | a@b.com |\n+----+---------+",
+      "output": "+---------+\n| Email   |\n+---------+\n| a@b.com |\n+---------+"
+    }
+  ],
+  "starter_code": {
+    "sql": "-- Write your SQL query statement below\nSELECT \n"
+  },
+  "test_cases": [
+    {
+      "schema_ddl": "\n          CREATE TABLE Person (id INT, email VARCHAR(255));\n          INSERT INTO Person VALUES (1, 'a@b.com'), (2, 'c@d.com'), (3, 'a@b.com');\n        ",
+      "expected_output": {
+        "columns": [
+          "Email"
+        ],
+        "values": [
+          [
+            "a@b.com"
+          ]
+        ]
+      },
+      "hidden": false
+    },
+    {
+      "schema_ddl": "\n      CREATE TABLE Person (id INT, email VARCHAR(255));\n      INSERT INTO Person VALUES (1, 'x@y.com'), (2, 'x@y.com'), (3, 'x@y.com');\n    ",
+      "expected_output": {
+        "columns": [
+          "Email"
+        ],
+        "values": [
+          [
+            "x@y.com"
+          ]
+        ]
+      },
+      "hidden": true
+    },
+    {
+      "schema_ddl": "\n      CREATE TABLE Person (id INT, email VARCHAR(255));\n      INSERT INTO Person VALUES (1, 'unique@mail.com'), (2, 'unique2@mail.com');\n    ",
+      "expected_output": {
+        "columns": [],
+        "values": []
+      },
+      "hidden": true
+    },
+    {
+      "schema_ddl": "\n      CREATE TABLE Person (id INT, email VARCHAR(255));\n      INSERT INTO Person VALUES (1, 'a@a.com'), (2, 'b@b.com'), (3, 'a@a.com'), (4, 'c@c.com'), (5, 'b@b.com');\n    ",
+      "expected_output": {
+        "columns": [
+          "Email"
+        ],
+        "values": [
+          [
+            "a@a.com"
+          ],
+          [
+            "b@b.com"
+          ]
+        ]
+      },
+      "hidden": true
+    },
+    {
+      "schema_ddl": "\n      CREATE TABLE Person (id INT, email VARCHAR(255));\n      INSERT INTO Person VALUES (1, 'test@test.com');\n    ",
+      "expected_output": {
+        "columns": [],
+        "values": []
+      },
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "sql": "SELECT email AS Email\nFROM Person\nGROUP BY email\nHAVING COUNT(email) > 1;"
+  },
+  "hints": [
+    "Group by email and filter with `HAVING COUNT(email) > 1`."
+  ],
+  "editorial_md": "### Method: GROUP BY & HAVING\n\n```sql\nSELECT email AS Email\nFROM Person\nGROUP BY email\nHAVING COUNT(email) > 1;\n```"
+}

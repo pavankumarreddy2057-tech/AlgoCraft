@@ -1,0 +1,174 @@
+{
+  "slug": "4sum",
+  "title": "4Sum",
+  "difficulty": "Medium",
+  "tags": [
+    "Two Pointers",
+    "Arrays",
+    "Sorting"
+  ],
+  "statement_md": "Given an array `nums` of `n` integers, return an array of all the **unique** quadruplets `[nums[a], nums[b], nums[c], nums[d]]` such that `nums[a] + nums[b] + nums[c] + nums[d] == target`.",
+  "constraints": [
+    "1 <= nums.length <= 200",
+    "-10^9 <= nums[i] <= 10^9",
+    "-10^9 <= target <= 10^9"
+  ],
+  "examples": [
+    {
+      "input": {
+        "nums": [
+          1,
+          0,
+          -1,
+          0,
+          -2,
+          2
+        ],
+        "target": 0
+      },
+      "output": [
+        [
+          -2,
+          -1,
+          1,
+          2
+        ],
+        [
+          -2,
+          0,
+          0,
+          2
+        ],
+        [
+          -1,
+          0,
+          0,
+          1
+        ]
+      ]
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def fourSum(self, nums: List[int], target: int) -> List[List[int]]:\n        pass\n",
+    "javascript": "function fourSum(nums, target) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "nums": [
+          1,
+          0,
+          -1,
+          0,
+          -2,
+          2
+        ],
+        "target": 0
+      },
+      "expected_output": [
+        [
+          -2,
+          -1,
+          1,
+          2
+        ],
+        [
+          -2,
+          0,
+          0,
+          2
+        ],
+        [
+          -1,
+          0,
+          0,
+          1
+        ]
+      ],
+      "hidden": false
+    },
+    {
+      "input": {
+        "nums": [
+          3,
+          3
+        ],
+        "target": 6
+      },
+      "expected_output": [],
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "target": 7
+      },
+      "expected_output": [],
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          -3,
+          4,
+          3,
+          90
+        ],
+        "target": 0
+      },
+      "expected_output": [],
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          5,
+          8,
+          11,
+          15
+        ],
+        "target": 19
+      },
+      "expected_output": [],
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          -10,
+          -5,
+          0,
+          5,
+          10
+        ],
+        "target": 0
+      },
+      "expected_output": [
+        [
+          -10,
+          -5,
+          5,
+          10
+        ]
+      ],
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def fourSum(self, nums: List[int], target: int) -> List[List[int]]:\n        nums.sort()\n        res = []\n        def kSum(k, start, target, path):\n            if k == 2:\n                l, r = start, len(nums)-1\n                while l < r:\n                    s = nums[l] + nums[r]\n                    if s == target:\n                        res.append(path + [nums[l], nums[r]])\n                        l += 1\n                        while l < r and nums[l] == nums[l-1]:\n                            l += 1\n                    elif s < target:\n                        l += 1\n                    else:\n                        r -= 1\n                return\n            for i in range(start, len(nums)-k+1):\n                if i > start and nums[i] == nums[i-1]:\n                    continue\n                kSum(k-1, i+1, target-nums[i], path+[nums[i]])\n        kSum(4, 0, target, [])\n        return res\n",
+    "javascript": "function fourSum(nums, target) {\n    nums.sort((a,b) => a-b);\n    const res = [];\n    function kSum(k, start, target, path) {\n        if (k === 2) {\n            let l = start, r = nums.length-1;\n            while (l < r) {\n                const s = nums[l] + nums[r];\n                if (s === target) {\n                    res.push([...path, nums[l], nums[r]]);\n                    l++;\n                    while (l < r && nums[l] === nums[l-1]) l++;\n                } else if (s < target) l++;\n                else r--;\n            }\n            return;\n        }\n        for (let i = start; i < nums.length-k+1; i++) {\n            if (i > start && nums[i] === nums[i-1]) continue;\n            kSum(k-1, i+1, target-nums[i], [...path, nums[i]]);\n        }\n    }\n    kSum(4, 0, target, []);\n    return res;\n}\n"
+  },
+  "hints": [
+    "Extend 3Sum solution with kSum recursion."
+  ],
+  "editorial_md": "### Method: Recursive kSum with Two Pointers\n- **Time Complexity**: $\\mathcal{O}(N^{k-1})$\n- **Space Complexity**: $\\mathcal{O}(N)$",
+  "time_limit_ms": 2000,
+  "memory_limit_mb": 128
+}

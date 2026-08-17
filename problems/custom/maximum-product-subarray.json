@@ -1,0 +1,120 @@
+{
+  "slug": "maximum-product-subarray",
+  "title": "Maximum Product Subarray",
+  "difficulty": "Medium",
+  "tags": [
+    "Arrays",
+    "Dynamic Programming"
+  ],
+  "statement_md": "Given an integer array `nums`, find a contiguous non-empty subarray within the array that has the largest product, and return the product.",
+  "constraints": [
+    "1 <= nums.length <= 2 * 10^4",
+    "-10 <= nums[i] <= 10"
+  ],
+  "examples": [
+    {
+      "input": {
+        "nums": [
+          2,
+          3,
+          -2,
+          4
+        ]
+      },
+      "output": 6
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def maxProduct(self, nums: List[int]) -> int:\n        pass\n",
+    "javascript": "function maxProduct(nums) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "nums": [
+          2,
+          3,
+          -2,
+          4
+        ]
+      },
+      "expected_output": 6,
+      "hidden": false
+    },
+    {
+      "input": {
+        "nums": [
+          1
+        ]
+      },
+      "expected_output": 1,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          2,
+          1
+        ]
+      },
+      "expected_output": 2,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
+      },
+      "expected_output": 120,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
+      },
+      "expected_output": 3628800,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          -1,
+          -2,
+          -3,
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "expected_output": 6,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def maxProduct(self, nums: List[int]) -> int:\n        max_prod = min_prod = result = nums[0]\n        for n in nums[1:]:\n            curr_max = max(n, max_prod * n, min_prod * n)\n            curr_min = min(n, max_prod * n, min_prod * n)\n            max_prod, min_prod = curr_max, curr_min\n            result = max(result, max_prod)\n        return result\n",
+    "javascript": "function maxProduct(nums) {\n    let maxProd = nums[0], minProd = nums[0], result = nums[0];\n    for (let i = 1; i < nums.length; i++) {\n        const n = nums[i];\n        const currMax = Math.max(n, maxProd * n, minProd * n);\n        const currMin = Math.min(n, maxProd * n, minProd * n);\n        maxProd = currMax;\n        minProd = currMin;\n        result = Math.max(result, maxProd);\n    }\n    return result;\n}\n"
+  },
+  "hints": [
+    "Track both maximum and minimum product ending at each position."
+  ],
+  "editorial_md": "### Method: Dynamic Programming\n- **Time Complexity**: $\\mathcal{O}(N)$\n- **Space Complexity**: $\\mathcal{O}(1)$",
+  "time_limit_ms": 2000,
+  "memory_limit_mb": 128
+}

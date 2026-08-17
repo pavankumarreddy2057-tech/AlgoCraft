@@ -1,0 +1,80 @@
+{
+  "slug": "palindromic-substrings",
+  "title": "Palindromic Substrings",
+  "difficulty": "Medium",
+  "tags": [
+    "String",
+    "Dynamic Programming",
+    "Two Pointers"
+  ],
+  "statement_md": "Given a string `s`, return the number of palindromic substrings in it.",
+  "constraints": [
+    "1 <= s.length <= 1000"
+  ],
+  "examples": [
+    {
+      "input": {
+        "s": "abc"
+      },
+      "output": 3
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def countSubstrings(self, s: str) -> int:\n        pass\n",
+    "javascript": "function countSubstrings(s) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "s": "abc"
+      },
+      "expected_output": 3,
+      "hidden": false
+    },
+    {
+      "input": {
+        "s": "a"
+      },
+      "expected_output": 1,
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "ab"
+      },
+      "expected_output": 2,
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "aba"
+      },
+      "expected_output": 4,
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "aaaaa"
+      },
+      "expected_output": 15,
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "abcdefg"
+      },
+      "expected_output": 7,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def countSubstrings(self, s: str) -> int:\n        count = 0\n        def expand(l, r):\n            nonlocal count\n            while l >= 0 and r < len(s) and s[l] == s[r]:\n                count += 1\n                l -= 1\n                r += 1\n        for i in range(len(s)):\n            expand(i, i)\n            expand(i, i+1)\n        return count\n",
+    "javascript": "function countSubstrings(s) {\n    let count = 0;\n    function expand(l, r) {\n        while (l >= 0 && r < s.length && s[l] === s[r]) {\n            count++;\n            l--;\n            r++;\n        }\n    }\n    for (let i = 0; i < s.length; i++) {\n        expand(i, i);\n        expand(i, i+1);\n    }\n    return count;\n}\n"
+  },
+  "hints": [
+    "Count palindromes by expanding from each center."
+  ],
+  "editorial_md": "### Method: Expand Around Center\n- **Time Complexity**: $\\mathcal{O}(N^2)$\n- **Space Complexity**: $\\mathcal{O}(1)$",
+  "time_limit_ms": 2000,
+  "memory_limit_mb": 128
+}

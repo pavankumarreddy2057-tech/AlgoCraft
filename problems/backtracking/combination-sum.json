@@ -1,0 +1,211 @@
+{
+  "slug": "combination-sum",
+  "title": "Combination Sum",
+  "difficulty": "Medium",
+  "tags": [
+    "Arrays",
+    "Backtracking"
+  ],
+  "statement_md": "Given an array of distinct integers `candidates` and a `target` integer, return a list of all **unique combinations** of `candidates` where the chosen numbers sum to `target`. You may return the combinations in **any order**.\n\nThe same number may be chosen from `candidates` an unlimited number of times.",
+  "constraints": [
+    "1 <= candidates.length <= 30",
+    "2 <= candidates[i] <= 40",
+    "1 <= target <= 40"
+  ],
+  "examples": [
+    {
+      "input": {
+        "candidates": [
+          2,
+          3,
+          6,
+          7
+        ],
+        "target": 7
+      },
+      "output": [
+        [
+          2,
+          2,
+          3
+        ],
+        [
+          7
+        ]
+      ]
+    },
+    {
+      "input": {
+        "candidates": [
+          2,
+          3,
+          5
+        ],
+        "target": 8
+      },
+      "output": [
+        [
+          2,
+          2,
+          2,
+          2
+        ],
+        [
+          2,
+          3,
+          3
+        ],
+        [
+          3,
+          5
+        ]
+      ]
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def combinationSum(self, candidates: List[int], target: int) -> List[List[int]]:\n        pass\n",
+    "javascript": "function combinationSum(candidates, target) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "candidates": [
+          2,
+          3,
+          6,
+          7
+        ],
+        "target": 7
+      },
+      "expected_output": [
+        [
+          2,
+          2,
+          3
+        ],
+        [
+          7
+        ]
+      ],
+      "hidden": false
+    },
+    {
+      "input": {
+        "candidates": [
+          2,
+          3,
+          5
+        ],
+        "target": 8
+      },
+      "expected_output": [
+        [
+          2,
+          2,
+          2,
+          2
+        ],
+        [
+          2,
+          3,
+          3
+        ],
+        [
+          3,
+          5
+        ]
+      ],
+      "hidden": false
+    },
+    {
+      "input": {
+        "candidates": [
+          2
+        ],
+        "target": 1
+      },
+      "expected_output": [],
+      "hidden": true
+    },
+    {
+      "input": {
+        "candidates": [
+          1
+        ],
+        "target": 2
+      },
+      "expected_output": [
+        [
+          1,
+          1
+        ]
+      ],
+      "hidden": true
+    },
+    {
+      "input": {
+        "candidates": [
+          2,
+          4,
+          6,
+          8
+        ],
+        "target": 8
+      },
+      "expected_output": [
+        [
+          2,
+          2,
+          2,
+          2
+        ],
+        [
+          2,
+          2,
+          4
+        ],
+        [
+          2,
+          6
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          8
+        ]
+      ],
+      "hidden": true
+    },
+    {
+      "input": {
+        "candidates": [
+          3,
+          5,
+          7
+        ],
+        "target": 10
+      },
+      "expected_output": [
+        [
+          3,
+          7
+        ],
+        [
+          5,
+          5
+        ]
+      ],
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def combinationSum(self, candidates: List[int], target: int) -> List[List[int]]:\n        res = []\n        def dfs(i, cur, total):\n            if total == target:\n                res.append(cur.copy())\n                return\n            if i >= len(candidates) or total > target:\n                return\n            cur.append(candidates[i])\n            dfs(i, cur, total + candidates[i])\n            cur.pop()\n            dfs(i + 1, cur, total)\n        dfs(0, [], 0)\n        return res\n",
+    "javascript": "function combinationSum(candidates, target) {\n    const res = [];\n    function dfs(i, cur, total) {\n        if (total === target) {\n            res.push([...cur]);\n            return;\n        }\n        if (i >= candidates.length || total > target) return;\n        cur.push(candidates[i]);\n        dfs(i, cur, total + candidates[i]);\n        cur.pop();\n        dfs(i + 1, cur, total);\n    }\n    dfs(0, [], 0);\n    return res;\n}\n"
+  },
+  "hints": [
+    "At step `i`, choose between including `candidates[i]` (staying at index `i`) or skipping to `i + 1`."
+  ],
+  "editorial_md": "### Method: Backtracking Decision Tree\n- **Time Complexity**: $\\mathcal{O}(2^T)$ where $T = \\text{target}$\n- **Space Complexity**: $\\mathcal{O}(T)$"
+}

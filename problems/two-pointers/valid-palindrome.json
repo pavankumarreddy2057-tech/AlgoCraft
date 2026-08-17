@@ -1,0 +1,83 @@
+{
+  "slug": "valid-palindrome",
+  "title": "Valid Palindrome",
+  "difficulty": "Easy",
+  "tags": [
+    "Two Pointers",
+    "Strings"
+  ],
+  "statement_md": "A phrase is a **palindrome** if, after converting all uppercase letters into lowercase letters and removing all non-alphanumeric characters, it reads the same forward and backward.",
+  "constraints": [
+    "1 <= s.length <= 2 * 10^5"
+  ],
+  "examples": [
+    {
+      "input": {
+        "s": "A man, a plan, a canal: Panama"
+      },
+      "output": true
+    },
+    {
+      "input": {
+        "s": "race a car"
+      },
+      "output": false
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def isPalindrome(self, s: str) -> bool:\n        pass\n",
+    "javascript": "function isPalindrome(s) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "s": "A man, a plan, a canal: Panama"
+      },
+      "expected_output": true,
+      "hidden": false
+    },
+    {
+      "input": {
+        "s": "race a car"
+      },
+      "expected_output": false,
+      "hidden": false
+    },
+    {
+      "input": {
+        "s": " "
+      },
+      "expected_output": true,
+      "hidden": false
+    },
+    {
+      "input": {
+        "s": "a"
+      },
+      "expected_output": true,
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "ab"
+      },
+      "expected_output": false,
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "aba"
+      },
+      "expected_output": true,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def isPalindrome(self, s: str) -> bool:\n        clean = [c.lower() for c in s if c.isalnum()]\n        return clean == clean[::-1]\n",
+    "javascript": "function isPalindrome(s) {\n    const clean = s.toLowerCase().replace(/[^a-z0-9]/g, \"\");\n    let l = 0, r = clean.length - 1;\n    while (l < r) {\n        if (clean[l] !== clean[r]) return false;\n        l++;\n        r--;\n    }\n    return true;\n}\n"
+  },
+  "hints": [
+    "Strip non-alphanumerics and compare inward with two pointers."
+  ],
+  "editorial_md": "### Method: Two Pointers\n- **Time Complexity**: $\\mathcal{O}(N)$\n- **Space Complexity**: $\\mathcal{O}(1)$"
+}

@@ -1,0 +1,143 @@
+{
+  "slug": "koko-eating-bananas",
+  "title": "Koko Eating Bananas",
+  "difficulty": "Medium",
+  "tags": [
+    "Array",
+    "Binary Search"
+  ],
+  "statement_md": "Koko loves to eat bananas. There are `n` piles of bananas, the `i`-th pile has `piles[i]` bananas. The guards have gone and will come back in `h` hours.\n\nKoko can decide her bananas-per-hour eating speed of `k`. Each hour, she chooses some pile of bananas and eats `k` bananas from that pile. If the pile has less than `k` bananas, she eats all of them instead and will not eat any more bananas during this hour.\n\nReturn *the minimum integer* `k` *such that she can eat all the bananas within* `h` *hours*.",
+  "constraints": [
+    "1 <= piles.length <= 10^4",
+    "piles.length <= h <= 10^9",
+    "1 <= piles[i] <= 10^9"
+  ],
+  "examples": [
+    {
+      "input": {
+        "piles": [
+          3,
+          6,
+          7,
+          11
+        ],
+        "h": 8
+      },
+      "output": 4
+    },
+    {
+      "input": {
+        "piles": [
+          30,
+          11,
+          23,
+          4,
+          20
+        ],
+        "h": 5
+      },
+      "output": 30
+    },
+    {
+      "input": {
+        "piles": [
+          30,
+          11,
+          23,
+          4,
+          20
+        ],
+        "h": 6
+      },
+      "output": 23
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def minEatingSpeed(self, piles: List[int], h: int) -> int:\n        pass\n",
+    "javascript": "function minEatingSpeed(piles, h) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "piles": [
+          3,
+          6,
+          7,
+          11
+        ],
+        "h": 8
+      },
+      "expected_output": 4,
+      "hidden": false
+    },
+    {
+      "input": {
+        "piles": [
+          30,
+          11,
+          23,
+          4,
+          20
+        ],
+        "h": 5
+      },
+      "expected_output": 30,
+      "hidden": false
+    },
+    {
+      "input": {
+        "piles": [
+          30,
+          11,
+          23,
+          4,
+          20
+        ],
+        "h": 6
+      },
+      "expected_output": 23,
+      "hidden": false
+    },
+    {
+      "input": {
+        "piles": [
+          312884470
+        ],
+        "h": 312884469
+      },
+      "expected_output": 2,
+      "hidden": true
+    },
+    {
+      "input": {
+        "piles": [
+          3,
+          6,
+          7,
+          11
+        ],
+        "h": 5
+      },
+      "expected_output": 7,
+      "hidden": true
+    },
+    {
+      "input": {
+        "piles": [
+          1000
+        ],
+        "h": 2
+      },
+      "expected_output": 500,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def minEatingSpeed(self, piles: List[int], h: int) -> int:\n        import math\n        l, r = 1, max(piles)\n        res = r\n        while l <= r:\n            k = (l + r) // 2\n            total_time = sum(math.ceil(p / k) for p in piles)\n            if total_time <= h:\n                res = k\n                r = k - 1\n            else:\n                l = k + 1\n        return res\n",
+    "javascript": "function minEatingSpeed(piles, h) {\n    let l = 1, r = Math.max(...piles);\n    let res = r;\n    while (l <= r) {\n        const k = Math.floor((l + r) / 2);\n        let totalTime = 0;\n        for (const p of piles) {\n            totalTime += Math.ceil(p / k);\n        }\n        if (totalTime <= h) {\n            res = k;\n            r = k - 1;\n        } else {\n            l = k + 1;\n        }\n    }\n    return res;\n}\n"
+  },
+  "hints": [
+    "Binary search the eating speed `k` between `1` and `max(piles)`."
+  ],
+  "editorial_md": "### Method: Binary Search on Answer\n- **Time Complexity**: $\\mathcal{O}(N \\log(\\max(P)))$\n- **Space Complexity**: $\\mathcal{O}(1)$"
+}

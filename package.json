@@ -1,0 +1,18 @@
+{
+  "name": "offline-leetcode",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Offline-first coding practice platform with sandboxed execution, SM-2 spaced repetition, and scalable problem bank",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "npm --prefix server run dev",
+    "dev:client": "npm --prefix client run dev",
+    "build": "npm --prefix server run build && npm --prefix client run build",
+    "seed": "npm --prefix server run seed",
+    "validate": "npm --prefix server run validate",
+    "install:all": "npm install && npm --prefix server install && npm --prefix client install"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

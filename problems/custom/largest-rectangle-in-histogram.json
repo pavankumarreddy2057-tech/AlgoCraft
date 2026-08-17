@@ -1,0 +1,104 @@
+{
+  "slug": "largest-rectangle-in-histogram",
+  "title": "Largest Rectangle in Histogram",
+  "difficulty": "Hard",
+  "tags": [
+    "Stack",
+    "Arrays",
+    "Monotonic Stack"
+  ],
+  "statement_md": "Given an array of integers `heights` representing the histogram's bar height where the width of each bar is 1, return the area of the largest rectangle in the histogram.",
+  "constraints": [
+    "1 <= heights.length <= 10^5",
+    "0 <= heights[i] <= 10^4"
+  ],
+  "examples": [
+    {
+      "input": {
+        "heights": [
+          2,
+          1,
+          5,
+          6,
+          2,
+          3
+        ]
+      },
+      "output": 10
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def largestRectangleArea(self, heights: List[int]) -> int:\n        pass\n",
+    "javascript": "function largestRectangleArea(heights) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "heights": [
+          2,
+          1,
+          5,
+          6,
+          2,
+          3
+        ]
+      },
+      "expected_output": 10,
+      "hidden": false
+    },
+    {
+      "input": {
+        "heights": [
+          2,
+          1,
+          5,
+          6,
+          2,
+          3
+        ]
+      },
+      "expected_output": 10,
+      "hidden": true
+    },
+    {
+      "input": {
+        "heights": [
+          2,
+          4
+        ]
+      },
+      "expected_output": 4,
+      "hidden": true
+    },
+    {
+      "input": {
+        "heights": [
+          1
+        ]
+      },
+      "expected_output": 1,
+      "hidden": true
+    },
+    {
+      "input": {
+        "heights": [
+          2,
+          1,
+          2
+        ]
+      },
+      "expected_output": 3,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def largestRectangleArea(self, heights: List[int]) -> int:\n        stack = []\n        max_area = 0\n        for i, h in enumerate(heights + [0]):\n            while stack and heights[stack[-1]] > h:\n                height = heights[stack.pop()]\n                width = i if not stack else i - stack[-1] - 1\n                max_area = max(max_area, height * width)\n            stack.append(i)\n        return max_area\n",
+    "javascript": "function largestRectangleArea(heights) {\n    const stack = [];\n    let maxArea = 0;\n    for (let i = 0; i <= heights.length; i++) {\n        const h = i === heights.length ? 0 : heights[i];\n        while (stack.length > 0 && heights[stack[stack.length-1]] > h) {\n            const height = heights[stack.pop()];\n            const width = stack.length === 0 ? i : i - stack[stack.length-1] - 1;\n            maxArea = Math.max(maxArea, height * width);\n        }\n        stack.push(i);\n    }\n    return maxArea;\n}\n"
+  },
+  "hints": [
+    "Use monotonic increasing stack to find next smaller element."
+  ],
+  "editorial_md": "### Method: Monotonic Stack\n- **Time Complexity**: $\\mathcal{O}(N)$\n- **Space Complexity**: $\\mathcal{O}(N)$",
+  "time_limit_ms": 2000,
+  "memory_limit_mb": 128
+}

@@ -1,0 +1,166 @@
+{
+  "slug": "sort-colors",
+  "title": "Sort Colors (Dutch National Flag)",
+  "difficulty": "Medium",
+  "tags": [
+    "Array",
+    "Two Pointers",
+    "Sorting"
+  ],
+  "statement_md": "Given an array `nums` with `n` objects colored red, white, or blue, sort them **in-place** so that objects of the same color are adjacent, with the colors in the order red, white, and blue.\n\nWe will use the integers `0`, `1`, and `2` to represent the color red, white, and blue, respectively.\n\nYou must solve this problem without using the library's sort function.",
+  "constraints": [
+    "n == nums.length",
+    "1 <= n <= 300",
+    "nums[i] is either 0, 1, or 2."
+  ],
+  "examples": [
+    {
+      "input": {
+        "nums": [
+          2,
+          0,
+          2,
+          1,
+          1,
+          0
+        ]
+      },
+      "output": [
+        0,
+        0,
+        1,
+        1,
+        2,
+        2
+      ]
+    },
+    {
+      "input": {
+        "nums": [
+          2,
+          0,
+          1
+        ]
+      },
+      "output": [
+        0,
+        1,
+        2
+      ]
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def sortColors(self, nums: List[int]) -> List[int]:\n        pass\n",
+    "javascript": "function sortColors(nums) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "nums": [
+          2,
+          0,
+          2,
+          1,
+          1,
+          0
+        ]
+      },
+      "expected_output": [
+        0,
+        0,
+        1,
+        1,
+        2,
+        2
+      ],
+      "hidden": false
+    },
+    {
+      "input": {
+        "nums": [
+          2,
+          0,
+          1
+        ]
+      },
+      "expected_output": [
+        0,
+        1,
+        2
+      ],
+      "hidden": false
+    },
+    {
+      "input": {
+        "nums": [
+          0
+        ]
+      },
+      "expected_output": [
+        0
+      ],
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          1
+        ]
+      },
+      "expected_output": [
+        1
+      ],
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          2,
+          2,
+          2,
+          1,
+          1,
+          0,
+          0,
+          1,
+          2
+        ]
+      },
+      "expected_output": [
+        0,
+        0,
+        1,
+        1,
+        1,
+        2,
+        2,
+        2,
+        2
+      ],
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          0
+        ]
+      },
+      "expected_output": [
+        0,
+        1,
+        2
+      ],
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def sortColors(self, nums: List[int]) -> List[int]:\n        l, r = 0, len(nums) - 1\n        i = 0\n        while i <= r:\n            if nums[i] == 0:\n                nums[l], nums[i] = nums[i], nums[l]\n                l += 1\n                i += 1\n            elif nums[i] == 2:\n                nums[i], nums[r] = nums[r], nums[i]\n                r -= 1\n            else:\n                i += 1\n        return nums\n",
+    "javascript": "function sortColors(nums) {\n    let l = 0, r = nums.length - 1, i = 0;\n    while (i <= r) {\n        if (nums[i] === 0) {\n            [nums[l], nums[i]] = [nums[i], nums[l]];\n            l++;\n            i++;\n        } else if (nums[i] === 2) {\n            [nums[i], nums[r]] = [nums[r], nums[i]];\n            r--;\n        } else {\n            i++;\n        }\n    }\n    return nums;\n}\n"
+  },
+  "hints": [
+    "Use three pointers: `l` for 0s boundary, `r` for 2s boundary, and `i` to scan."
+  ],
+  "editorial_md": "### Method: Dutch National Flag 3-Way Partition\n- **Time Complexity**: $\\mathcal{O}(N)$\n- **Space Complexity**: $\\mathcal{O}(1)$"
+}

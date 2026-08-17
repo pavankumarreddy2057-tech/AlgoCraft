@@ -1,0 +1,128 @@
+{
+  "slug": "kth-largest-element-in-an-array",
+  "title": "Kth Largest Element in an Array",
+  "difficulty": "Medium",
+  "tags": [
+    "Arrays",
+    "Sorting",
+    "Heap",
+    "Quickselect"
+  ],
+  "statement_md": "Find the `k-th` largest element in an unsorted array. Note that it is the `k-th` largest element in sorted order, not the `k-th` distinct element.",
+  "constraints": [
+    "1 <= k <= nums.length <= 10^5",
+    "-10^4 <= nums[i] <= 10^4"
+  ],
+  "examples": [
+    {
+      "input": {
+        "nums": [
+          3,
+          2,
+          1,
+          5,
+          6,
+          4
+        ],
+        "k": 2
+      },
+      "output": 5
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def findKthLargest(self, nums: List[int], k: int) -> int:\n        pass\n",
+    "javascript": "function findKthLargest(nums, k) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "nums": [
+          3,
+          2,
+          1,
+          5,
+          6,
+          4
+        ],
+        "k": 2
+      },
+      "expected_output": 5,
+      "hidden": false
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          1,
+          1,
+          2,
+          2,
+          3
+        ],
+        "k": 2
+      },
+      "expected_output": 2,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          1
+        ],
+        "k": 1
+      },
+      "expected_output": 1,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          4,
+          1,
+          -1,
+          2,
+          -1,
+          2,
+          3
+        ],
+        "k": 2
+      },
+      "expected_output": 3,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2
+        ],
+        "k": 2
+      },
+      "expected_output": 1,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          3,
+          0,
+          1,
+          0
+        ],
+        "k": 1
+      },
+      "expected_output": 3,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def findKthLargest(self, nums: List[int], k: int) -> int:\n        import heapq\n        return heapq.nlargest(k, nums)[-1]\n",
+    "javascript": "function findKthLargest(nums, k) {\n    const heap = new MinHeap();\n    for (const n of nums) {\n        heap.push(n);\n        if (heap.size() > k) heap.pop();\n    }\n    return heap.peek();\n}\nclass MinHeap {\n    constructor() { this.heap = []; }\n    push(val) { this.heap.push(val); this._bubbleUp(); }\n    pop() { const min = this.heap[0]; const end = this.heap.pop(); if (this.heap.length > 0) { this.heap[0] = end; this._sinkDown(); } return min; }\n    peek() { return this.heap[0]; }\n    size() { return this.heap.length; }\n    _bubbleUp() { let idx = this.heap.length-1; while (idx > 0) { const parent = Math.floor((idx-1)/2); if (this.heap[parent] <= this.heap[idx]) break; [this.heap[parent], this.heap[idx]] = [this.heap[idx], this.heap[parent]]; idx = parent; } }\n    _sinkDown() { let idx = 0; while (true) { let smallest = idx; const left = 2*idx+1, right = 2*idx+2; if (left < this.heap.length && this.heap[left] < this.heap[smallest]) smallest = left; if (right < this.heap.length && this.heap[right] < this.heap[smallest]) smallest = right; if (smallest === idx) break; [this.heap[smallest], this.heap[idx]] = [this.heap[idx], this.heap[smallest]]; idx = smallest; } }\n}\n"
+  },
+  "hints": [
+    "Use a min-heap of size k or quickselect algorithm."
+  ],
+  "editorial_md": "### Method: Heap\n- **Time Complexity**: $\\mathcal{O}(N \\log K)$\n- **Space Complexity**: $\\mathcal{O}(K)$",
+  "time_limit_ms": 2000,
+  "memory_limit_mb": 128
+}

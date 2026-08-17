@@ -1,0 +1,125 @@
+{
+  "slug": "find-peak-element",
+  "title": "Find Peak Element",
+  "difficulty": "Medium",
+  "tags": [
+    "Array",
+    "Binary Search"
+  ],
+  "statement_md": "A peak element is an element that is strictly greater than its neighbors.\n\nGiven a **0-indexed** integer array `nums`, find a peak element, and return its index. If the array contains multiple peaks, return the index to **any of the peaks**.\n\nYou must write an algorithm that runs in `O(log n)` time.",
+  "constraints": [
+    "1 <= nums.length <= 1000",
+    "-2^31 <= nums[i] <= 2^31 - 1",
+    "nums[i] != nums[i + 1] for all valid i."
+  ],
+  "examples": [
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          1
+        ]
+      },
+      "output": 2
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          1,
+          3,
+          5,
+          6,
+          4
+        ]
+      },
+      "output": 5
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def findPeakElement(self, nums: List[int]) -> int:\n        pass\n",
+    "javascript": "function findPeakElement(nums) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          1
+        ]
+      },
+      "expected_output": 2,
+      "hidden": false
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          1,
+          3,
+          5,
+          6,
+          4
+        ]
+      },
+      "expected_output": 5,
+      "hidden": false
+    },
+    {
+      "input": {
+        "nums": [
+          1
+        ]
+      },
+      "expected_output": 0,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2
+        ]
+      },
+      "expected_output": 1,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          2,
+          1
+        ]
+      },
+      "expected_output": 0,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          3,
+          2,
+          4,
+          1
+        ]
+      },
+      "expected_output": 1,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def findPeakElement(self, nums: List[int]) -> int:\n        l, r = 0, len(nums) - 1\n        while l < r:\n            mid = (l + r) // 2\n            if nums[mid] > nums[mid + 1]:\n                r = mid\n            else:\n                l = mid + 1\n        return l\n",
+    "javascript": "function findPeakElement(nums) {\n    let l = 0, r = nums.length - 1;\n    while (l < r) {\n        const mid = Math.floor((l + r) / 2);\n        if (nums[mid] > nums[mid + 1]) {\n            r = mid;\n        } else {\n            l = mid + 1;\n        }\n    }\n    return l;\n}\n"
+  },
+  "hints": [
+    "If `nums[mid] < nums[mid + 1]`, a peak must lie on the right side. Else, it lies on the left."
+  ],
+  "editorial_md": "### Method: Binary Search on Monotonic Slopes\n- **Time Complexity**: $\\mathcal{O}(\\log N)$\n- **Space Complexity**: $\\mathcal{O}(1)$"
+}

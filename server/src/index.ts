@@ -1,0 +1,89 @@
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dbManager } from './db/database.js';
+import { syncProblemBank } from './db/seed-loader.js';
+import { problemsRouter } from './routes/problems.js';
+import { submissionsRouter } from './routes/submissions.js';
+import { reviewRouter } from './routes/review.js';
+import { statsRouter } from './routes/stats.js';
+import { adminRouter } from './routes/admin.js';
+
+dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const app = express();
+const PORT = process.env.PORT || 4000;
+
+// Middleware
+app.use(cors({ origin: '*' }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// Health Check
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    mode: 'offline',
+    timestamp: new Date().toISOString()
+  });
+});
+
+import { notesRouter } from './routes/notes.js';
+import { mentorRouter } from './routes/mentor.js';
+import { interviewRouter } from './routes/interview.js';
+import { benchmarkRouter } from './runner/benchmark-runner.js';
+
+// API Routes
+app.use('/api/problems', problemsRouter);
+app.use('/api/submissions', submissionsRouter);
+app.use('/api/review', reviewRouter);
+app.use('/api/stats', statsRouter);
+app.use('/api/admin', adminRouter);
+app.use('/api/notes', notesRouter);
+app.use('/api/mentor', mentorRouter);
+app.use('/api/interview', interviewRouter);
+app.use('/api/benchmark', benchmarkRouter);
+
+// Serve Client Static Files in Production
+const clientDistPath = path.resolve(__dirname, '../../client/dist');
+app.use(express.static(clientDistPath));
+
+app.get('*', (req, res) => {
+  if (req.path.startsWith('/api')) {
+    return res.status(404).json({ error: 'Endpoint not found' });
+  }
+  const indexPath = path.join(clientDistPath, 'index.html');
+  res.sendFile(indexPath, (err) => {
+    if (err) {
+      res.status(200).send('AlgoCraft API Server is running. Client build not found in dist/. Please run client dev server.');
+    }
+  });
+});
+
+// Start Server
+async function bootstrap() {
+  try {
+    await dbManager.init();
+    console.log('[Server] SQLite DB initialized.');
+
+    // Auto-sync problem files on startup
+    await syncProblemBank();
+
+    app.listen(PORT, () => {
+      console.log(`\n======================================================`);
+      console.log(`  🚀 AlgoCraft Offline Platform Server running at:`);
+      console.log(`  👉 http://localhost:${PORT}`);
+      console.log(`======================================================\n`);
+    });
+  } catch (err: any) {
+    console.error('[Server] Fatal bootstrap error:', err);
+    process.exit(1);
+  }
+}
+
+bootstrap();

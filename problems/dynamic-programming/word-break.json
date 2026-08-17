@@ -1,0 +1,125 @@
+{
+  "slug": "word-break",
+  "title": "Word Break",
+  "difficulty": "Medium",
+  "tags": [
+    "Array",
+    "Hash Table",
+    "String",
+    "Dynamic Programming",
+    "Trie",
+    "Memoization"
+  ],
+  "statement_md": "Given a string `s` and a dictionary of strings `wordDict`, return `true` if `s` can be segmented into a space-separated sequence of one or more dictionary words.",
+  "constraints": [
+    "1 <= s.length <= 300",
+    "1 <= wordDict.length <= 1000",
+    "1 <= wordDict[i].length <= 20"
+  ],
+  "examples": [
+    {
+      "input": {
+        "s": "leetcode",
+        "wordDict": [
+          "leet",
+          "code"
+        ]
+      },
+      "output": true
+    },
+    {
+      "input": {
+        "s": "applepenapple",
+        "wordDict": [
+          "apple",
+          "pen"
+        ]
+      },
+      "output": true
+    },
+    {
+      "input": {
+        "s": "catsandog",
+        "wordDict": [
+          "cats",
+          "dog",
+          "sand",
+          "and",
+          "cat"
+        ]
+      },
+      "output": false
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def wordBreak(self, s: str, wordDict: List[str]) -> bool:\n        pass\n",
+    "javascript": "function wordBreak(s, wordDict) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "s": "leetcode",
+        "wordDict": [
+          "leet",
+          "code"
+        ]
+      },
+      "expected_output": true,
+      "hidden": false
+    },
+    {
+      "input": {
+        "s": "applepenapple",
+        "wordDict": [
+          "apple",
+          "pen"
+        ]
+      },
+      "expected_output": true,
+      "hidden": false
+    },
+    {
+      "input": {
+        "s": "catsandog",
+        "wordDict": [
+          "cats",
+          "dog",
+          "sand",
+          "and",
+          "cat"
+        ]
+      },
+      "expected_output": false,
+      "hidden": false
+    },
+    {
+      "input": {
+        "s": "a",
+        "wordDict": [
+          "a"
+        ]
+      },
+      "expected_output": true,
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "leetcode",
+        "wordDict": [
+          "leet",
+          "code"
+        ]
+      },
+      "expected_output": true,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def wordBreak(self, s: str, wordDict: List[str]) -> bool:\n        dp = [False] * (len(s) + 1)\n        dp[len(s)] = True\n        for i in range(len(s) - 1, -1, -1):\n            for w in wordDict:\n                if (i + len(w)) <= len(s) and s[i:i + len(w)] == w:\n                    dp[i] = dp[i + len(w)]\n                if dp[i]:\n                    break\n        return dp[0]\n",
+    "javascript": "function wordBreak(s, wordDict) {\n    const dp = new Array(s.length + 1).fill(false);\n    dp[s.length] = true;\n    for (let i = s.length - 1; i >= 0; i--) {\n        for (const w of wordDict) {\n            if (i + w.length <= s.length && s.slice(i, i + w.length) === w) {\n                dp[i] = dp[i + w.length];\n            }\n            if (dp[i]) break;\n        }\n    }\n    return dp[0];\n}\n"
+  },
+  "hints": [
+    "dp[i] is True if s[i:] can be matched with words in wordDict starting at i."
+  ],
+  "editorial_md": "### Method: Bottom-Up 1D DP\n- **Time Complexity**: $\\mathcal{O}(N \\cdot M \\cdot K)$ where $M = |\\text{wordDict}|$\n- **Space Complexity**: $\\mathcal{O}(N)$"
+}

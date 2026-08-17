@@ -1,0 +1,239 @@
+{
+  "slug": "word-search",
+  "title": "Word Search",
+  "difficulty": "Medium",
+  "tags": [
+    "Array",
+    "String",
+    "Backtracking",
+    "Matrix"
+  ],
+  "statement_md": "Given an `m x n` grid of characters `board` and a string `word`, return `true` *if* `word` *exists in the grid*.\n\nThe word can be constructed from letters of sequentially adjacent cells, where adjacent cells are horizontally or vertically neighboring. The same letter cell may not be used more than once.",
+  "constraints": [
+    "m == board.length",
+    "n = board[i].length",
+    "1 <= m, n <= 6",
+    "1 <= word.length <= 15"
+  ],
+  "examples": [
+    {
+      "input": {
+        "board": [
+          [
+            "A",
+            "B",
+            "C",
+            "E"
+          ],
+          [
+            "S",
+            "F",
+            "C",
+            "S"
+          ],
+          [
+            "A",
+            "D",
+            "E",
+            "E"
+          ]
+        ],
+        "word": "ABCCED"
+      },
+      "output": true
+    },
+    {
+      "input": {
+        "board": [
+          [
+            "A",
+            "B",
+            "C",
+            "E"
+          ],
+          [
+            "S",
+            "F",
+            "C",
+            "S"
+          ],
+          [
+            "A",
+            "D",
+            "E",
+            "E"
+          ]
+        ],
+        "word": "SEE"
+      },
+      "output": true
+    },
+    {
+      "input": {
+        "board": [
+          [
+            "A",
+            "B",
+            "C",
+            "E"
+          ],
+          [
+            "S",
+            "F",
+            "C",
+            "S"
+          ],
+          [
+            "A",
+            "D",
+            "E",
+            "E"
+          ]
+        ],
+        "word": "ABCB"
+      },
+      "output": false
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def exist(self, board: List[List[str]], word: str) -> bool:\n        pass\n",
+    "javascript": "function exist(board, word) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "board": [
+          [
+            "A",
+            "B",
+            "C",
+            "E"
+          ],
+          [
+            "S",
+            "F",
+            "C",
+            "S"
+          ],
+          [
+            "A",
+            "D",
+            "E",
+            "E"
+          ]
+        ],
+        "word": "ABCCED"
+      },
+      "expected_output": true,
+      "hidden": false
+    },
+    {
+      "input": {
+        "board": [
+          [
+            "A",
+            "B",
+            "C",
+            "E"
+          ],
+          [
+            "S",
+            "F",
+            "C",
+            "S"
+          ],
+          [
+            "A",
+            "D",
+            "E",
+            "E"
+          ]
+        ],
+        "word": "SEE"
+      },
+      "expected_output": true,
+      "hidden": false
+    },
+    {
+      "input": {
+        "board": [
+          [
+            "A",
+            "B",
+            "C",
+            "E"
+          ],
+          [
+            "S",
+            "F",
+            "C",
+            "S"
+          ],
+          [
+            "A",
+            "D",
+            "E",
+            "E"
+          ]
+        ],
+        "word": "ABCB"
+      },
+      "expected_output": false,
+      "hidden": false
+    },
+    {
+      "input": {
+        "board": [
+          [
+            "a"
+          ]
+        ],
+        "word": "a"
+      },
+      "expected_output": true,
+      "hidden": true
+    },
+    {
+      "input": {
+        "board": [
+          [
+            "a",
+            "b"
+          ],
+          [
+            "c",
+            "d"
+          ]
+        ],
+        "word": "abcd"
+      },
+      "expected_output": false,
+      "hidden": true
+    },
+    {
+      "input": {
+        "board": [
+          [
+            "A",
+            "B"
+          ],
+          [
+            "C",
+            "D"
+          ]
+        ],
+        "word": "ACDB"
+      },
+      "expected_output": true,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def exist(self, board: List[List[str]], word: str) -> bool:\n        ROWS, COLS = len(board), len(board[0])\n        path = set()\n        def dfs(r, c, i):\n            if i == len(word):\n                return True\n            if r < 0 or c < 0 or r >= ROWS or c >= COLS or word[i] != board[r][c] or (r, c) in path:\n                return False\n            path.add((r, c))\n            res = dfs(r + 1, c, i + 1) or dfs(r - 1, c, i + 1) or dfs(r, c + 1, i + 1) or dfs(r, c - 1, i + 1)\n            path.remove((r, c))\n            return res\n        for r in range(ROWS):\n            for c in range(COLS):\n                if dfs(r, c, 0):\n                    return True\n        return False\n",
+    "javascript": "function exist(board, word) {\n    const ROWS = board.length, COLS = board[0].length;\n    const path = new Set();\n    function dfs(r, c, i) {\n        if (i === word.length) return true;\n        if (r < 0 || c < 0 || r >= ROWS || c >= COLS || board[r][c] !== word[i] || path.has(`${r},${c}`)) {\n            return false;\n        }\n        path.add(`${r},${c}`);\n        const res = dfs(r + 1, c, i + 1) || dfs(r - 1, c, i + 1) || dfs(r, c + 1, i + 1) || dfs(r, c - 1, i + 1);\n        path.delete(`${r},${c}`);\n        return res;\n    }\n    for (let r = 0; r < ROWS; r++) {\n        for (let c = 0; c < COLS; c++) {\n            if (dfs(r, c, 0)) return true;\n        }\n    }\n    return false;\n}\n"
+  },
+  "hints": [
+    "DFS from each cell matching word[0] and backtrack using a visited set."
+  ],
+  "editorial_md": "### Method: Backtracking Matrix DFS\n- **Time Complexity**: $\\mathcal{O}(N \\cdot M \\cdot 4^L)$\n- **Space Complexity**: $\\mathcal{O}(L)$"
+}

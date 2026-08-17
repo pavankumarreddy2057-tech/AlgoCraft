@@ -1,0 +1,147 @@
+{
+  "slug": "remove-nth-node-from-end-of-list",
+  "title": "Remove Nth Node From End of List",
+  "difficulty": "Medium",
+  "tags": [
+    "Linked List",
+    "Two Pointers"
+  ],
+  "statement_md": "Given the `head` of a linked list, remove the `n`-th node from the end of the list and return its head.",
+  "constraints": [
+    "The number of nodes in the list is sz.",
+    "1 <= sz <= 30",
+    "0 <= Node.val <= 100",
+    "1 <= n <= sz"
+  ],
+  "examples": [
+    {
+      "input": {
+        "head": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "n": 2
+      },
+      "output": [
+        1,
+        2,
+        3,
+        5
+      ]
+    },
+    {
+      "input": {
+        "head": [
+          1
+        ],
+        "n": 1
+      },
+      "output": []
+    },
+    {
+      "input": {
+        "head": [
+          1,
+          2
+        ],
+        "n": 1
+      },
+      "output": [
+        1
+      ]
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def removeNthFromEnd(self, head: Optional[ListNode], n: int) -> Optional[ListNode]:\n        pass\n",
+    "javascript": "function removeNthFromEnd(head, n) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "head": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "n": 2
+      },
+      "expected_output": [
+        1,
+        2,
+        3,
+        5
+      ],
+      "hidden": false
+    },
+    {
+      "input": {
+        "head": [
+          1
+        ],
+        "n": 1
+      },
+      "expected_output": [],
+      "hidden": false
+    },
+    {
+      "input": {
+        "head": [
+          1,
+          2
+        ],
+        "n": 1
+      },
+      "expected_output": [
+        1
+      ],
+      "hidden": false
+    },
+    {
+      "input": {
+        "head": [
+          1,
+          2
+        ],
+        "n": 2
+      },
+      "expected_output": [
+        2
+      ],
+      "hidden": true
+    },
+    {
+      "input": {
+        "head": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60
+        ],
+        "n": 6
+      },
+      "expected_output": [
+        20,
+        30,
+        40,
+        50,
+        60
+      ],
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def removeNthFromEnd(self, head: Optional[ListNode], n: int) -> Optional[ListNode]:\n        dummy = ListNode(0, head)\n        left = dummy\n        right = head\n        while n > 0 and right:\n            right = right.next\n            n -= 1\n        while right:\n            left = left.next\n            right = right.next\n        left.next = left.next.next\n        return dummy.next\n",
+    "javascript": "function removeNthFromEnd(head, n) {\n    const dummy = new ListNode(0, head);\n    let left = dummy;\n    let right = head;\n    while (n > 0 && right) {\n        right = right.next;\n        n--;\n    }\n    while (right) {\n        left = left.next;\n        right = right.next;\n    }\n    left.next = left.next.next;\n    return dummy.next;\n}\n"
+  },
+  "hints": [
+    "Advance the fast pointer by `n` nodes first. Then advance both pointers simultaneously."
+  ],
+  "editorial_md": "### Method: Fast & Slow Pointer with Dummy Node\n- **Time Complexity**: $\\mathcal{O}(N)$\n- **Space Complexity**: $\\mathcal{O}(1)$"
+}

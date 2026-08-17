@@ -1,0 +1,123 @@
+{
+  "slug": "jump-game",
+  "title": "Jump Game",
+  "difficulty": "Medium",
+  "tags": [
+    "Arrays",
+    "Dynamic Programming",
+    "Greedy"
+  ],
+  "statement_md": "You are given an integer array `nums`. You are initially positioned at the first index, and each element represents your maximum jump length at that position. Return `true` if you can reach the last index.",
+  "constraints": [
+    "1 <= nums.length <= 10^4",
+    "0 <= nums[i] <= 10^5"
+  ],
+  "examples": [
+    {
+      "input": {
+        "nums": [
+          2,
+          3,
+          1,
+          1,
+          4
+        ]
+      },
+      "output": true
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def canJump(self, nums: List[int]) -> bool:\n        pass\n",
+    "javascript": "function canJump(nums) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "nums": [
+          2,
+          3,
+          1,
+          1,
+          4
+        ]
+      },
+      "expected_output": true,
+      "hidden": false
+    },
+    {
+      "input": {
+        "nums": [
+          1
+        ]
+      },
+      "expected_output": true,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          2,
+          1
+        ]
+      },
+      "expected_output": true,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
+      },
+      "expected_output": true,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
+      },
+      "expected_output": true,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          -1,
+          -2,
+          -3,
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "expected_output": false,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def canJump(self, nums: List[int]) -> bool:\n        max_reach = 0\n        for i, jump in enumerate(nums):\n            if i > max_reach:\n                return False\n            max_reach = max(max_reach, i + jump)\n        return True\n",
+    "javascript": "function canJump(nums) {\n    let maxReach = 0;\n    for (let i = 0; i < nums.length; i++) {\n        if (i > maxReach) return false;\n        maxReach = Math.max(maxReach, i + nums[i]);\n    }\n    return true;\n}\n"
+  },
+  "hints": [
+    "Track the farthest index reachable."
+  ],
+  "editorial_md": "### Method: Greedy\n- **Time Complexity**: $\\mathcal{O}(N)$\n- **Space Complexity**: $\\mathcal{O}(1)$",
+  "time_limit_ms": 2000,
+  "memory_limit_mb": 128
+}

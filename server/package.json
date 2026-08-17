@@ -1,0 +1,29 @@
+{
+  "name": "offline-leetcode-server",
+  "version": "1.0.0",
+  "description": "Backend API, SQLite database, and sandboxed code execution engine for offline coding platform",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "seed": "tsx src/db/seed-loader.ts",
+    "validate": "tsx src/validator/problem-validator.ts"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "offline-leetcode": "file:..",
+    "sql.js": "^1.12.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.7",
+    "@types/sql.js": "^1.4.9",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  }
+}

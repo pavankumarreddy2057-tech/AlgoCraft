@@ -1,0 +1,80 @@
+{
+  "slug": "longest-valid-parentheses",
+  "title": "Longest Valid Parentheses",
+  "difficulty": "Hard",
+  "tags": [
+    "Stack",
+    "String",
+    "Dynamic Programming"
+  ],
+  "statement_md": "Given a string containing just the characters `'('` and `')'`, return the length of the longest valid (well-formed) parentheses substring.",
+  "constraints": [
+    "0 <= s.length <= 3 * 10^4"
+  ],
+  "examples": [
+    {
+      "input": {
+        "s": "(()"
+      },
+      "output": 2
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def longestValidParentheses(self, s: str) -> int:\n        pass\n",
+    "javascript": "function longestValidParentheses(s) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "s": "(()"
+      },
+      "expected_output": 2,
+      "hidden": false
+    },
+    {
+      "input": {
+        "s": "a"
+      },
+      "expected_output": 0,
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "ab"
+      },
+      "expected_output": 0,
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "aba"
+      },
+      "expected_output": 0,
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "aaaaa"
+      },
+      "expected_output": 0,
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "abcdefg"
+      },
+      "expected_output": 0,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def longestValidParentheses(self, s: str) -> int:\n        stack = [-1]\n        max_len = 0\n        for i, c in enumerate(s):\n            if c == '(':\n                stack.append(i)\n            else:\n                stack.pop()\n                if not stack:\n                    stack.append(i)\n                else:\n                    max_len = max(max_len, i - stack[-1])\n        return max_len\n",
+    "javascript": "function longestValidParentheses(s) {\n    const stack = [-1];\n    let maxLen = 0;\n    for (let i = 0; i < s.length; i++) {\n        if (s[i] === '(') {\n            stack.push(i);\n        } else {\n            stack.pop();\n            if (stack.length === 0) {\n                stack.push(i);\n            } else {\n                maxLen = Math.max(maxLen, i - stack[stack.length-1]);\n            }\n        }\n    }\n    return maxLen;\n}\n"
+  },
+  "hints": [
+    "Use stack to store indices of unmatched parentheses."
+  ],
+  "editorial_md": "### Method: Stack\n- **Time Complexity**: $\\mathcal{O}(N)$\n- **Space Complexity**: $\\mathcal{O}(N)$",
+  "time_limit_ms": 2000,
+  "memory_limit_mb": 128
+}

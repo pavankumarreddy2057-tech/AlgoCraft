@@ -1,0 +1,159 @@
+{
+  "slug": "sliding-window-maximum",
+  "title": "Sliding Window Maximum",
+  "difficulty": "Hard",
+  "tags": [
+    "Array",
+    "Queue",
+    "Sliding Window",
+    "Heap (Priority Queue)",
+    "Monotonic Queue"
+  ],
+  "statement_md": "You are given an array of integers `nums`, there is a sliding window of size `k` which is moving from the very left of the array to the very right. You can only see the `k` numbers in the window. Each time the sliding window moves right by one position.\n\nReturn *the max sliding window*.",
+  "constraints": [
+    "1 <= nums.length <= 10^5",
+    "-10^4 <= nums[i] <= 10^4",
+    "1 <= k <= nums.length"
+  ],
+  "examples": [
+    {
+      "input": {
+        "nums": [
+          1,
+          3,
+          -1,
+          -3,
+          5,
+          3,
+          6,
+          7
+        ],
+        "k": 3
+      },
+      "output": [
+        3,
+        3,
+        5,
+        5,
+        6,
+        7
+      ]
+    },
+    {
+      "input": {
+        "nums": [
+          1
+        ],
+        "k": 1
+      },
+      "output": [
+        1
+      ]
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def maxSlidingWindow(self, nums: List[int], k: int) -> List[int]:\n        pass\n",
+    "javascript": "function maxSlidingWindow(nums, k) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "nums": [
+          1,
+          3,
+          -1,
+          -3,
+          5,
+          3,
+          6,
+          7
+        ],
+        "k": 3
+      },
+      "expected_output": [
+        3,
+        3,
+        5,
+        5,
+        6,
+        7
+      ],
+      "hidden": false
+    },
+    {
+      "input": {
+        "nums": [
+          1
+        ],
+        "k": 1
+      },
+      "expected_output": [
+        1
+      ],
+      "hidden": false
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          -1
+        ],
+        "k": 1
+      },
+      "expected_output": [
+        1,
+        -1
+      ],
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          9,
+          11
+        ],
+        "k": 2
+      },
+      "expected_output": [
+        11
+      ],
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          4,
+          -2
+        ],
+        "k": 2
+      },
+      "expected_output": [
+        4
+      ],
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          7,
+          2,
+          4
+        ],
+        "k": 2
+      },
+      "expected_output": [
+        7,
+        4
+      ],
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def maxSlidingWindow(self, nums: List[int], k: int) -> List[int]:\n        import collections\n        output = []\n        q = collections.deque()\n        l = r = 0\n        while r < len(nums):\n            while q and nums[q[-1]] < nums[r]:\n                q.pop()\n            q.append(r)\n            if l > q[0]:\n                q.popleft()\n            if (r + 1) >= k:\n                output.append(nums[q[0]])\n                l += 1\n            r += 1\n        return output\n",
+    "javascript": "function maxSlidingWindow(nums, k) {\n    const output = [];\n    const q = []; // store indices\n    let l = 0, r = 0;\n    while (r < nums.length) {\n        while (q.length > 0 && nums[q[q.length - 1]] < nums[r]) {\n            q.pop();\n        }\n        q.push(r);\n        if (l > q[0]) {\n            q.shift();\n        }\n        if (r + 1 >= k) {\n            output.push(nums[q[0]]);\n            l++;\n        }\n        r++;\n    }\n    return output;\n}\n"
+  },
+  "hints": [
+    "Maintain a Monotonically Decreasing Deque of indices."
+  ],
+  "editorial_md": "### Method: Monotonic Deque\n- **Time Complexity**: $\\mathcal{O}(N)$\n- **Space Complexity**: $\\mathcal{O}(K)$"
+}

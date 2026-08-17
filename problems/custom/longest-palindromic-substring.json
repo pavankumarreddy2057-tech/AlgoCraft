@@ -1,0 +1,80 @@
+{
+  "slug": "longest-palindromic-substring",
+  "title": "Longest Palindromic Substring",
+  "difficulty": "Medium",
+  "tags": [
+    "String",
+    "Dynamic Programming",
+    "Two Pointers"
+  ],
+  "statement_md": "Given a string `s`, return the longest palindromic substring in `s`.",
+  "constraints": [
+    "1 <= s.length <= 1000"
+  ],
+  "examples": [
+    {
+      "input": {
+        "s": "babad"
+      },
+      "output": "bab"
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def longestPalindrome(self, s: str) -> str:\n        pass\n",
+    "javascript": "function longestPalindrome(s) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "s": "babad"
+      },
+      "expected_output": "bab",
+      "hidden": false
+    },
+    {
+      "input": {
+        "s": "a"
+      },
+      "expected_output": "a",
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "ab"
+      },
+      "expected_output": "a",
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "aba"
+      },
+      "expected_output": "aba",
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "aaaaa"
+      },
+      "expected_output": "aaaaa",
+      "hidden": true
+    },
+    {
+      "input": {
+        "s": "abcdefg"
+      },
+      "expected_output": "a",
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def longestPalindrome(self, s: str) -> str:\n        def expand(l, r):\n            while l >= 0 and r < len(s) and s[l] == s[r]:\n                l -= 1\n                r += 1\n            return s[l+1:r]\n        result = \"\"\n        for i in range(len(s)):\n            odd = expand(i, i)\n            even = expand(i, i+1)\n            result = max([result, odd, even], key=len)\n        return result\n",
+    "javascript": "function longestPalindrome(s) {\n    function expand(l, r) {\n        while (l >= 0 && r < s.length && s[l] === s[r]) {\n            l--;\n            r++;\n        }\n        return s.slice(l+1, r);\n    }\n    let result = \"\";\n    for (let i = 0; i < s.length; i++) {\n        const odd = expand(i, i);\n        const even = expand(i, i+1);\n        if (odd.length > result.length) result = odd;\n        if (even.length > result.length) result = even;\n    }\n    return result;\n}\n"
+  },
+  "hints": [
+    "Expand around center for odd and even length palindromes."
+  ],
+  "editorial_md": "### Method: Expand Around Center\n- **Time Complexity**: $\\mathcal{O}(N^2)$\n- **Space Complexity**: $\\mathcal{O}(1)$",
+  "time_limit_ms": 2000,
+  "memory_limit_mb": 128
+}

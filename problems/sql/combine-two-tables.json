@@ -1,0 +1,162 @@
+{
+  "slug": "combine-two-tables",
+  "title": "Combine Two Tables",
+  "difficulty": "Easy",
+  "tags": [
+    "Database",
+    "SQL"
+  ],
+  "statement_md": "Write a solution to report the first name, last name, city, and state of each person in the `Person` table. If the address of a `personId` is not present in the `Address` table, report `null` instead.\n\nReturn the result table in any order.",
+  "constraints": [
+    "Person table has personId as primary key",
+    "Address table has addressId as primary key"
+  ],
+  "examples": [
+    {
+      "input": "Table Person:\n+----------+----------+-----------+\n| personId | lastName | firstName |\n+----------+----------+-----------+\n| 1        | Wang     | Allen     |\n| 2        | Alice    | Bob       |\n+----------+----------+-----------+\nTable Address:\n+-----------+----------+---------------+------------+\n| addressId | personId | city          | state      |\n+-----------+----------+---------------+------------+\n| 1         | 2        | New York City | New York   |\n| 2         | 3        | Leetcode      | California |\n+-----------+----------+---------------+------------+",
+      "output": "+-----------+----------+---------------+----------+\n| firstName | lastName | city          | state    |\n+-----------+----------+---------------+----------+\n| Allen     | Wang     | Null          | Null     |\n| Bob       | Alice    | New York City | New York |\n+-----------+----------+---------------+----------+"
+    }
+  ],
+  "starter_code": {
+    "sql": "-- Write your SQL query statement below\nSELECT \n"
+  },
+  "test_cases": [
+    {
+      "schema_ddl": "\n          CREATE TABLE Person (personId INT, lastName VARCHAR(255), firstName VARCHAR(255));\n          CREATE TABLE Address (addressId INT, personId INT, city VARCHAR(255), state VARCHAR(255));\n          INSERT INTO Person VALUES (1, 'Wang', 'Allen'), (2, 'Alice', 'Bob');\n          INSERT INTO Address VALUES (1, 2, 'New York City', 'New York'), (2, 3, 'Leetcode', 'California');\n        ",
+      "expected_output": {
+        "columns": [
+          "firstName",
+          "lastName",
+          "city",
+          "state"
+        ],
+        "values": [
+          [
+            "Allen",
+            "Wang",
+            null,
+            null
+          ],
+          [
+            "Bob",
+            "Alice",
+            "New York City",
+            "New York"
+          ]
+        ]
+      },
+      "hidden": false
+    },
+    {
+      "schema_ddl": "\n      CREATE TABLE Person (personId INT, lastName VARCHAR(255), firstName VARCHAR(255));\n      CREATE TABLE Address (addressId INT, personId INT, city VARCHAR(255), state VARCHAR(255));\n      INSERT INTO Person VALUES (1, 'Smith', 'John'), (2, 'Doe', 'Jane'), (3, 'Brown', 'Charlie');\n      INSERT INTO Address VALUES (1, 1, 'Chicago', 'Illinois'), (2, 2, 'Houston', 'Texas');\n    ",
+      "expected_output": {
+        "columns": [
+          "firstName",
+          "lastName",
+          "city",
+          "state"
+        ],
+        "values": [
+          [
+            "John",
+            "Smith",
+            "Chicago",
+            "Illinois"
+          ],
+          [
+            "Jane",
+            "Doe",
+            "Houston",
+            "Texas"
+          ],
+          [
+            "Charlie",
+            "Brown",
+            null,
+            null
+          ]
+        ]
+      },
+      "hidden": true
+    },
+    {
+      "schema_ddl": "\n      CREATE TABLE Person (personId INT, lastName VARCHAR(255), firstName VARCHAR(255));\n      CREATE TABLE Address (addressId INT, personId INT, city VARCHAR(255), state VARCHAR(255));\n      INSERT INTO Person VALUES (1, 'Solo', 'Han');\n    ",
+      "expected_output": {
+        "columns": [
+          "firstName",
+          "lastName",
+          "city",
+          "state"
+        ],
+        "values": [
+          [
+            "Han",
+            "Solo",
+            null,
+            null
+          ]
+        ]
+      },
+      "hidden": true
+    },
+    {
+      "schema_ddl": "\n      CREATE TABLE Person (personId INT, lastName VARCHAR(255), firstName VARCHAR(255));\n      CREATE TABLE Address (addressId INT, personId INT, city VARCHAR(255), state VARCHAR(255));\n      INSERT INTO Person VALUES (1, 'A', 'B');\n      INSERT INTO Address VALUES (1, 1, 'City1', 'State1'), (2, 1, 'City2', 'State2');\n    ",
+      "expected_output": {
+        "columns": [
+          "firstName",
+          "lastName",
+          "city",
+          "state"
+        ],
+        "values": [
+          [
+            "B",
+            "A",
+            "City1",
+            "State1"
+          ],
+          [
+            "B",
+            "A",
+            "City2",
+            "State2"
+          ]
+        ]
+      },
+      "hidden": true
+    },
+    {
+      "schema_ddl": "\n      CREATE TABLE Person (personId INT, lastName VARCHAR(255), firstName VARCHAR(255));\n      CREATE TABLE Address (addressId INT, personId INT, city VARCHAR(255), state VARCHAR(255));\n      INSERT INTO Person VALUES (10, 'Taylor', 'Bob'), (20, 'Clark', 'Alice');\n      INSERT INTO Address VALUES (1, 20, 'Miami', 'Florida');\n    ",
+      "expected_output": {
+        "columns": [
+          "firstName",
+          "lastName",
+          "city",
+          "state"
+        ],
+        "values": [
+          [
+            "Bob",
+            "Taylor",
+            null,
+            null
+          ],
+          [
+            "Alice",
+            "Clark",
+            "Miami",
+            "Florida"
+          ]
+        ]
+      },
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "sql": "SELECT p.firstName, p.lastName, a.city, a.state\nFROM Person p\nLEFT JOIN Address a ON p.personId = a.personId;"
+  },
+  "hints": [
+    "Since we need all persons regardless of whether they have an address, use a `LEFT JOIN` on `Person` with `Address`."
+  ],
+  "editorial_md": "### Method: LEFT JOIN\nUse `LEFT JOIN` on `personId` to preserve all entries from `Person`.\n\n```sql\nSELECT p.firstName, p.lastName, a.city, a.state\nFROM Person p\nLEFT JOIN Address a ON p.personId = a.personId;\n```"
+}

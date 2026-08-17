@@ -1,0 +1,118 @@
+{
+  "slug": "remove-duplicates-from-sorted-array",
+  "title": "Remove Duplicates from Sorted Array",
+  "difficulty": "Easy",
+  "tags": [
+    "Two Pointers",
+    "Arrays"
+  ],
+  "statement_md": "Given an integer array `nums` sorted in non-decreasing order, remove the duplicates **in-place** such that each unique element appears only once. Return the number of unique elements.",
+  "constraints": [
+    "1 <= nums.length <= 3 * 10^4",
+    "-100 <= nums[i] <= 100"
+  ],
+  "examples": [
+    {
+      "input": {
+        "nums": [
+          1,
+          1,
+          2
+        ]
+      },
+      "output": 2
+    }
+  ],
+  "starter_code": {
+    "python": "class Solution:\n    def removeDuplicates(self, nums: List[int]) -> int:\n        pass\n",
+    "javascript": "function removeDuplicates(nums) {\n    // Your solution here\n}\n"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "nums": [
+          1,
+          1,
+          2
+        ]
+      },
+      "expected_output": 2,
+      "hidden": false
+    },
+    {
+      "input": {
+        "nums": [
+          1
+        ]
+      },
+      "expected_output": 1,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          2,
+          1
+        ]
+      },
+      "expected_output": 2,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
+      },
+      "expected_output": 5,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
+      },
+      "expected_output": 10,
+      "hidden": true
+    },
+    {
+      "input": {
+        "nums": [
+          -1,
+          -2,
+          -3,
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "expected_output": 7,
+      "hidden": true
+    }
+  ],
+  "reference_solution": {
+    "python": "class Solution:\n    def removeDuplicates(self, nums: List[int]) -> int:\n        if not nums: return 0\n        j = 0\n        for i in range(1, len(nums)):\n            if nums[i] != nums[j]:\n                j += 1\n                nums[j] = nums[i]\n        return j + 1\n",
+    "javascript": "function removeDuplicates(nums) {\n    if (nums.length === 0) return 0;\n    let j = 0;\n    for (let i = 1; i < nums.length; i++) {\n        if (nums[i] !== nums[j]) {\n            j++;\n            nums[j] = nums[i];\n        }\n    }\n    return j + 1;\n}\n"
+  },
+  "hints": [
+    "Use two pointers: one for unique elements, one for traversal."
+  ],
+  "editorial_md": "### Method: Two Pointers\n- **Time Complexity**: $\\mathcal{O}(N)$\n- **Space Complexity**: $\\mathcal{O}(1)$",
+  "time_limit_ms": 2000,
+  "memory_limit_mb": 128
+}
